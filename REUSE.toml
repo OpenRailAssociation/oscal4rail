@@ -1,0 +1,44 @@
+version = 1
+
+# Default: all first-party files are Apache-2.0, copyright DB Systel GmbH.
+# Per-path overrides below handle third-party schemas (NIST, CC0-1.0) and
+# regulation quotes embedded in catalog/experiment files.
+
+[[annotations]]
+path = [
+  "**/*.md",
+  "**/*.py",
+  "**/*.yaml",
+  "**/*.yml",
+  ".gitignore",
+  "REUSE.toml",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 DB Systel GmbH"
+SPDX-License-Identifier = "Apache-2.0"
+
+# NIST OSCAL JSON schemas are reproduced verbatim and are public domain (CC0-1.0).
+# Attribution: National Institute of Standards and Technology (NIST),
+# U.S. Department of Commerce. See NOTICE.md.
+[[annotations]]
+path = "schemas/nist/**"
+precedence = "override"
+SPDX-FileCopyrightText = "National Institute of Standards and Technology (NIST), U.S. Department of Commerce"
+SPDX-License-Identifier = "CC0-1.0"
+
+# Catalog files: the BS-KI example catalog was created at Hack4Rail,
+# the hackathon of the OpenRail Association (with DB, SBB, OEBB). Licensed
+# Apache-2.0. See NOTICE.md.
+[[annotations]]
+path = "catalogs/**"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Hack4Rail @ OpenRail Association"
+SPDX-License-Identifier = "Apache-2.0"
+
+# Rulemapping builder exports (experiments), created at Hack4Rail @ OpenRail
+# Association. Licensed Apache-2.0. See NOTICE.md.
+[[annotations]]
+path = "docs/experiments/rulemapping/**"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Hack4Rail @ OpenRail Association"
+SPDX-License-Identifier = "Apache-2.0"

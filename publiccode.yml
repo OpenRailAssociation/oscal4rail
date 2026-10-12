@@ -1,0 +1,34 @@
+# SPDX-FileCopyrightText: 2026 DB Systel GmbH
+# SPDX-License-Identifier: Apache-2.0
+
+publiccodeYmlVersion: "0.4"
+
+name: OSCAL4Rail
+url: "https://github.com/OpenRailAssociation/oscal4rail"
+
+developmentStatus: development
+
+softwareType: "standalone/other"
+
+description:
+  en:
+    shortDescription: >
+      A railway profile over NIST OSCAL for governance-as-code: a four-layer
+      framework (Catalog, Rules, Change Impact, Assessment) plus the Regulatory
+      Cascade model to manage, version and verify regulatory requirements across
+      the railway sector.
+    documentation: "https://github.com/OpenRailAssociation/oscal4rail/tree/main/docs"
+
+legal:
+  license: Apache-2.0
+
+localisation:
+  localisationReady: false
+  availableLanguages:
+    - en
+
+businessCapabilities:
+  profile: railway
+
+maintenance:
+  type: community

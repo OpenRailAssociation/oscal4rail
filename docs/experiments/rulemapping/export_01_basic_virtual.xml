@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rulemap title="BS-KI 2.1 – Aktuelle Uhrzeit" application="query-action-ai">
+  <node id="1" title="Muss die aktuelle Uhrzeit angezeigt werden?" alttext="" logic="virtual">
+    <node id="4" title="knoten 1" alttext="" logic="virtual">
+      <node id="8" title="Knoten 1.1" alttext="" logic="virtual"/>
+    </node>
+    <node id="5" title="Knoten 2" alttext="" logic="virtual">
+      <node id="7" title="Knoten 2.1" alttext="" logic="virtual"/>
+      <node id="6" title="Knoten 2.2" alttext="" logic="virtual"/>
+    </node>
+  </node>
+</rulemap>

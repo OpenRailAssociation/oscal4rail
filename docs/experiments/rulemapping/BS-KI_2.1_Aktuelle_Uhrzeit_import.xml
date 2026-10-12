@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rulemap title="BS-KI 2.1 – Aktuelle Uhrzeit" application="query-action-ai">
+  <node id="1" title="Muss die aktuelle Uhrzeit angezeigt werden?" alttext="BS-KI Kapitel 2.1: Die aktuelle Uhrzeit ist für die Kundschaft ein zentrales Element zur Orientierung." logic="or">
+    <node id="2" title="Haltestelle Bahn (verbindlich)" alttext="Alle Bedingungen müssen erfüllt sein" logic="and">
+      <node id="3" title="Kanal = Haltestelle" alttext="" logic="virtual"/>
+      <node id="4" title="Verkehrsträger = Bahn" alttext="" logic="virtual"/>
+      <node id="5" title="≥ 800 Ein-/Aussteiger pro Tag" alttext="Bei weniger als 800 kann auf die Angabe verzichtet werden" logic="virtual"/>
+    </node>
+    <node id="6" title="Haltestelle Bus/Tram/Metro (empfohlen)" alttext="Empfehlung, keine Pflicht" logic="and">
+      <node id="7" title="Kanal = Haltestelle" alttext="" logic="virtual"/>
+      <node id="8" title="Verkehrsträger = Bus, Tram oder Metro" alttext="" logic="virtual"/>
+    </node>
+    <node id="9" title="Fahrzeug innen (empfohlen)" alttext="Empfehlung für alle Verkehrsträger" logic="and">
+      <node id="10" title="Kanal = Fahrzeug innen" alttext="" logic="virtual"/>
+    </node>
+    <node id="11" title="Fahrzeug außen / Daten (nicht relevant)" alttext="Keine Anforderung" logic="or" invertlogic="yes">
+      <node id="12" title="Kanal = Fahrzeug außen" alttext="" logic="virtual"/>
+      <node id="13" title="Kanal = Daten (Einlieferung)" alttext="" logic="virtual"/>
+    </node>
+  </node>
+</rulemap>
