@@ -2,7 +2,7 @@
 
 > **Version:** 0.1.0 (Hack4Rail 2026 – initial draft)
 > **License:** CC0 1.0 Universal (public domain)
-> **Inspired by:** Arpad Vasarhelyi (Arpad.Vasarhelyi@deutschebahn.com)
+> **Inspired by:** Arpad Vasarhelyi
 
 ---
 

@@ -1,7 +1,7 @@
 # OSCAL4Rail
 
 > A 4-layer framework extending [NIST OSCAL](https://pages.nist.gov/OSCAL/) for machine-readable railway governance.
-> Inspired by Arpad Vasarhelyi (Arpad.Vasarhelyi@deutschebahn.com)
+> Inspired by Arpad Vasarhelyi
 
 **OSCAL4Rail** is an open standard for making railway governance machine-readable, deterministic, and AI-agent-ready — from internal IT standards (Konzernrichtlinien) down to regulatory compliance.
 

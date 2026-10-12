@@ -59,9 +59,8 @@ The project originated at **Hack4Rail 2026** (joint hackathon by SBB, ÖBB, DB a
 
 | Name | Organisation | Contact |
 |------|-------------|---------|
-| Jens Grote (Project Lead) | DB Systel GmbH | jens.grote@deutschebahn.com |
-| Arpad Vasarhelyi | Deutsche Bahn | Arpad.Vasarhelyi@deutschebahn.com |
-| Simon Freihart (pending) | SBB | Simon.Freihart@sbb.ch |
+| Jens Grote (Project Lead) | DB Systel GmbH | [@JensGrote](https://github.com/JensGrote) |
+| Simon Freihart | SBB | [@simon-frei](https://github.com/simon-frei) |
 
 ---
 
