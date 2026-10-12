@@ -1,6 +1,6 @@
 # OSCAL4Rail
 
-> A 4-layer framework extending [NIST OSCAL](https://pages.nist.gov/OSCAL/) for machine-readable railway governance.
+> A framework building on [NIST OSCAL](https://pages.nist.gov/OSCAL/) for machine-readable railway governance. Four layers; the Catalog layer builds on NIST OSCAL, layers 2–4 are under design.
 > Inspired by Arpad Vasarhelyi
 
 **OSCAL4Rail** is an open standard for making railway governance machine-readable, deterministic, and AI-agent-ready — from internal IT standards (Konzernrichtlinien) down to regulatory compliance.
@@ -9,14 +9,14 @@
 
 Railway companies translate legal requirements into internal IT governance (Konzernrichtlinien, internal standards). These company-level adaptations are today scattered across PDFs and Word documents — interpreted individually, applied inconsistently, invisible to automated systems. Nobody knows what changed between v1.0 and v2.0 at the rule level.
 
-OSCAL4Rail solves this with a **4-layer framework**:
+OSCAL4Rail is designed as a **4-layer framework**. Only the Catalog layer builds on a settled NIST OSCAL basis today; the format and tooling for layers 2–4 are still being evaluated in the project's analysis issues.
 
-| Layer | Based on | What it does |
-|-------|----------|--------------|
-| **(1) Catalog** | [NIST OSCAL Control Layer](https://pages.nist.gov/OSCAL/learn/concepts/layer/control/) (Catalog + Profile + Mapping) | Machine-readable regulations, cascade as profile chain, cross-framework mapping (multilingual, cross-border) |
-| **(2) Rules** | [Rulemapping](https://rulemapping.org/) format | Applicability logic: which controls apply in which context? **New — not in NIST OSCAL.** |
-| **(3) Change Impact** | [oscal-deep-diff](https://github.com/usnistgov/oscal-deep-diff) + railway semantics | Structural diff (NIST tool) + railway classification (tightened/relaxed/added/removed) + impact propagation through cascade |
-| **(4) Assessment** | [NIST OSCAL Assessment Layer](https://pages.nist.gov/OSCAL/learn/concepts/layer/assessment/) | Compliance verification by AI agents and human reviewers (Assessment Plan, Results, POA&M) |
+| Layer | Based on | Status |
+|-------|----------|--------|
+| **(1) Catalog** | [NIST OSCAL Control Layer](https://pages.nist.gov/OSCAL/learn/concepts/layer/control/) (Catalog + Profile + Mapping) | ⚙️ In progress — machine-readable regulations, cascade as profile chain, cross-framework mapping (multilingual, cross-border) |
+| **(2) Rules** | *to be determined (see assessment issues)* | ⬜ Planned — applicability logic: which controls apply in which context? New — not in NIST OSCAL. |
+| **(3) Change Impact** | *to be determined (see assessment issues)* | ⬜ Planned — structural diff + railway classification (tightened/relaxed/added/removed) + impact propagation through cascade |
+| **(4) Assessment** | [NIST OSCAL Assessment Layer](https://pages.nist.gov/OSCAL/learn/concepts/layer/assessment/) *(candidate)* | ⬜ Planned — compliance verification by AI agents and human reviewers |
 
 The broader vision: the same framework also works for upstream regulations (EU TSI → national laws → industry standards → company implementation) — creating a complete, machine-readable regulatory cascade.
 
@@ -84,7 +84,7 @@ OSCAL4Rail builds on established OSCAL tooling rather than reinventing the wheel
 | Tool | Role in OSCAL4Rail | Source |
 |------|-------------------|--------|
 | **[compliance-trestle](https://github.com/oscal-compass/compliance-trestle)** | Validation, Profile Resolution, Workspace, Plugin Host | OSCAL-Compass (IBM) |
-| **[oscal-deep-diff](https://github.com/usnistgov/oscal-deep-diff)** | Structural diff between catalog versions (Layer 3 basis) | NIST |
+| **[oscal-deep-diff](https://github.com/usnistgov/oscal-deep-diff)** | Structural diff between catalog versions (candidate for Layer 3, under evaluation) | NIST |
 | **[compliance-trestle-mcp](https://github.com/oscal-compass/compliance-trestle-mcp)** | AI agent integration via Model Context Protocol | OSCAL-Compass |
 | **trestle-oscal4rail** (planned) | Railway plugin: cascade, semantic diff, assessment scales | OSCAL4Rail |
 
