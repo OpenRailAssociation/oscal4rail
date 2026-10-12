@@ -1,0 +1,3467 @@
+catalog:
+  uuid: 72fcc28b-b64a-4035-8e5c-20b1699f146b
+  metadata:
+    title: Nationaler Branchenstandard Kundeninformation (BS-KI)
+    published: '2026-01-01T00:00:00Z'
+    last-modified: '2026-06-23T13:35:00Z'
+    version: '1.0'
+    oscal-version: 1.1.3
+    props:
+    - name: country
+      value: CH
+    - name: language
+      value: de
+    - name: source-url
+      value: https://www.oev-info.ch/de/branchenstandard/nationaler-branchenstandard-kundeninformation
+    - name: source-document
+      value: BS-KI_DE.pdf
+    - name: source-version
+      value: '1.0'
+    - name: source-date
+      value: 2026-01
+  groups:
+  - id: bs-ki-2
+    title: Allgemeine Informationsinhalte der Kundeninformation
+    controls:
+    - id: bs-ki-2.1
+      title: Aktuelle Uhrzeit
+      parts:
+      - name: statement
+        prose: 'Bei Haltestellen mit weniger als 800 Ein- und Aussteigern pro Tag kann auf die Angabe der
+
+          Uhrzeit verzichtet werden.
+
+
+          Die aktuelle Uhrzeit ist für die Kundschaft ein zentrales Element zur Orientierung. Sie kann analog
+
+          oder digital dargestellt werden (Informationen zur Darstellung siehe Abschnitt 6.5).'
+      props:
+      - name: source-chapter
+        value: '2.1'
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.bahn
+        remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+      - name: applicability
+        value: empfohlen
+        class: haltestelle.bus-tram-metro
+      - name: applicability
+        value: empfohlen
+        class: haltestelle.schiff
+      - name: applicability
+        value: empfohlen
+        class: haltestelle.seilbahn
+      - name: applicability
+        value: verbindlich
+        class: fahrzeug-innen.bahn
+      - name: applicability
+        value: verbindlich
+        class: fahrzeug-innen.bus-tram-metro
+      - name: applicability
+        value: verbindlich
+        class: fahrzeug-innen.schiff
+    - id: bs-ki-2.2
+      title: Name der Haltestelle
+      parts:
+      - name: statement
+        prose: 'Die Beschriftung der Haltestelle mit ihrem Namen (gemäss Abschnitt 6.4) ist das Grundelement
+
+          der räumlichen Orientierung (siehe auch Abschnitt 2.4). Sie dient sowohl der Bestätigung, dass
+
+          sich die Haltestelle tatsächlich an diesem Ort befindet, als auch der Bestätigung, an der richtigen
+
+          Haltestelle zu sein.
+
+
+          Es ist sicherzustellen, dass die Beschriftung beim Zugang zur Haltestelle und, soweit sinnvoll, aus
+
+          dem Fahrzeug heraus ersichtlich ist. Der Name der Haltestelle kann dazu einmal oder mehrfach
+
+          angebracht werden.'
+      props:
+      - name: source-chapter
+        value: '2.2'
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.bahn
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.bus-tram-metro
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.schiff
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.seilbahn
+      - name: applicability
+        value: verbindlich
+        class: daten.einlieferung
+    - id: bs-ki-2.3
+      title: Beschriftung der Haltekante
+      parts:
+      - name: statement
+        prose: 'Damit sich die Kundschaft innerhalb einer Haltestelle orientieren kann, müssen die einzelnen
+
+          Haltekanten beschriftet werden. Die Beschriftung der Haltekanten ist ein Element der räumlichen
+
+          Orientierung (siehe auch Abschnitt 2.4). So erkennt die Kundschaft, dass sie am richtigen Ort auf
+
+          ihre Fahrt wartet. Die Art der Beschriftung ist abhängig von der Verkehrsmittelkategorie:
+
+
+          •  Bei Bahn, Zahnradbahn, Metro und Schiff erfolgt sie mit der Beschriftung des Gleises oder des
+
+          Stegs (siehe Abschnitt 3.10). Ausgenommen sind Haltestellen mit nur einer Haltekante, hier
+
+          reicht die Beschriftung mit dem Haltestellennamen (siehe Abschnitt 2.2).
+
+
+          •  Bei Bus und Tram wird die Liniennummer (siehe Abschnitt 3.6) und das Ziel (siehe Abschnitt'
+      props:
+      - name: source-chapter
+        value: '2.3'
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.bahn
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.bus-tram-metro
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.schiff
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.seilbahn
+    - id: bs-ki-2.4
+      title: Wegweisung
+      parts:
+      - name: statement
+        prose: 'Die Wegweisung erfolgt mit Signaletik und Piktogrammen (siehe Abschnitt 6.10). Gemeinsam mit
+
+          dem Namen der Haltestelle (siehe Abschnitt 2.2) und der Beschriftung der Haltekante (siehe
+
+          Abschnitt 2.3) wird die räumliche Orientierung für die Kundschaft sichergestellt. Die Wegweisung
+
+          gilt auch im öffentlichen Bereich zwischen und zu den einzelnen Haltestellen und zu
+
+          Haltestellen/Haltekanten von anderen Verkehrsmitteln.
+
+
+
+
+          Dabei wird folgende Priorisierung angewendet:
+
+
+          Priorität 1
+
+
+          Positionsbestätigung, damit die Kundschaft weiss, wo sie sich genau
+
+          befinden:
+
+
+          •  Haltestellenname (zwingend)
+
+          •  Bezeichnung Kante, Gleis, Steg (zwingend, falls mehr als 1 Gleis / mehr
+
+
+          als 2 Kanten)
+
+
+          •  Unterteilung der Gleise in Sektoren (optional)
+
+
+          Wegweisung (optional):
+
+
+          •  Ausschilderung zu potenziellen Abfahrtsorten inklusive Ersatzverkehr
+
+
+          (Verkehrsmittel, Haltekante)
+
+
+          Priorität 2
+
+
+          Reiserelevante Informationen:
+
+
+          •  Wegweisung zu Schalter, Billettautomaten, Schliessfächer, Toiletten,
+
+
+          Bistro usw.
+
+
+          Informationen zur Anschlussmobilität:
+
+
+          •  Auto-, Velovermietung, Taxi usw.
+
+
+          Umgebungshinweise:
+
+
+          •  Ausgänge, Point of Interest usw.
+
+
+          Priorität 3
+
+
+          Informationen ohne Relevanz für die Reise:
+
+
+          •  Einkaufsmöglichkeiten, Geldautomaten usw.'
+      props:
+      - name: source-chapter
+        value: '2.4'
+      - name: applicability
+        value: empfohlen
+        class: haltestelle.bahn
+      - name: applicability
+        value: empfohlen
+        class: haltestelle.bus-tram-metro
+      - name: applicability
+        value: empfohlen
+        class: haltestelle.schiff
+      - name: applicability
+        value: empfohlen
+        class: haltestelle.seilbahn
+    - id: bs-ki-2.5
+      title: Ereignisinformationen
+      parts:
+      - name: statement
+        prose: 'Vorfälle, welche Abweichungen vom geplanten Betrieb zur Folge haben, werden als Ereignisse
+
+          bezeichnet. Ereignisse können geplant (z.B. Baustellen) oder ungeplant (z.B. Störungen,
+
+          insbesondere Unfälle oder Naturereignisse) sein. Die Kundschaft ist im Ereignisfall nur dann
+
+          handlungsfähig, wenn sie die nötigen Informationen über das Ereignis erhält. Dazu gehören z.B.
+
+          alternative Reisemöglichkeiten, Dauer oder Auswirkungen.
+
+
+
+
+          Meldungselemente
+
+
+          Die Ereignismeldung hat folgende Meldungselemente, wobei situativ nicht alle zum Einsatz
+
+          kommen:
+
+
+          Meldungselement  Beispiel 1
+
+
+          Überschrift
+
+
+          Störung
+
+
+          Titel (Schlagzeile)
+
+
+          Der Tram- und Busverkehr
+
+          zwischen Zürich, Tiefenbrunnen
+
+          und Bellevue ist unterbrochen.
+
+
+          Beispiel 2
+
+
+          Störung behoben
+
+
+          Der Unterbruch des Tram- und
+
+          Busverkehrs zwischen Zürich,
+
+          Tiefenbrunnen und Bellevue ist
+
+          aufgehoben.
+
+
+          Grund
+
+
+          Dauer
+
+
+          Information
+
+
+          Auswirkungen
+
+
+          Empfehlung
+
+
+          Der Grund dafür ist ein
+
+          Wasserrohrbruch.
+
+
+          Die Dauer der Einschränkung ist
+
+          unbestimmt.
+
+
+          Betroffen sind die Linien 2, 4, 912
+
+          und 916.
+
+
+          Die Linien 2, 4, 912 und 916 fallen
+
+          zwischen Zürich, Tiefenbrunnen
+
+          und Bellevue aus.
+
+
+          Reisende zwischen Zürich,
+
+          Tiefenbrunnen und Bellevue
+
+          benützen die Züge.
+
+
+          Bemerkung
+
+
+          Weitere Informationen erhalten Sie
+
+          unter www.zvv.ch/fahrplan.
+
+
+          Vereinzelt sind weiterhin
+
+          Verspätungen möglich.
+
+
+          Die Aufzählung ist weder als Reihenfolge noch Priorisierung zu verstehen.
+
+
+          Es ist darauf zu achten, der Kundschaft möglichst alle relevanten Informationen mitzugeben.
+
+          Insbesondere auf die Elemente «Grund», «Dauer», «Auswirkung» und «Empfehlung» ist nur in
+
+          Ausnahmefällen (z.B. Endmeldung einer Störung) zu verzichten. Der Titel (Schlagzeile) ist für jede
+
+          Meldung verbindlich.
+
+
+          Standardsätze
+
+
+          Die Ausführungsbestimmungen regeln die Details inklusive der zu verwendenden Standardsätze
+
+          bezüglich Ereignismeldungen.
+
+
+          Absprache zwischen TU im gleichen Angebotsbereich
+
+
+          Falls verschiedene TU zum gleichen Ereignis eigene Meldungen erfassen, dürfen sich diese nicht
+
+          widersprechen. Es liegt in der Verantwortung der betroffenen TU und Verbünde, sich bei
+
+          überschneidenden Angebotsbereichen vorgängig über das kommunikative Vorgehen im
+
+          Ereignisfall abzusprechen. Sich überschneidende Angebotsbereiche entstehen beispielsweise
+
+          dann, wenn mehr als ein TU die gleiche Strecke befährt.
+
+
+
+          Geplante Ereignisse
+
+
+          Bei geplanten Ereignissen ist der Fahrplan anzupassen und angepasst einzuliefern (siehe auch
+
+          Abschnitt 8.4.1, die Fristen gemäss FPV sind zu beachten). Um die Kundschaft über die
+
+          vorgenommenen Änderungen und deren Umstände (Ursache, Dauer usw.) zu informieren,
+
+          kommen ergänzend Ereignismeldungen zum Einsatz.
+
+
+          Lang andauernde ungeplante Ereignisse
+
+
+          Bei ungeplanten Ereignissen, welche lang (Tage oder Wochen) andauern, ist neben der
+
+          Ereignismeldung der Fahrplan ebenfalls anzupassen, dies so, dass eine möglichst kleine Lücke
+
+          zwischen Soll-Fahrplan und Echtzeitdaten entsteht.'
+      - name: guidance
+        title: Anhang 1 – Standardsätze für die Kommunikation im Ereignisfall
+        prose: 'Der folgende Katalog mit Standardsätzen ermöglicht den Schweizerischen Transportunternehmen die einheitliche
+          Kommunikation im Ereignisfall. Für Fahrgäste wird dadurch der Zugang zum öffentlichen Verkehr vereinfacht und die
+          Orientierung im Ereignisfall erleichtert.
+
+
+          Diese Vorschrift hat Anspruch auf Vollständigkeit. Ziel ist es, eine schweizweit einheitliche Kommunikation zu gewährleisten.
+
+
+          Meldungselemente (Gliederung nach VDV 736):
+
+          1.1  Titel (zwingend) – Eingeschränkter Betrieb, Unterbruch, Betrieb eingestellt, Unregelmässiger Betrieb, Haltestelle
+          verschoben/nicht bedient/eingeschränkter Zugang
+
+          1.2  Grund – Standardsatz Ereignisgrund + Attributliste Ereignisgründe
+
+          1.3  Dauer – unbestimmt, bekannt, ungefähr absehbar, bis mindestens
+
+          1.4  Information – Linien, Zugänge
+
+          1.5  Auswirkungen – Kein Verkehr, Unterbruch, Einstellung, Haltestelle verschoben/nicht bedient, Durchfahrten, Umleitungen
+
+          1.6  Empfehlungen – Reisendenlenkungen, Ersatzbusse, Umfahrungen
+
+          1.7  Bemerkung – Informationsmöglichkeit, Zeitpunkt, Online-Fahrplan, Barrierefreiheit
+
+          1.8  URL-Link'
+      props:
+      - name: source-chapter
+        value: '2.5'
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.bahn
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.bus-tram-metro
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.schiff
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.seilbahn
+      - name: applicability
+        value: verbindlich
+        class: fahrzeug-innen.bahn
+      - name: applicability
+        value: verbindlich
+        class: fahrzeug-innen.bus-tram-metro
+      - name: applicability
+        value: verbindlich
+        class: fahrzeug-innen.schiff
+      - name: applicability
+        value: verbindlich
+        class: daten.einlieferung
+      - name: source-document
+        value: BS-KI_Anhang1_Ereignistexte_DE.pdf
+        remarks: Anhang Ereignistexte, Version 01.11.2024, 172 Seiten Standardsätze in DE/FR/IT/EN
+    - id: bs-ki-2.6
+      title: Infos zu Linien und Tarifzonen
+      parts:
+      - name: statement
+        prose: 'Liniennetzpläne dienen der Orientierung über das konzessionierte Angebot in der Umgebung,
+
+          Zonenpläne helfen zusätzlich dabei, ein korrektes Ticket zu lösen.
+
+
+          Der Liniennetz- bzw. Zonenplan muss nicht massstabgetreu sein, eine geografische Anlehnung ist
+
+          jedoch zwingend.
+
+
+
+
+          Auf jedem Liniennetz- und Zonenplan müssen ergänzend folgende Informationen und Angaben
+
+          abgebildet werden:
+
+
+          •  Titel
+
+          •  Zeichenerklärung / Legende
+
+          •  Gültigkeitsdatum (Fahrplanperiode) oder Datum des Datenstandes (gültig ab …)
+
+          •  beim Zonenplan Name oder Logo des Tarif- bzw. Verkehrsverbunds oder der TU
+
+
+          Die Ausführungsbestimmungen regeln die Details zu den Gestaltungsempfehlungen.
+
+
+          Liniennetzplan
+
+
+          Liniennetzpläne bilden das Angebot eines bestimmten Perimeters in einem bestimmten
+
+          Detaillierungsgrad ab. Der Perimeter ist z.B. das Gebiet eines Tarifverbundes oder die ganze
+
+          Schweiz. Der Detaillierungsgrad bestimmt, welche Angebote abgebildet werden, z.B. nur
+
+          Fernverkehr, nur Regionalverkehr oder nur das Nachtnetz. Auf dem Liniennetzplan sind alle
+
+          konzessionierten Angebote sämtlicher TU im gewählten Perimeter und dem gewählten
+
+          Detaillierungsgrad abzubilden.
+
+
+          Liniennetzpläne stellen das Netz schematisch dar, aber mit einem geografischen Bezug
+
+          (Nordausrichtung, schematische Darstellung von grösseren Gewässern oder Wäldern usw.).
+
+
+          Zonenplan
+
+
+          Wenn sich die Haltestelle oder die Fahrt nicht innerhalb eines Tarif- oder Verkehrsverbunds
+
+          befindet, müssen keine Zonenpläne ausgehängt werden.
+
+
+          Die Tarifzonen müssen klar ersichtlich sein. Das konzessionierte Angebot muss vereinfacht
+
+          mitabgebildet werden, damit sich aus dem Zonenplan ergibt, welche Haltestelle sich in welcher
+
+          Zone befindet.'
+      props:
+      - name: source-chapter
+        value: '2.6'
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.bahn
+        remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.bus-tram-metro
+        remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+      - name: applicability
+        value: empfohlen
+        class: haltestelle.schiff
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.seilbahn
+        remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+      - name: applicability
+        value: empfohlen
+        class: fahrzeug-innen.bahn
+      - name: applicability
+        value: empfohlen
+        class: fahrzeug-innen.bus-tram-metro
+      - name: applicability
+        value: empfohlen
+        class: fahrzeug-innen.schiff
+    - id: bs-ki-2.7
+      title: Infos zum Billettbezug
+      parts:
+      - name: statement
+        prose: Es müssen die Möglichkeiten aufgezeigt werden, wo ein Billett gekauft werden kann.
+      props:
+      - name: source-chapter
+        value: '2.7'
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.bahn
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.bus-tram-metro
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.schiff
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.seilbahn
+    - id: bs-ki-2.8
+      title: Kontakt zur TU
+      parts:
+      - name: statement
+        prose: 'Damit die Kundschaft weiss, wohin sie sich bei Unsicherheit oder Fragen wenden kann, muss ein
+
+          entsprechender Kontakt angegeben werden. Dies kann entweder die TU sein, welche die Linie
+
+          betreibt oder eine andere TU, welche diese Dienstleistung übernimmt.
+
+
+          Pflicht-Angaben:
+
+
+          •  Name TU oder Tarif- bzw. Verkehrsverbund
+
+          •  Telefonnummer
+
+
+          Optionale Kontaktkanäle:
+
+
+          •  E-Mail-Adresse
+
+          •  Webseite, gegebenenfalls direkt zu Kontaktangaben bzw. Kontaktformular
+
+
+          Wenn die Telefonnummer zu Bürozeiten nicht bedient ist, muss einer der optionalen Kontaktkanäle
+
+          angegeben werden.'
+      props:
+      - name: source-chapter
+        value: '2.8'
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.bahn
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.bus-tram-metro
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.schiff
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.seilbahn
+      - name: applicability
+        value: empfohlen
+        class: fahrzeug-innen.bahn
+      - name: applicability
+        value: empfohlen
+        class: fahrzeug-innen.bus-tram-metro
+      - name: applicability
+        value: empfohlen
+        class: fahrzeug-innen.schiff
+      - name: applicability
+        value: empfohlen
+        class: fahrzeug-innen.seilbahn
+    - id: bs-ki-2.9
+      title: Passagierrechte
+      parts:
+      - name: statement
+        prose: 'Die Rechte der Kundschaft im öV sind im Personenbeförderungsgesetz und seiner Verordnung
+
+          verankert und müssen von den TU eingehalten werden. Dabei ist insbesondere die
+
+          Informationspflicht zu berücksichtigen.
+
+
+          Die Kundschaft ist sowohl aktiv als auch passiv über ihre Rechte zu informieren. Passiv bedeutet,
+
+          dass der Link zur nationalen Seite zu den Fahrgastrechten (swisspass.ch/fahrgastrechte) auf der
+
+          Website der TU und – falls eine eigene App betrieben wird – in der App einfach auffindbar und
+
+          verlinkt sein muss.
+
+
+          Falls eine Fahrt mindestens 60 Minuten verspätet ist, muss im betroffenen Fahrzeug aktiv auf die
+
+          Fahrgastrechte aufmerksam gemacht werden (z.B. ein Hinweis auf: swisspass.ch/fahrgastrechte):
+
+
+          •  Akustisch: Kommunikation über die vorhandenen akustischen Kundeninformationssysteme
+
+
+          oder über anwesendes Fahr- / Dienstpersonal oder Kundenbegleiter.
+
+
+          •  Optisch: Kommunikation über die im Fahrzeug, dem Schiff oder an der Berg-/Talstation
+
+
+          vorhandenen optischen Kundeninformationssysteme.
+
+
+
+
+          3.
+
+
+          Fahrtbezogene Inhalte der Kundeninformation
+
+
+          Neben den allgemeinen Informationen benötigt die Kundschaft insbesondere Angaben zu ihrer
+
+          konkreten Fahrt. Diese können in zwei Formen bereitgestellt werden:
+
+
+          •  Als publizierter Fahrplan, z. B. in Form einer Abfahrtstabelle oder eines Abfahrtsplakats (siehe
+
+
+          Abschnitt 3.1).
+
+
+          •  Als Echtzeitinformationen zu bevorstehenden Fahrten (siehe Abschnitte 3.2 und 3.3). Diese
+
+
+          können z. B. folgendermassen dargestellt werden:
+
+
+          o  als einzelne Fahrt (z.B. Informationen am/im Fahrzeug, Perronanzeiger im Bereich Bahn)
+
+          o  als in nächster Zeit verkehrende Fahrten (z.B. Haltekantenanzeiger oder Abfahrtsmonitor
+
+
+          an der Haltestelle, Anschlussdurchsage im Fahrzeug)'
+      props:
+      - name: source-chapter
+        value: '2.9'
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.bahn
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.bus-tram-metro
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.schiff
+      - name: applicability
+        value: verbindlich
+        class: haltestelle.seilbahn
+      - name: applicability
+        value: verbindlich
+        class: fahrzeug-innen.bahn
+      - name: applicability
+        value: verbindlich
+        class: fahrzeug-innen.bus-tram-metro
+      - name: applicability
+        value: verbindlich
+        class: fahrzeug-innen.schiff
+      - name: applicability
+        value: verbindlich
+        class: fahrzeug-innen.seilbahn
+  - id: bs-ki-3
+    title: Fahrtbezogene Inhalte der Kundeninformation
+    groups:
+    - id: bs-ki-3.1
+      title: Übersicht aller Fahrten der Haltestelle
+      controls:
+      - id: bs-ki-3.4-uebersicht
+        title: Fahrplanzeit (Übersicht aller Fahrten der Haltestelle  ("Fahrplan"))
+        parts:
+        - name: statement
+          prose: 'Jede Fahrt muss im Sollfahrplan über eine geplante Abfahrtszeit oder Betriebszeit verfügen.
+
+            Werden Ankünfte dargestellt, ist die Ankunftszeit anzugeben.
+
+
+            Die Darstellung von Uhrzeiten ist zu berücksichtigen (siehe Abschnitt 6.5).
+
+
+            Beispiele
+
+
+            Abfahrtszeit
+
+
+            13:37 / 5’
+
+
+            Betriebszeit
+
+
+            von 08:30 bis 16:30 durchgehend
+
+
+            Hinweise zur Verwendung von Abfahrtszeiten im Fahrplan sowie in Betriebszeiten sind im
+
+            Abschnitt 6.6 aufgeführt.'
+        props:
+        - name: source-chapter
+          value: '3.4'
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bahn
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.schiff
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.seilbahn
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+      - id: bs-ki-3.5-uebersicht
+        title: Verkehrsmittelkategorie (Übersicht aller Fahrten der Haltestelle  ("Fahrplan"))
+        parts:
+        - name: statement
+          prose: 'Die Verkehrsmittel werden zu Verkehrsmittelkategorien gebündelt. Gegenüber der Kundschaft
+
+            werden sie in der Regel als Piktogramme kommuniziert. Sie geben Orientierungshilfe auf den
+
+            Kanälen der Kundeninformation und kommen in der Signaletik zum Einsatz.
+
+
+
+
+            Auf eine Unterscheidung zwischen verschiedenen Antriebsarten von Bussen (z.B. Trolleybussen,
+
+            Elektrobussen usw.) wird verzichtet, zumal die Busse auch wechselnd auf der gleichen Linie
+
+            verkehren können. Für weitere Informationen zu den Piktogrammen siehe Abschnitt 6.10.
+
+
+            In der Schweiz werden folgende Verkehrsmittelkategorien verwendet:
+
+
+            Verkehrsmittelkategorie Bahn
+
+
+            Deutsch
+
+
+            Zug
+
+
+            Zahnradbahn
+
+
+            Französisch  Train
+
+
+            Chemin de fer à crémaillère
+
+
+            Italienisch
+
+
+            Treno
+
+
+            Ferrovia a cremagliera
+
+
+            Englisch
+
+
+            Train
+
+
+            Rack-Railroad
+
+
+            Als Zahnradbahn gelten alle Bahnen mit durchgehendem Zahnradantrieb. Bahnen im Mischbetrieb
+
+            von Zahnradantrieb und Adhäsionsantrieb gelten als Zug.
+
+
+            Verkehrsmittelkategorien Bus, Tram, Metro
+
+
+            Deutsch
+
+
+            Bus  Tram
+
+
+            Metro
+
+
+            Französisch  Bus  Tram
+
+
+            Métro
+
+
+            Italienisch
+
+
+            Bus  Tram
+
+
+            Metro
+
+
+            Englisch
+
+
+            Bus  Tramway  Underground
+
+
+            Verkehrsmittelkategorien bei Seilbahnen und Aufzügen
+
+
+            Deutsch
+
+
+            Standseilbahn  Pendelbahn
+
+
+            Gondelbahn  Sesselbahn  Aufzug
+
+
+            Französisch  Funiculaire
+
+
+            Téléphérique à va-et-
+
+            vient
+
+
+            Télécabine
+
+
+            Télésiège
+
+
+            Ascenseur
+
+
+            Italienisch
+
+
+            Funicolare
+
+
+            Funivie a va e vieni
+
+
+            Cabinovie
+
+
+            Seggiovia
+
+
+            Ascensore
+
+
+            Englisch
+
+
+            Funicular
+
+
+            Cable car
+
+
+            Gondola lift  Chairlift
+
+
+            Elevator
+
+
+            Verkehrsmittelkategorien auf dem Wasser
+
+
+            Deutsch
+
+
+            Schiff
+
+
+            Fähre
+
+
+            Französisch  Bateau
+
+
+            Ferry
+
+
+            Italienisch
+
+
+            Batello
+
+
+            Traghetto
+
+
+            Englisch
+
+
+            Boat
+
+
+            Ferry
+
+
+            Als Fähren gelten jene Schiffe, welche neben Personentransport auch Autos transportieren.
+
+            Schiffe im sogenannten Fährbetrieb ohne den Transport von Autos gelten als Schiffe.'
+        props:
+        - name: source-chapter
+          value: '3.5'
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bahn
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.schiff
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.seilbahn
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+      - id: bs-ki-3.6-uebersicht
+        title: Liniennummer (Übersicht aller Fahrten der Haltestelle  ("Fahrplan"))
+        parts:
+        - name: statement
+          prose: 'Die Liniennummer ist die gegenüber der Kundschaft angezeigte Identifikation einer Linie. Die
+
+            Liniennummer muss innerhalb einer Region pro Verkehrsmittelkategoriegruppe gemäss 3.5
+
+            eindeutig sein. Im Fernverkehr muss diese innerhalb der ganzen Schweiz eindeutig sein. Zwei
+
+            gleiche Liniennummern benachbarter Regionen bzw. Verkehrsmittelkategoriegruppen gemäss 3.5
+
+            dürfen sich nicht berühren. Die Regionen sind in den Ausführungsbestimmungen geregelt.
+
+
+            Die Liniennummer ist je Verkehrsmittelkategorie unterschiedlich aufgebaut (siehe Abschnitt 3.6.3).'
+        - name: guidance
+          title: AB BS-KI 3.6 – Definition der Linie
+          prose: 'Die folgenden Grundsätze gelten:
+
+            •  Auf der Linie darf es maximal drei unterschiedliche Fahrtvarianten geben.
+
+            •  Pro Fahrtvariante müssen mindestens 80% der Via der Stammstrecke bedient werden.
+
+            •  Fehlende Via aufgrund von Teilstrecken werden nicht mitgerechnet.
+
+            •  Unterschiedliche Reihenfolgen innerhalb der Nachbarhaltestellen (z.B. Halt 7 wird zu 8 und Halt 8 wird zu 7)
+            werden nicht mitgerechnet.
+
+            •  Früh- und Spätkurse dürfen darüber hinaus maximal 20% zusätzliche Via (zur Stammstrecke) anfahren, ohne dass
+            sie als separate Fahrvariante gezählt werden.
+
+            •  Verstärkungsfahrten (z.B. während der HVZ oder für Schülerverkehr) dürfen von der Haltepolitik abweichen und
+            zählen nicht zu den drei Fahrtvarianten.
+
+            •  Ausfransungen (Y-Linien) sind nicht erlaubt.
+
+            •  Einzelfahrten, welche linienübergreifend fahren (z.B. Pässe Rundfahrten) werden als eigenständige Linie definiert.
+
+            •  Ergänzende integrale Angebote (z.B. Skibus) sind eigenständige Linie.'
+        - name: guidance
+          title: AB BS-KI 3.6 – Änderung der Liniennummer
+          prose: Grundsätzlich gelten die Liniennummer und Linienbezeichnung, wie sie in den Konzessionen verfügt sind. Wenn
+            es zur besseren Kommunikation gegenüber den Kunden erforderlich ist, können Liniennummern und Linienbezeichnungen
+            in Absprache mit dem BAV geändert werden, ohne dass eine Konzessionsänderung notwendig ist (Art. 17 VPB). Voraussetzung
+            ist, dass der Bestand der Linie weiterhin der erteilten Konzession entspricht. Diesbezügliche Anfragen sind an
+            das BAV zu richten. Die Änderung erfolgt jeweils zum Fahrplanwechsel.
+        - name: guidance
+          title: AB BS-KI 3.6 – CH-Liniennummer (CHLNR)
+          prose: 'Die CH-Liniennummer setzt sich wie folgt zusammen:
+
+            <Präfix>.<Region>.<Liniennummer>:<Attribut>
+
+
+            Präfix – charakterisiert die Verkehrsart:
+
+            b = Bahn, Zahnradbahn und deren Ersatzverkehr
+
+            c = Autoverlad (ohne Transport von Fussgänger)
+
+            n = Schiff
+
+            r = Bus, Tram und Metro, sowie Schiff, Seilbahnen und Zahnradbahnen, wenn diese in das städtische Liniennetz integriert
+            sind
+
+            f = Seilbahn'
+        - name: guidance
+          title: AB BS-KI 3.6 – Regionen Bahn
+          prose: 'Nummer  Region
+
+            0  Fernverkehr, andere nationale Angebote
+
+            1  Arc Lémanique
+
+            2  Région Fribourg
+
+            3  Region Bern
+
+            4  Arc jurassien und Kanton Solothurn
+
+            5  Region Nordwestschweiz (TNW-AG)
+
+            6  Region Zentralschweiz
+
+            7  Region Zürich (ZVV)
+
+            8  Region Ostschweiz (Ostwind)
+
+            9  Region Graubünden
+
+            t  Ticino'
+        props:
+        - name: source-chapter
+          value: '3.6'
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bahn
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.schiff
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.seilbahn
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+        - name: source-document
+          value: AB_3.6_DE.pdf
+          remarks: Ausführungsbestimmung Abschnitt 3.6, Version 3. Dezember 2025
+      - id: bs-ki-3.7-uebersicht
+        title: Ziel (Übersicht aller Fahrten der Haltestelle  ("Fahrplan"))
+        parts:
+        - name: statement
+          prose: 'Das Ziel einer Fahrt ist grundsätzlich die effektive letzte Haltestelle der Fahrt. Damit wird
+
+            kommuniziert, wohin gefahren wird. Für die Schreibweise ist der Abschnitt 6.4 zu beachten.'
+        props:
+        - name: source-chapter
+          value: '3.7'
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bahn
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.schiff
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.seilbahn
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+      - id: bs-ki-3.8-uebersicht
+        title: Via (Übersicht aller Fahrten der Haltestelle  ("Fahrplan"))
+        parts:
+        - name: statement
+          prose: 'Die Angabe von Via gibt der Kundschaft Hinweise zum Fahrtverlauf. Zusätzlich vermitteln sie
+
+            Sicherheit, die richtige Fahrt zu nehmen und helfen bei der geografischen Orientierung.
+
+
+            Via werden in Fahrtrichtung von links nach rechts bzw. von oben nach unten sortiert dargestellt.
+
+
+            Für die Auswahl und Darstellung von Via gelten folgende Regeln:
+
+
+            •  Können aus Platzgründen nicht alle Via aufgeführt werden, regeln die
+
+
+            Ausführungsbestimmungen die Wahl der relevantesten Via und allfällig mögliche Kurz- oder
+
+            Teilbezeichnungen. Es ist auch möglich, dass aus Platzgründen gar keine Via aufgeführt
+
+            werden können.
+
+
+            •  Als Via dürfen nur Haltestellen verwendet werden und keine Regionennamen wie z.B.
+
+
+            „Vallemaggia“.
+
+
+            •  Je Haltestelle dürfen nur Via angezeigt werden, die auf dem noch zu fahrenden
+
+
+            Streckenverlauf liegen. Wenn auf dem Fahrplan eine Perlschnur gezeigt wird, dürfen alle Via
+
+            angezeigt werden, aber nur, wenn klar erkennbar ist, welche bereits zurückgelegt wurden und
+
+            welche noch kommen, zum Beispiel durch Ausgrauen der bereits zurückgelegten Strecke.
+
+
+            •  Via-Stationen, die von links nach rechts angezeigt werden, sind durch zwei Leerschläge
+
+
+            voneinander zu trennen (keine Trennzeichen wie «–» oder «,»).
+
+            •  Via-Stationen sind in der Darstellung klar vom Ziel abzugrenzen.
+
+            •  Für die Schreibweise ist der Abschnitt 6.4 zu beachten.'
+        props:
+        - name: source-chapter
+          value: '3.8'
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bahn
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.schiff
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.seilbahn
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+      - id: bs-ki-3.10-uebersicht
+        title: Abfahrtsort soll und real (Übersicht aller Fahrten der Haltestelle  ("Fahrplan"))
+        parts:
+        - name: statement
+          prose: 'Die Kundschaft muss sich innerhalb der Haltestelle über die verschiedenen Abfahrtsorte (sofern
+
+            mehrere vorhanden sind) orientieren können. Dazu werden die Abfahrtsorte einheitlich benannt
+
+            und durchnummeriert bzw. durchbuchstabiert. Die Bezeichnungen müssen über alle Kanäle und
+
+            Touchpoints einheitlich verwendet werden.
+
+
+
+
+            Massgebend ist die jeweilige Verkehrsmittelkategorie:
+
+
+            Verkehrsmittelkategorie
+
+
+            Sprache
+
+
+            Bezeichnung
+
+
+            DE
+
+
+            FR
+
+
+            IT
+
+
+            EN
+
+
+            Zug / Zahnradbahn / Metro   Gleis
+
+
+            Bus / Tram
+
+
+            Schiff
+
+
+            Seilbahn / Gondelbahn /
+
+            Sessellift / Standseilbahn
+
+
+            Kante
+
+
+            Steg
+
+
+            Perron
+
+
+            voie
+
+
+            quai
+
+
+            quai
+
+
+            quai
+
+
+            binario
+
+
+            platform
+
+
+            1 bis 99
+
+
+            corsia
+
+
+            pontile
+
+
+            stop
+
+
+            pier
+
+
+            A bis Z
+
+
+            1 bis 99
+
+
+            banchina
+
+
+            platform
+
+
+            1 bis 99
+
+
+            Auf das Nummerieren bzw. Durchbuchstabieren kann unter folgenden Bedingungen verzichtet
+
+            werden:
+
+
+            •  Bei Bahn- und Schiff-Haltestellen, wenn nur ein Gleis oder ein Steg vorhanden ist.
+
+            •  Bei Bus-, Tram- und Metro-Haltestellen, wenn alle folgenden Punkte erfüllt sind:
+
+
+            o  Maximal 2 Kanten
+
+            o  Die Kanten liegen in Sichtdistanz nahe beieinander.
+
+            o  Es besteht keine anderweitige Verwechslungsgefahr.
+
+            •  Bei Seilbahnen, wenn das Ziel der Linie angegeben wird.
+
+
+            Wird auf eine Nummerierung / Buchstabierung verzichtet, ist dies auf allen Kanälen umzusetzen,
+
+            insbesondere dürfen auch keine Daten (siehe Abschnitt 8.4.6) eingeliefert werden.
+
+
+            Bei Seilbahnen befindet sich das Perron und damit dessen Beschriftung physisch bei der
+
+            Zutrittskontrolle (sofern vorhanden) und nicht beim Übergang in die Kabine, um der Kundschaft
+
+            eine rechtzeitige Orientierung zu ermöglichen.'
+        props:
+        - name: source-chapter
+          value: '3.10'
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bahn
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.schiff
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.seilbahn
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+      - id: bs-ki-3.12-uebersicht
+        title: Beförderungshinweise (Übersicht aller Fahrten der Haltestelle  ("Fahrplan"))
+        parts:
+        - name: statement
+          prose: 'Die Beförderungshinweise dienen dazu, spezielle Bedingungen für die betreffende Fahrt zu
+
+            kommunizieren. Sie werden immer dann verwendet, wenn die Kundschaft vorgängig eine
+
+            Handlung vornehmen resp. ein zusätzliches Produkt kaufen muss, um die Fahrt antreten zu
+
+            können. Beispiele sind eine Reservierungs- oder Zuschlagspflicht oder Einschränkungen im
+
+            Veloselbstverlad (Veloselbstverlad reservierungspflichtig, kein Veloselbstverlad usw.).
+
+
+            Die Liste hints.csv zeigt alle aktuellen Beförderungshinweise auf.
+
+
+            Beförderungshinweise stehen stets in allen Sprachen gemäss Abschnitt 6.2 zur Verfügung und
+
+            besitzen eine Abkürzung. Die Abkürzungen müssen in einer Legende erklärt werden. Teilweise
+
+            können sie zusätzlich mit einem Symbol dargestellt werden.'
+        props:
+        - name: source-chapter
+          value: '3.12'
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bahn
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.schiff
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.seilbahn
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+      - id: bs-ki-3.13-uebersicht
+        title: Angebotshinweise (Übersicht aller Fahrten der Haltestelle  ("Fahrplan"))
+        parts:
+        - name: statement
+          prose: 'Mit Angebotshinweisen (auch Service-Attribute genannt) werden der Kundschaft auf einer
+
+            bestimmten Fahrt bestehende Komforteigenschaften angegeben. Dies können zum Beispiel
+
+            Verpflegungsangebote, Ruhezonen, Panoramawagen oder der Hinweis sein, dass der Kurs durch
+
+            ein Dampfschiff geführt wird.
+
+
+            Die Liste hints.csv zeigt alle aktuellen Angebotshinweise auf.
+
+
+            Angebotshinweise stehen stets in allen Sprachen gemäss Abschnitt 6.2 zur Verfügung und
+
+            besitzen eine Abkürzung. Die Abkürzungen müssen in einer Legende erklärt werden. Teilweise
+
+            können sie zusätzlich mit einem Symbol dargestellt werden.
+
+
+            Fahrzeugattribute wie Rollstuhl- oder Vorzugsplätze oder Bereiche für Velo oder Kinderwagen
+
+            gelten ebenfalls als Angebotshinweise. Diese Fahrzeugattribute werden nicht als Daten eingeliefert
+
+            und sind in der Liste hints.csv nicht aufgeführt.
+
+
+            Die Fahrzeugklasse ist ebenfalls ein Fahrzeugattribut. Zur Vereinfachung wird davon
+
+            ausgegangen, dass in Zügen und Schiffen 1. und 2. Klasse vorhanden sind. Abweichungen davon
+
+            werden als «nur 2. Klasse» eingeliefert und kommuniziert.
+
+
+            In allen anderen Verkehrsmitteln ist nur die 2. Klasse vorhanden, dies wird nicht kommuniziert.'
+        props:
+        - name: source-chapter
+          value: '3.13'
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bahn
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bus-tram-metro
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.schiff
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.seilbahn
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+      - id: bs-ki-3.14-uebersicht
+        title: Infotexte (Übersicht aller Fahrten der Haltestelle  ("Fahrplan"))
+        parts:
+        - name: statement
+          prose: 'Braucht die Kundschaft für die Planung der Reise zusätzliche Informationen, welche weder über
+
+            die Fahrplandaten noch über Beförderungs- oder Angebotshinweise kommuniziert werden können,
+
+            müssen zusätzlich Infotexte verwendet werden.
+
+
+            Die Infotexte werden modular aus Textbausteinen aufgebaut, siehe Ausführungsbestimmungen.
+
+
+            Bei durchgebundenen Linien («Sitzenbleiben» gemäss Abschnitt 3.7.1) darf der Hinweis «Dieses
+
+            Fahrzeug fährt weiter als [Liniennummer] Richtung [Ziel]» nicht als Infotexte eingeliefert werden.
+
+            Dieser Hinweis wird durch die Auskunftssysteme anhand der Durchbindung berechnet.
+
+
+            Der Fahrtverlauf muss in den Fahrplaninformationen korrekt abgebildet und eingeliefert werden.
+
+            Infotexte wie «dieser Kurs hält nicht in [Haltestelle]» sind nicht erlaubt.'
+        props:
+        - name: source-chapter
+          value: '3.14'
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bahn
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bus-tram-metro
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.schiff
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.seilbahn
+        - name: applicability
+          value: empfohlen
+          class: daten.einlieferung
+      - id: bs-ki-3.15-uebersicht
+        title: Marketingname (Übersicht aller Fahrten der Haltestelle  ("Fahrplan"))
+        parts:
+        - name: statement
+          prose: 'Die Verbindlichkeit v / e in der Matrix bezieht sich nicht darauf, dass ein Marketingname gewählt
+
+            werden soll, sondern darauf, ob dieser (falls vorhanden) in den entsprechenden Kanälen
+
+            dargestellt werden soll.
+
+
+            Der Marketingname dient der generellen Vermarktung des öffentlichen Verkehrs im Freizeit- und
+
+            Ausflugsbereich (z.B. Glacier Express oder Treno Gottardo) oder für spezielle Angebote, welche
+
+            im Zusammenhang mit fahrplanmässigen Fahrten angeboten werden, z.B. Mittagsschiff.
+
+
+            Marketingnamen gelten als Zusatzinformation und sind somit nicht Teil des Erkennungsschlüssels
+
+            (siehe Abschnitt 6.1). In optischen Publikationskanälen (z.B. Online-Fahrplan, Abfahrtsplakat,
+
+            Smarte Stele) werden Marketingnamen aufgeführt, sofern genügend Platz vorhanden ist. In
+
+            akustischen Publikationskanälen wird auf die Ausgabe von Marketingnamen mehrheitlich
+
+            verzichtet, um die Dauer der Durchsagen zu begrenzen.'
+        props:
+        - name: source-chapter
+          value: '3.15'
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bahn
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bus-tram-metro
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.schiff
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.seilbahn
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+    - id: bs-ki-3.2
+      title: Informationen zur Fahrt
+      controls:
+      - id: bs-ki-3.4-fahrt
+        title: Fahrplanzeit (Informationen zur Fahrt)
+        parts:
+        - name: statement
+          prose: 'Jede Fahrt muss im Sollfahrplan über eine geplante Abfahrtszeit oder Betriebszeit verfügen.
+
+            Werden Ankünfte dargestellt, ist die Ankunftszeit anzugeben.
+
+
+            Die Darstellung von Uhrzeiten ist zu berücksichtigen (siehe Abschnitt 6.5).
+
+
+            Beispiele
+
+
+            Abfahrtszeit
+
+
+            13:37 / 5’
+
+
+            Betriebszeit
+
+
+            von 08:30 bis 16:30 durchgehend
+
+
+            Hinweise zur Verwendung von Abfahrtszeiten im Fahrplan sowie in Betriebszeiten sind im
+
+            Abschnitt 6.6 aufgeführt.'
+        props:
+        - name: source-chapter
+          value: '3.4'
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bus-tram-metro
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.schiff
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.seilbahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.schiff
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+      - id: bs-ki-3.5-fahrt
+        title: Verkehrsmittelkategorie (Informationen zur Fahrt)
+        parts:
+        - name: statement
+          prose: 'Die Verkehrsmittel werden zu Verkehrsmittelkategorien gebündelt. Gegenüber der Kundschaft
+
+            werden sie in der Regel als Piktogramme kommuniziert. Sie geben Orientierungshilfe auf den
+
+            Kanälen der Kundeninformation und kommen in der Signaletik zum Einsatz.
+
+
+
+
+            Auf eine Unterscheidung zwischen verschiedenen Antriebsarten von Bussen (z.B. Trolleybussen,
+
+            Elektrobussen usw.) wird verzichtet, zumal die Busse auch wechselnd auf der gleichen Linie
+
+            verkehren können. Für weitere Informationen zu den Piktogrammen siehe Abschnitt 6.10.
+
+
+            In der Schweiz werden folgende Verkehrsmittelkategorien verwendet:
+
+
+            Verkehrsmittelkategorie Bahn
+
+
+            Deutsch
+
+
+            Zug
+
+
+            Zahnradbahn
+
+
+            Französisch  Train
+
+
+            Chemin de fer à crémaillère
+
+
+            Italienisch
+
+
+            Treno
+
+
+            Ferrovia a cremagliera
+
+
+            Englisch
+
+
+            Train
+
+
+            Rack-Railroad
+
+
+            Als Zahnradbahn gelten alle Bahnen mit durchgehendem Zahnradantrieb. Bahnen im Mischbetrieb
+
+            von Zahnradantrieb und Adhäsionsantrieb gelten als Zug.
+
+
+            Verkehrsmittelkategorien Bus, Tram, Metro
+
+
+            Deutsch
+
+
+            Bus  Tram
+
+
+            Metro
+
+
+            Französisch  Bus  Tram
+
+
+            Métro
+
+
+            Italienisch
+
+
+            Bus  Tram
+
+
+            Metro
+
+
+            Englisch
+
+
+            Bus  Tramway  Underground
+
+
+            Verkehrsmittelkategorien bei Seilbahnen und Aufzügen
+
+
+            Deutsch
+
+
+            Standseilbahn  Pendelbahn
+
+
+            Gondelbahn  Sesselbahn  Aufzug
+
+
+            Französisch  Funiculaire
+
+
+            Téléphérique à va-et-
+
+            vient
+
+
+            Télécabine
+
+
+            Télésiège
+
+
+            Ascenseur
+
+
+            Italienisch
+
+
+            Funicolare
+
+
+            Funivie a va e vieni
+
+
+            Cabinovie
+
+
+            Seggiovia
+
+
+            Ascensore
+
+
+            Englisch
+
+
+            Funicular
+
+
+            Cable car
+
+
+            Gondola lift  Chairlift
+
+
+            Elevator
+
+
+            Verkehrsmittelkategorien auf dem Wasser
+
+
+            Deutsch
+
+
+            Schiff
+
+
+            Fähre
+
+
+            Französisch  Bateau
+
+
+            Ferry
+
+
+            Italienisch
+
+
+            Batello
+
+
+            Traghetto
+
+
+            Englisch
+
+
+            Boat
+
+
+            Ferry
+
+
+            Als Fähren gelten jene Schiffe, welche neben Personentransport auch Autos transportieren.
+
+            Schiffe im sogenannten Fährbetrieb ohne den Transport von Autos gelten als Schiffe.'
+        props:
+        - name: source-chapter
+          value: '3.5'
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bus-tram-metro
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.schiff
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.seilbahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+      - id: bs-ki-3.6-fahrt
+        title: Liniennummer (Informationen zur Fahrt)
+        parts:
+        - name: statement
+          prose: 'Die Liniennummer ist die gegenüber der Kundschaft angezeigte Identifikation einer Linie. Die
+
+            Liniennummer muss innerhalb einer Region pro Verkehrsmittelkategoriegruppe gemäss 3.5
+
+            eindeutig sein. Im Fernverkehr muss diese innerhalb der ganzen Schweiz eindeutig sein. Zwei
+
+            gleiche Liniennummern benachbarter Regionen bzw. Verkehrsmittelkategoriegruppen gemäss 3.5
+
+            dürfen sich nicht berühren. Die Regionen sind in den Ausführungsbestimmungen geregelt.
+
+
+            Die Liniennummer ist je Verkehrsmittelkategorie unterschiedlich aufgebaut (siehe Abschnitt 3.6.3).'
+        - name: guidance
+          title: AB BS-KI 3.6 – Definition der Linie
+          prose: 'Die folgenden Grundsätze gelten:
+
+            •  Auf der Linie darf es maximal drei unterschiedliche Fahrtvarianten geben.
+
+            •  Pro Fahrtvariante müssen mindestens 80% der Via der Stammstrecke bedient werden.
+
+            •  Fehlende Via aufgrund von Teilstrecken werden nicht mitgerechnet.
+
+            •  Unterschiedliche Reihenfolgen innerhalb der Nachbarhaltestellen (z.B. Halt 7 wird zu 8 und Halt 8 wird zu 7)
+            werden nicht mitgerechnet.
+
+            •  Früh- und Spätkurse dürfen darüber hinaus maximal 20% zusätzliche Via (zur Stammstrecke) anfahren, ohne dass
+            sie als separate Fahrvariante gezählt werden.
+
+            •  Verstärkungsfahrten (z.B. während der HVZ oder für Schülerverkehr) dürfen von der Haltepolitik abweichen und
+            zählen nicht zu den drei Fahrtvarianten.
+
+            •  Ausfransungen (Y-Linien) sind nicht erlaubt.
+
+            •  Einzelfahrten, welche linienübergreifend fahren (z.B. Pässe Rundfahrten) werden als eigenständige Linie definiert.
+
+            •  Ergänzende integrale Angebote (z.B. Skibus) sind eigenständige Linie.'
+        - name: guidance
+          title: AB BS-KI 3.6 – Änderung der Liniennummer
+          prose: Grundsätzlich gelten die Liniennummer und Linienbezeichnung, wie sie in den Konzessionen verfügt sind. Wenn
+            es zur besseren Kommunikation gegenüber den Kunden erforderlich ist, können Liniennummern und Linienbezeichnungen
+            in Absprache mit dem BAV geändert werden, ohne dass eine Konzessionsänderung notwendig ist (Art. 17 VPB). Voraussetzung
+            ist, dass der Bestand der Linie weiterhin der erteilten Konzession entspricht. Diesbezügliche Anfragen sind an
+            das BAV zu richten. Die Änderung erfolgt jeweils zum Fahrplanwechsel.
+        - name: guidance
+          title: AB BS-KI 3.6 – CH-Liniennummer (CHLNR)
+          prose: 'Die CH-Liniennummer setzt sich wie folgt zusammen:
+
+            <Präfix>.<Region>.<Liniennummer>:<Attribut>
+
+
+            Präfix – charakterisiert die Verkehrsart:
+
+            b = Bahn, Zahnradbahn und deren Ersatzverkehr
+
+            c = Autoverlad (ohne Transport von Fussgänger)
+
+            n = Schiff
+
+            r = Bus, Tram und Metro, sowie Schiff, Seilbahnen und Zahnradbahnen, wenn diese in das städtische Liniennetz integriert
+            sind
+
+            f = Seilbahn'
+        - name: guidance
+          title: AB BS-KI 3.6 – Regionen Bahn
+          prose: 'Nummer  Region
+
+            0  Fernverkehr, andere nationale Angebote
+
+            1  Arc Lémanique
+
+            2  Région Fribourg
+
+            3  Region Bern
+
+            4  Arc jurassien und Kanton Solothurn
+
+            5  Region Nordwestschweiz (TNW-AG)
+
+            6  Region Zentralschweiz
+
+            7  Region Zürich (ZVV)
+
+            8  Region Ostschweiz (Ostwind)
+
+            9  Region Graubünden
+
+            t  Ticino'
+        props:
+        - name: source-chapter
+          value: '3.6'
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bus-tram-metro
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.schiff
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.seilbahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-aussen.front.bahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-aussen.front.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-aussen.seite.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-aussen.seite.bus-tram-metro
+        - name: applicability
+          value: empfohlen
+          class: fahrzeug-aussen.seite.schiff
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-aussen.heck.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.schiff
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+        - name: source-document
+          value: AB_3.6_DE.pdf
+          remarks: Ausführungsbestimmung Abschnitt 3.6, Version 3. Dezember 2025
+      - id: bs-ki-3.7-fahrt
+        title: Ziel (Informationen zur Fahrt)
+        parts:
+        - name: statement
+          prose: 'Das Ziel einer Fahrt ist grundsätzlich die effektive letzte Haltestelle der Fahrt. Damit wird
+
+            kommuniziert, wohin gefahren wird. Für die Schreibweise ist der Abschnitt 6.4 zu beachten.'
+        props:
+        - name: source-chapter
+          value: '3.7'
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bus-tram-metro
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.schiff
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.seilbahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-aussen.front.bahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-aussen.front.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-aussen.seite.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-aussen.seite.bus-tram-metro
+        - name: applicability
+          value: empfohlen
+          class: fahrzeug-aussen.seite.schiff
+        - name: applicability
+          value: empfohlen
+          class: fahrzeug-aussen.heck.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.schiff
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+      - id: bs-ki-3.8-fahrt
+        title: Via (Informationen zur Fahrt)
+        parts:
+        - name: statement
+          prose: 'Die Angabe von Via gibt der Kundschaft Hinweise zum Fahrtverlauf. Zusätzlich vermitteln sie
+
+            Sicherheit, die richtige Fahrt zu nehmen und helfen bei der geografischen Orientierung.
+
+
+            Via werden in Fahrtrichtung von links nach rechts bzw. von oben nach unten sortiert dargestellt.
+
+
+            Für die Auswahl und Darstellung von Via gelten folgende Regeln:
+
+
+            •  Können aus Platzgründen nicht alle Via aufgeführt werden, regeln die
+
+
+            Ausführungsbestimmungen die Wahl der relevantesten Via und allfällig mögliche Kurz- oder
+
+            Teilbezeichnungen. Es ist auch möglich, dass aus Platzgründen gar keine Via aufgeführt
+
+            werden können.
+
+
+            •  Als Via dürfen nur Haltestellen verwendet werden und keine Regionennamen wie z.B.
+
+
+            „Vallemaggia“.
+
+
+            •  Je Haltestelle dürfen nur Via angezeigt werden, die auf dem noch zu fahrenden
+
+
+            Streckenverlauf liegen. Wenn auf dem Fahrplan eine Perlschnur gezeigt wird, dürfen alle Via
+
+            angezeigt werden, aber nur, wenn klar erkennbar ist, welche bereits zurückgelegt wurden und
+
+            welche noch kommen, zum Beispiel durch Ausgrauen der bereits zurückgelegten Strecke.
+
+
+            •  Via-Stationen, die von links nach rechts angezeigt werden, sind durch zwei Leerschläge
+
+
+            voneinander zu trennen (keine Trennzeichen wie «–» oder «,»).
+
+            •  Via-Stationen sind in der Darstellung klar vom Ziel abzugrenzen.
+
+            •  Für die Schreibweise ist der Abschnitt 6.4 zu beachten.'
+        props:
+        - name: source-chapter
+          value: '3.8'
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bus-tram-metro
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.schiff
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.seilbahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: empfohlen
+          class: fahrzeug-aussen.front.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-aussen.seite.bahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: empfohlen
+          class: fahrzeug-aussen.seite.bus-tram-metro
+        - name: applicability
+          value: empfohlen
+          class: fahrzeug-aussen.seite.schiff
+        - name: applicability
+          value: empfohlen
+          class: fahrzeug-aussen.heck.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.schiff
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+      - id: bs-ki-3.9-fahrt
+        title: Nächster Halt (Informationen zur Fahrt)
+        parts:
+        - name: statement
+          prose: 'Bei Linien, welche nur zwei Haltestellen bedienen (z.B. Pendelbahnen ohne Zwischenstation),
+
+            kann auf die Angabe des nächsten Halts verzichtet werden.
+
+
+            Die Angabe des nächsten Halts im Fahrzeug ist für die Kundschaft wichtig, damit diese sich
+
+            entlang des Fahrverlaufes orientieren kann.'
+        props:
+        - name: source-chapter
+          value: '3.9'
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.schiff
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.seilbahn
+      - id: bs-ki-3.10-fahrt
+        title: Abfahrtsort soll und real (Informationen zur Fahrt)
+        parts:
+        - name: statement
+          prose: 'Die Kundschaft muss sich innerhalb der Haltestelle über die verschiedenen Abfahrtsorte (sofern
+
+            mehrere vorhanden sind) orientieren können. Dazu werden die Abfahrtsorte einheitlich benannt
+
+            und durchnummeriert bzw. durchbuchstabiert. Die Bezeichnungen müssen über alle Kanäle und
+
+            Touchpoints einheitlich verwendet werden.
+
+
+
+
+            Massgebend ist die jeweilige Verkehrsmittelkategorie:
+
+
+            Verkehrsmittelkategorie
+
+
+            Sprache
+
+
+            Bezeichnung
+
+
+            DE
+
+
+            FR
+
+
+            IT
+
+
+            EN
+
+
+            Zug / Zahnradbahn / Metro   Gleis
+
+
+            Bus / Tram
+
+
+            Schiff
+
+
+            Seilbahn / Gondelbahn /
+
+            Sessellift / Standseilbahn
+
+
+            Kante
+
+
+            Steg
+
+
+            Perron
+
+
+            voie
+
+
+            quai
+
+
+            quai
+
+
+            quai
+
+
+            binario
+
+
+            platform
+
+
+            1 bis 99
+
+
+            corsia
+
+
+            pontile
+
+
+            stop
+
+
+            pier
+
+
+            A bis Z
+
+
+            1 bis 99
+
+
+            banchina
+
+
+            platform
+
+
+            1 bis 99
+
+
+            Auf das Nummerieren bzw. Durchbuchstabieren kann unter folgenden Bedingungen verzichtet
+
+            werden:
+
+
+            •  Bei Bahn- und Schiff-Haltestellen, wenn nur ein Gleis oder ein Steg vorhanden ist.
+
+            •  Bei Bus-, Tram- und Metro-Haltestellen, wenn alle folgenden Punkte erfüllt sind:
+
+
+            o  Maximal 2 Kanten
+
+            o  Die Kanten liegen in Sichtdistanz nahe beieinander.
+
+            o  Es besteht keine anderweitige Verwechslungsgefahr.
+
+            •  Bei Seilbahnen, wenn das Ziel der Linie angegeben wird.
+
+
+            Wird auf eine Nummerierung / Buchstabierung verzichtet, ist dies auf allen Kanälen umzusetzen,
+
+            insbesondere dürfen auch keine Daten (siehe Abschnitt 8.4.6) eingeliefert werden.
+
+
+            Bei Seilbahnen befindet sich das Perron und damit dessen Beschriftung physisch bei der
+
+            Zutrittskontrolle (sofern vorhanden) und nicht beim Übergang in die Kabine, um der Kundschaft
+
+            eine rechtzeitige Orientierung zu ermöglichen.'
+        props:
+        - name: source-chapter
+          value: '3.10'
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bahn
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bus-tram-metro
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.schiff
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+      - id: bs-ki-3.11-fahrt
+        title: Formation (Informationen zur Fahrt)
+        parts:
+        - name: statement
+          prose: 'Formationsanzeigen werden nur bei der Verkehrsmittelkategorie «Bahn» genutzt. Die Anzeige der
+
+            Formation hilft der Kundschaft bei langen Zügen, sich schon vor Einfahrt am Gleis zu orientieren.
+
+
+
+            Daher soll eine Formationsanzeige nach Möglichkeit gemeinsam mit der Sektorierung des Gleises
+
+            verwendet werden.
+
+
+            Die Formationsanzeige zeigt der Kundschaft die folgenden Informationen an:
+
+
+            •  Die Länge des zu erwartenden Zugs und dessen Platzierung am Gleis
+
+            •  Angaben zur Fahrzeugklasse der einzelnen Wagen
+
+            •  Falls sinnvoll: Angebotshinweise (gemäss Abschnitt 3.13), welche nur in bestimmten Wagen
+
+
+            auffindbar sind (Fahrzeugattribute), z.B. Standort des Restaurants
+
+
+            •  Wagennummer (falls Sitzplatzreservierungen möglich sind)
+
+            •  Falls vorhanden, sind spezielle Rollstuhlplätze mittels eines Rollstuhlsymbols zwingend
+
+
+            aufzuführen. Dies ist unabhängig vom BfR-Status und ergänzen diesen.'
+        props:
+        - name: source-chapter
+          value: '3.11'
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bahn
+        - name: applicability
+          value: empfohlen
+          class: daten.einlieferung
+      - id: bs-ki-3.12-fahrt
+        title: Beförderungshinweise (Informationen zur Fahrt)
+        parts:
+        - name: statement
+          prose: 'Die Beförderungshinweise dienen dazu, spezielle Bedingungen für die betreffende Fahrt zu
+
+            kommunizieren. Sie werden immer dann verwendet, wenn die Kundschaft vorgängig eine
+
+            Handlung vornehmen resp. ein zusätzliches Produkt kaufen muss, um die Fahrt antreten zu
+
+            können. Beispiele sind eine Reservierungs- oder Zuschlagspflicht oder Einschränkungen im
+
+            Veloselbstverlad (Veloselbstverlad reservierungspflichtig, kein Veloselbstverlad usw.).
+
+
+            Die Liste hints.csv zeigt alle aktuellen Beförderungshinweise auf.
+
+
+            Beförderungshinweise stehen stets in allen Sprachen gemäss Abschnitt 6.2 zur Verfügung und
+
+            besitzen eine Abkürzung. Die Abkürzungen müssen in einer Legende erklärt werden. Teilweise
+
+            können sie zusätzlich mit einem Symbol dargestellt werden.'
+        props:
+        - name: source-chapter
+          value: '3.12'
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bahn
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bus-tram-metro
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.schiff
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+      - id: bs-ki-3.13-fahrt
+        title: Angebotshinweise (Informationen zur Fahrt)
+        parts:
+        - name: statement
+          prose: 'Mit Angebotshinweisen (auch Service-Attribute genannt) werden der Kundschaft auf einer
+
+            bestimmten Fahrt bestehende Komforteigenschaften angegeben. Dies können zum Beispiel
+
+            Verpflegungsangebote, Ruhezonen, Panoramawagen oder der Hinweis sein, dass der Kurs durch
+
+            ein Dampfschiff geführt wird.
+
+
+            Die Liste hints.csv zeigt alle aktuellen Angebotshinweise auf.
+
+
+            Angebotshinweise stehen stets in allen Sprachen gemäss Abschnitt 6.2 zur Verfügung und
+
+            besitzen eine Abkürzung. Die Abkürzungen müssen in einer Legende erklärt werden. Teilweise
+
+            können sie zusätzlich mit einem Symbol dargestellt werden.
+
+
+            Fahrzeugattribute wie Rollstuhl- oder Vorzugsplätze oder Bereiche für Velo oder Kinderwagen
+
+            gelten ebenfalls als Angebotshinweise. Diese Fahrzeugattribute werden nicht als Daten eingeliefert
+
+            und sind in der Liste hints.csv nicht aufgeführt.
+
+
+            Die Fahrzeugklasse ist ebenfalls ein Fahrzeugattribut. Zur Vereinfachung wird davon
+
+            ausgegangen, dass in Zügen und Schiffen 1. und 2. Klasse vorhanden sind. Abweichungen davon
+
+            werden als «nur 2. Klasse» eingeliefert und kommuniziert.
+
+
+            In allen anderen Verkehrsmitteln ist nur die 2. Klasse vorhanden, dies wird nicht kommuniziert.'
+        props:
+        - name: source-chapter
+          value: '3.13'
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-aussen.seite.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-aussen.seite.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.schiff
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+      - id: bs-ki-3.15-fahrt
+        title: Marketingname (Informationen zur Fahrt)
+        parts:
+        - name: statement
+          prose: 'Die Verbindlichkeit v / e in der Matrix bezieht sich nicht darauf, dass ein Marketingname gewählt
+
+            werden soll, sondern darauf, ob dieser (falls vorhanden) in den entsprechenden Kanälen
+
+            dargestellt werden soll.
+
+
+            Der Marketingname dient der generellen Vermarktung des öffentlichen Verkehrs im Freizeit- und
+
+            Ausflugsbereich (z.B. Glacier Express oder Treno Gottardo) oder für spezielle Angebote, welche
+
+            im Zusammenhang mit fahrplanmässigen Fahrten angeboten werden, z.B. Mittagsschiff.
+
+
+            Marketingnamen gelten als Zusatzinformation und sind somit nicht Teil des Erkennungsschlüssels
+
+            (siehe Abschnitt 6.1). In optischen Publikationskanälen (z.B. Online-Fahrplan, Abfahrtsplakat,
+
+            Smarte Stele) werden Marketingnamen aufgeführt, sofern genügend Platz vorhanden ist. In
+
+            akustischen Publikationskanälen wird auf die Ausgabe von Marketingnamen mehrheitlich
+
+            verzichtet, um die Dauer der Durchsagen zu begrenzen.'
+        props:
+        - name: source-chapter
+          value: '3.15'
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bahn
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bus-tram-metro
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.schiff
+        - name: applicability
+          value: empfohlen
+          class: fahrzeug-aussen.front.bahn
+        - name: applicability
+          value: empfohlen
+          class: fahrzeug-aussen.front.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-aussen.seite.bahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: empfohlen
+          class: fahrzeug-aussen.seite.bus-tram-metro
+        - name: applicability
+          value: empfohlen
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+      - id: bs-ki-3.16.1-fahrt
+        title: Verspätung (Informationen zur Fahrt)
+        parts:
+        - name: statement
+          prose: 'Die Ausgabe von Verspätungen gibt der Kundschaft eine gewisse Sicherheit, dass ein nicht
+
+            planmässig verkehrendes Fahrzeug zu einem bestimmten Zeitpunkt doch noch eintreffen wird.
+
+
+            Die Ausgabe von Verspätungen unterscheidet sich bei den unterschiedlichen Betriebsarten (siehe
+
+            Abschnitt 6.6) und Verkehrsmittelkategorien (siehe Abschnitt 3.5):
+
+
+            In der zeitbasierten Darstellung (gemäss 6.6.1) wird die Abweichung von der Soll-Zeit
+
+            kommuniziert.
+
+
+            Bei der Intervalldarstellung (gemäss 6.6.1), wird eine allfällige Verspätung in die Minutenzahl
+
+            integriert.
+
+
+            Der Schwellenwert von Verspätungen wird zwischen den Verkehrsmittelkategorien unterschieden:
+
+
+            •  Tram/Bus:
+
+            •  Alle anderen Verkehrsmittelkategorien:   3 Minuten
+
+
+            1 Minute
+
+
+
+
+            Falls keine Prognose erstellt werden kann, z.B. weil ein Fahrzeug im Stau steht oder weil nicht
+
+            bekannt ist, wie lange eine Störung andauert, wird ein entsprechender Hinweis kommuniziert.
+
+
+            Verkehrsmittel, welche als Fahrplanzeit eine Betriebszeit (siehe 6.6.2) haben, können nicht
+
+            verspätet sein.'
+        props:
+        - name: source-chapter
+          value: 3.16.1
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bus-tram-metro
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.schiff
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.seilbahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.schiff
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+      - id: bs-ki-3.16.2-fahrt
+        title: Information zu Ausfällen und Betriebszuständen (Informationen zur Fahrt)
+        parts:
+        - name: statement
+          prose: 'Ausfälle von Fahrten ohne Ersatz mit der gleichen Verkehrsmittelkategorie müssen mindestens bis
+
+            zur fahrplanmässigen Abfahrtszeit angegeben werden. Bei Ausfällen mit Ersatz mit der gleichen
+
+            Verkehrsmittelkategorie genügt die Anzeige der entsprechenden Ersatzfahrt.
+
+
+            Die Betriebseinstellung von Verkehrsmitteln mit einer Betriebszeit (gemäss Abschnitt 6.6.2) wird
+
+            ebenfalls als Ausfall kommuniziert.
+
+
+            Für den Datenaustausch siehe Abschnitt 8.'
+        props:
+        - name: source-chapter
+          value: 3.16.2
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bus-tram-metro
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.schiff
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.seilbahn
+          remarks: v e – verbindlich (abgeltungsberechtigt), empfohlen (eigenwirtschaftlich)
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.schiff
+        - name: applicability
+          value: verbindlich
+          class: daten.einlieferung
+      - id: bs-ki-3.16.3-fahrt
+        title: Zusatzinformation Echtzeit (Informationen zur Fahrt)
+        parts:
+        - name: statement
+          prose: 'Für die Kundschaft können weitere fahrtgebundene Informationen wichtig sein, diese liegen
+
+            üblicherweise in Textform vor. Beispiele sind:
+
+
+            •
+
+
+            Informationen zu Abweichungen Ist/Soll:
+
+
+            o  Änderungen Abfahrtsort
+
+            o  Umleitungen, ausserordentlicher Halt / Durchfahrt
+
+
+            •  zusätzliche Hinweise:
+
+
+            fahrtgebundene Störungen (z.B. Türstörung)
+
+            freie Sitzplätze
+
+
+            o
+
+            o
+
+            o  Ausfall von Komfortangeboten (z.B. «Dieses Schiff verkehrt heute ohne Restaurant»)
+
+
+            Die Abweichungen zwischen Ist und Soll müssen durch die Ausgabesysteme aus den
+
+            eingelieferten Daten abgeleitet und dürfen daher nicht eingeliefert werden. Die zusätzlichen
+
+            Hinweise müssen bei Bedarf eingeliefert werden.'
+        props:
+        - name: source-chapter
+          value: 3.16.3
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bahn
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bus-tram-metro
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.schiff
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.seilbahn
+        - name: applicability
+          value: empfohlen
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: empfohlen
+          class: fahrzeug-innen.bus-tram-metro
+        - name: applicability
+          value: empfohlen
+          class: fahrzeug-innen.schiff
+        - name: applicability
+          value: empfohlen
+          class: daten.einlieferung
+      - id: bs-ki-3.16.4-fahrt
+        title: Reisendenlenkung (Informationen zur Fahrt)
+        parts:
+        - name: statement
+          prose: 'Bei Streckensperrungen, Ausfällen oder grossen Verspätungen sollen der Kundschaft zusätzlich
+
+            zu den fahrtunabhängigen Handlungsempfehlungen der Ereignisinformation fahrtspezifische
+
+            Reisendenlenkungen angeboten werden (siehe Abschnitt 2.5).
+
+
+            Nach Möglichkeit sollen die Formulierungen aus dem Abschnitt 2.5 sinngemäss verwendet
+
+            werden.'
+        props:
+        - name: source-chapter
+          value: 3.16.4
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bahn
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.schiff
+        - name: applicability
+          value: verbindlich
+          class: haltestelle.seilbahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.schiff
+    - id: bs-ki-3.3
+      title: Informationen zu Anschlüssen
+      controls:
+      - id: bs-ki-3.4-anschluss
+        title: Fahrplanzeit (Informationen zu Anschlüssen)
+        parts:
+        - name: statement
+          prose: 'Jede Fahrt muss im Sollfahrplan über eine geplante Abfahrtszeit oder Betriebszeit verfügen.
+
+            Werden Ankünfte dargestellt, ist die Ankunftszeit anzugeben.
+
+
+            Die Darstellung von Uhrzeiten ist zu berücksichtigen (siehe Abschnitt 6.5).
+
+
+            Beispiele
+
+
+            Abfahrtszeit
+
+
+            13:37 / 5’
+
+
+            Betriebszeit
+
+
+            von 08:30 bis 16:30 durchgehend
+
+
+            Hinweise zur Verwendung von Abfahrtszeiten im Fahrplan sowie in Betriebszeiten sind im
+
+            Abschnitt 6.6 aufgeführt.'
+        props:
+        - name: source-chapter
+          value: '3.4'
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.schiff
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.seilbahn
+      - id: bs-ki-3.5-anschluss
+        title: Verkehrsmittelkategorie (Informationen zu Anschlüssen)
+        parts:
+        - name: statement
+          prose: 'Die Verkehrsmittel werden zu Verkehrsmittelkategorien gebündelt. Gegenüber der Kundschaft
+
+            werden sie in der Regel als Piktogramme kommuniziert. Sie geben Orientierungshilfe auf den
+
+            Kanälen der Kundeninformation und kommen in der Signaletik zum Einsatz.
+
+
+
+
+            Auf eine Unterscheidung zwischen verschiedenen Antriebsarten von Bussen (z.B. Trolleybussen,
+
+            Elektrobussen usw.) wird verzichtet, zumal die Busse auch wechselnd auf der gleichen Linie
+
+            verkehren können. Für weitere Informationen zu den Piktogrammen siehe Abschnitt 6.10.
+
+
+            In der Schweiz werden folgende Verkehrsmittelkategorien verwendet:
+
+
+            Verkehrsmittelkategorie Bahn
+
+
+            Deutsch
+
+
+            Zug
+
+
+            Zahnradbahn
+
+
+            Französisch  Train
+
+
+            Chemin de fer à crémaillère
+
+
+            Italienisch
+
+
+            Treno
+
+
+            Ferrovia a cremagliera
+
+
+            Englisch
+
+
+            Train
+
+
+            Rack-Railroad
+
+
+            Als Zahnradbahn gelten alle Bahnen mit durchgehendem Zahnradantrieb. Bahnen im Mischbetrieb
+
+            von Zahnradantrieb und Adhäsionsantrieb gelten als Zug.
+
+
+            Verkehrsmittelkategorien Bus, Tram, Metro
+
+
+            Deutsch
+
+
+            Bus  Tram
+
+
+            Metro
+
+
+            Französisch  Bus  Tram
+
+
+            Métro
+
+
+            Italienisch
+
+
+            Bus  Tram
+
+
+            Metro
+
+
+            Englisch
+
+
+            Bus  Tramway  Underground
+
+
+            Verkehrsmittelkategorien bei Seilbahnen und Aufzügen
+
+
+            Deutsch
+
+
+            Standseilbahn  Pendelbahn
+
+
+            Gondelbahn  Sesselbahn  Aufzug
+
+
+            Französisch  Funiculaire
+
+
+            Téléphérique à va-et-
+
+            vient
+
+
+            Télécabine
+
+
+            Télésiège
+
+
+            Ascenseur
+
+
+            Italienisch
+
+
+            Funicolare
+
+
+            Funivie a va e vieni
+
+
+            Cabinovie
+
+
+            Seggiovia
+
+
+            Ascensore
+
+
+            Englisch
+
+
+            Funicular
+
+
+            Cable car
+
+
+            Gondola lift  Chairlift
+
+
+            Elevator
+
+
+            Verkehrsmittelkategorien auf dem Wasser
+
+
+            Deutsch
+
+
+            Schiff
+
+
+            Fähre
+
+
+            Französisch  Bateau
+
+
+            Ferry
+
+
+            Italienisch
+
+
+            Batello
+
+
+            Traghetto
+
+
+            Englisch
+
+
+            Boat
+
+
+            Ferry
+
+
+            Als Fähren gelten jene Schiffe, welche neben Personentransport auch Autos transportieren.
+
+            Schiffe im sogenannten Fährbetrieb ohne den Transport von Autos gelten als Schiffe.'
+        props:
+        - name: source-chapter
+          value: '3.5'
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.schiff
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.seilbahn
+      - id: bs-ki-3.6-anschluss
+        title: Liniennummer (Informationen zu Anschlüssen)
+        parts:
+        - name: statement
+          prose: 'Die Liniennummer ist die gegenüber der Kundschaft angezeigte Identifikation einer Linie. Die
+
+            Liniennummer muss innerhalb einer Region pro Verkehrsmittelkategoriegruppe gemäss 3.5
+
+            eindeutig sein. Im Fernverkehr muss diese innerhalb der ganzen Schweiz eindeutig sein. Zwei
+
+            gleiche Liniennummern benachbarter Regionen bzw. Verkehrsmittelkategoriegruppen gemäss 3.5
+
+            dürfen sich nicht berühren. Die Regionen sind in den Ausführungsbestimmungen geregelt.
+
+
+            Die Liniennummer ist je Verkehrsmittelkategorie unterschiedlich aufgebaut (siehe Abschnitt 3.6.3).'
+        - name: guidance
+          title: AB BS-KI 3.6 – Definition der Linie
+          prose: 'Die folgenden Grundsätze gelten:
+
+            •  Auf der Linie darf es maximal drei unterschiedliche Fahrtvarianten geben.
+
+            •  Pro Fahrtvariante müssen mindestens 80% der Via der Stammstrecke bedient werden.
+
+            •  Fehlende Via aufgrund von Teilstrecken werden nicht mitgerechnet.
+
+            •  Unterschiedliche Reihenfolgen innerhalb der Nachbarhaltestellen (z.B. Halt 7 wird zu 8 und Halt 8 wird zu 7)
+            werden nicht mitgerechnet.
+
+            •  Früh- und Spätkurse dürfen darüber hinaus maximal 20% zusätzliche Via (zur Stammstrecke) anfahren, ohne dass
+            sie als separate Fahrvariante gezählt werden.
+
+            •  Verstärkungsfahrten (z.B. während der HVZ oder für Schülerverkehr) dürfen von der Haltepolitik abweichen und
+            zählen nicht zu den drei Fahrtvarianten.
+
+            •  Ausfransungen (Y-Linien) sind nicht erlaubt.
+
+            •  Einzelfahrten, welche linienübergreifend fahren (z.B. Pässe Rundfahrten) werden als eigenständige Linie definiert.
+
+            •  Ergänzende integrale Angebote (z.B. Skibus) sind eigenständige Linie.'
+        - name: guidance
+          title: AB BS-KI 3.6 – Änderung der Liniennummer
+          prose: Grundsätzlich gelten die Liniennummer und Linienbezeichnung, wie sie in den Konzessionen verfügt sind. Wenn
+            es zur besseren Kommunikation gegenüber den Kunden erforderlich ist, können Liniennummern und Linienbezeichnungen
+            in Absprache mit dem BAV geändert werden, ohne dass eine Konzessionsänderung notwendig ist (Art. 17 VPB). Voraussetzung
+            ist, dass der Bestand der Linie weiterhin der erteilten Konzession entspricht. Diesbezügliche Anfragen sind an
+            das BAV zu richten. Die Änderung erfolgt jeweils zum Fahrplanwechsel.
+        - name: guidance
+          title: AB BS-KI 3.6 – CH-Liniennummer (CHLNR)
+          prose: 'Die CH-Liniennummer setzt sich wie folgt zusammen:
+
+            <Präfix>.<Region>.<Liniennummer>:<Attribut>
+
+
+            Präfix – charakterisiert die Verkehrsart:
+
+            b = Bahn, Zahnradbahn und deren Ersatzverkehr
+
+            c = Autoverlad (ohne Transport von Fussgänger)
+
+            n = Schiff
+
+            r = Bus, Tram und Metro, sowie Schiff, Seilbahnen und Zahnradbahnen, wenn diese in das städtische Liniennetz integriert
+            sind
+
+            f = Seilbahn'
+        - name: guidance
+          title: AB BS-KI 3.6 – Regionen Bahn
+          prose: 'Nummer  Region
+
+            0  Fernverkehr, andere nationale Angebote
+
+            1  Arc Lémanique
+
+            2  Région Fribourg
+
+            3  Region Bern
+
+            4  Arc jurassien und Kanton Solothurn
+
+            5  Region Nordwestschweiz (TNW-AG)
+
+            6  Region Zentralschweiz
+
+            7  Region Zürich (ZVV)
+
+            8  Region Ostschweiz (Ostwind)
+
+            9  Region Graubünden
+
+            t  Ticino'
+        props:
+        - name: source-chapter
+          value: '3.6'
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.schiff
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.seilbahn
+        - name: source-document
+          value: AB_3.6_DE.pdf
+          remarks: Ausführungsbestimmung Abschnitt 3.6, Version 3. Dezember 2025
+      - id: bs-ki-3.7-anschluss
+        title: Ziel (Informationen zu Anschlüssen)
+        parts:
+        - name: statement
+          prose: 'Das Ziel einer Fahrt ist grundsätzlich die effektive letzte Haltestelle der Fahrt. Damit wird
+
+            kommuniziert, wohin gefahren wird. Für die Schreibweise ist der Abschnitt 6.4 zu beachten.'
+        props:
+        - name: source-chapter
+          value: '3.7'
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.schiff
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.seilbahn
+      - id: bs-ki-3.8-anschluss
+        title: Via (Informationen zu Anschlüssen)
+        parts:
+        - name: statement
+          prose: 'Die Angabe von Via gibt der Kundschaft Hinweise zum Fahrtverlauf. Zusätzlich vermitteln sie
+
+            Sicherheit, die richtige Fahrt zu nehmen und helfen bei der geografischen Orientierung.
+
+
+            Via werden in Fahrtrichtung von links nach rechts bzw. von oben nach unten sortiert dargestellt.
+
+
+            Für die Auswahl und Darstellung von Via gelten folgende Regeln:
+
+
+            •  Können aus Platzgründen nicht alle Via aufgeführt werden, regeln die
+
+
+            Ausführungsbestimmungen die Wahl der relevantesten Via und allfällig mögliche Kurz- oder
+
+            Teilbezeichnungen. Es ist auch möglich, dass aus Platzgründen gar keine Via aufgeführt
+
+            werden können.
+
+
+            •  Als Via dürfen nur Haltestellen verwendet werden und keine Regionennamen wie z.B.
+
+
+            „Vallemaggia“.
+
+
+            •  Je Haltestelle dürfen nur Via angezeigt werden, die auf dem noch zu fahrenden
+
+
+            Streckenverlauf liegen. Wenn auf dem Fahrplan eine Perlschnur gezeigt wird, dürfen alle Via
+
+            angezeigt werden, aber nur, wenn klar erkennbar ist, welche bereits zurückgelegt wurden und
+
+            welche noch kommen, zum Beispiel durch Ausgrauen der bereits zurückgelegten Strecke.
+
+
+            •  Via-Stationen, die von links nach rechts angezeigt werden, sind durch zwei Leerschläge
+
+
+            voneinander zu trennen (keine Trennzeichen wie «–» oder «,»).
+
+            •  Via-Stationen sind in der Darstellung klar vom Ziel abzugrenzen.
+
+            •  Für die Schreibweise ist der Abschnitt 6.4 zu beachten.'
+        props:
+        - name: source-chapter
+          value: '3.8'
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.schiff
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.seilbahn
+      - id: bs-ki-3.10-anschluss
+        title: Abfahrtsort soll und real (Informationen zu Anschlüssen)
+        parts:
+        - name: statement
+          prose: 'Die Kundschaft muss sich innerhalb der Haltestelle über die verschiedenen Abfahrtsorte (sofern
+
+            mehrere vorhanden sind) orientieren können. Dazu werden die Abfahrtsorte einheitlich benannt
+
+            und durchnummeriert bzw. durchbuchstabiert. Die Bezeichnungen müssen über alle Kanäle und
+
+            Touchpoints einheitlich verwendet werden.
+
+
+
+
+            Massgebend ist die jeweilige Verkehrsmittelkategorie:
+
+
+            Verkehrsmittelkategorie
+
+
+            Sprache
+
+
+            Bezeichnung
+
+
+            DE
+
+
+            FR
+
+
+            IT
+
+
+            EN
+
+
+            Zug / Zahnradbahn / Metro   Gleis
+
+
+            Bus / Tram
+
+
+            Schiff
+
+
+            Seilbahn / Gondelbahn /
+
+            Sessellift / Standseilbahn
+
+
+            Kante
+
+
+            Steg
+
+
+            Perron
+
+
+            voie
+
+
+            quai
+
+
+            quai
+
+
+            quai
+
+
+            binario
+
+
+            platform
+
+
+            1 bis 99
+
+
+            corsia
+
+
+            pontile
+
+
+            stop
+
+
+            pier
+
+
+            A bis Z
+
+
+            1 bis 99
+
+
+            banchina
+
+
+            platform
+
+
+            1 bis 99
+
+
+            Auf das Nummerieren bzw. Durchbuchstabieren kann unter folgenden Bedingungen verzichtet
+
+            werden:
+
+
+            •  Bei Bahn- und Schiff-Haltestellen, wenn nur ein Gleis oder ein Steg vorhanden ist.
+
+            •  Bei Bus-, Tram- und Metro-Haltestellen, wenn alle folgenden Punkte erfüllt sind:
+
+
+            o  Maximal 2 Kanten
+
+            o  Die Kanten liegen in Sichtdistanz nahe beieinander.
+
+            o  Es besteht keine anderweitige Verwechslungsgefahr.
+
+            •  Bei Seilbahnen, wenn das Ziel der Linie angegeben wird.
+
+
+            Wird auf eine Nummerierung / Buchstabierung verzichtet, ist dies auf allen Kanälen umzusetzen,
+
+            insbesondere dürfen auch keine Daten (siehe Abschnitt 8.4.6) eingeliefert werden.
+
+
+            Bei Seilbahnen befindet sich das Perron und damit dessen Beschriftung physisch bei der
+
+            Zutrittskontrolle (sofern vorhanden) und nicht beim Übergang in die Kabine, um der Kundschaft
+
+            eine rechtzeitige Orientierung zu ermöglichen.'
+        props:
+        - name: source-chapter
+          value: '3.10'
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.schiff
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.seilbahn
+      - id: bs-ki-3.16.1-anschluss
+        title: Verspätung (Informationen zu Anschlüssen)
+        parts:
+        - name: statement
+          prose: 'Die Ausgabe von Verspätungen gibt der Kundschaft eine gewisse Sicherheit, dass ein nicht
+
+            planmässig verkehrendes Fahrzeug zu einem bestimmten Zeitpunkt doch noch eintreffen wird.
+
+
+            Die Ausgabe von Verspätungen unterscheidet sich bei den unterschiedlichen Betriebsarten (siehe
+
+            Abschnitt 6.6) und Verkehrsmittelkategorien (siehe Abschnitt 3.5):
+
+
+            In der zeitbasierten Darstellung (gemäss 6.6.1) wird die Abweichung von der Soll-Zeit
+
+            kommuniziert.
+
+
+            Bei der Intervalldarstellung (gemäss 6.6.1), wird eine allfällige Verspätung in die Minutenzahl
+
+            integriert.
+
+
+            Der Schwellenwert von Verspätungen wird zwischen den Verkehrsmittelkategorien unterschieden:
+
+
+            •  Tram/Bus:
+
+            •  Alle anderen Verkehrsmittelkategorien:   3 Minuten
+
+
+            1 Minute
+
+
+
+
+            Falls keine Prognose erstellt werden kann, z.B. weil ein Fahrzeug im Stau steht oder weil nicht
+
+            bekannt ist, wie lange eine Störung andauert, wird ein entsprechender Hinweis kommuniziert.
+
+
+            Verkehrsmittel, welche als Fahrplanzeit eine Betriebszeit (siehe 6.6.2) haben, können nicht
+
+            verspätet sein.'
+        props:
+        - name: source-chapter
+          value: 3.16.1
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bahn
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.bus-tram-metro
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.schiff
+        - name: applicability
+          value: verbindlich
+          class: fahrzeug-innen.seilbahn
+      - id: bs-ki-3.16.4-anschluss
+        title: Reisendenlenkung (Informationen zu Anschlüssen)
+        parts:
+        - name: statement
+          prose: 'Bei Streckensperrungen, Ausfällen oder grossen Verspätungen sollen der Kundschaft zusätzlich
+
+            zu den fahrtunabhängigen Handlungsempfehlungen der Ereignisinformation fahrtspezifische
+
+            Reisendenlenkungen angeboten werden (siehe Abschnitt 2.5).
+
+
+            Nach Möglichkeit sollen die Formulierungen aus dem Abschnitt 2.5 sinngemäss verwendet
+
+            werden.'
+        props:
+        - name: source-chapter
+          value: 3.16.4
+        - name: applicability
+          value: empfohlen
+          class: haltestelle.bahn
+  back-matter:
+    resources:
+    - uuid: 2b6f0b19-1b00-4493-b4c2-72a3d01cefda
+      title: Übergangsdokument BS-KI
+      description: Übergangsregelungen für den Nationalen Branchenstandard Kundeninformation. Definiert Fristen und Bedingungen
+        für die Umsetzung der einzelnen Vorgaben. 337 Seiten.
+      props:
+      - name: version
+        value: 01.11.2024
+      - name: type
+        value: transition-document
+      rlinks:
+      - href: Uebergangsdokument_DE.pdf
+    - uuid: 8e46420a-0915-49dc-9bb5-19b09cca98be
+      title: Ergänzungen Übergangsdokument BS-KI
+      description: Ergänzungen zum Übergangsdokument mit aktualisierten Fristen und Präzisierungen. Version 01.06.2024.
+      props:
+      - name: version
+        value: 01.06.2024
+      - name: type
+        value: transition-supplement
+      rlinks:
+      - href: Ergaenzungen_Uebergangsdokument_DE.pdf
+    - uuid: 5630415d-84b5-4a26-b8b5-34ffb7ff0228
+      title: Anhang 2 – On-Demand öV Schweiz
+      description: Kundeninformations-Bedürfnisse für On-Demand-Verkehr. Ergänzendes Dokument zum BS-KI. Ausgabe 15.03.2022.
+      props:
+      - name: version
+        value: 15.03.2022
+      - name: type
+        value: supplement
+      rlinks:
+      - href: BS-KI_Anhang2_OnDemand_DE.pdf
