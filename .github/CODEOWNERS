@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2026 DB Systel GmbH
+# SPDX-License-Identifier: Apache-2.0
+#
+# Code owners for OSCAL4Rail
+#
+# Owners are automatically requested for review on pull requests that touch
+# matching paths. This lets the maintainers review and approve each other's
+# PRs, so review is not bottlenecked on a single person.
+#
+# Handles verified against MAINTAINERS.md and repository collaborators
+# (both have push access). See also OpenRailAssociation/openrail-org-config
+# for team/branch-protection configuration.
+
+# Default owners for everything in the repository
+*       @JensGrote @simon-frei
