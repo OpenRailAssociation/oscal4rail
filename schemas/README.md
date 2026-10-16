@@ -37,3 +37,27 @@ python3 tools/fetch_oscal_schemas.py --update-manifest
 ```
 
 Current pinned version: see `nist/manifest.json`.
+
+## `oscal4rail/` — additive constraint schemas
+
+### `oscal4rail-catalog-constraints.schema.json`
+
+Checks the railway conventions from
+[`docs/reference/catalog-format.md`](../docs/reference/catalog-format.md) on a
+catalog, **in addition to** the NIST catalog schema. It is a **standalone** Draft-07
+schema and deliberately does **not** `$ref` the NIST schema (design decision on
+[#3](https://github.com/OpenRailAssociation/oscal4rail/issues/3), Variant A).
+Validation is therefore a **two-pass** process:
+
+1. NIST pass — structural validity against `nist/oscal-catalog.json`.
+2. OSCAL4Rail pass — railway conventions against this schema.
+
+It **enforces** the O4R invariants (chapter-based `@id`, mandatory provenance props,
+`statement` part non-empty, every `applicability` prop carries non-empty `value` +
+`class`) while staying **additive**: anything else NIST allows (extra parts such as
+`guidance` or `assessment-criteria`, extra props) passes untouched. Layer-4
+assessment constructs are not blocked here; they get their own schema later.
+
+**Out of scope (belongs to the validator, #5):** cross-field checks that JSON Schema
+cannot express — notably the invariant that the chapter encoded in a control `@id`
+equals its `source-chapter` prop (catalog-format.md §2).

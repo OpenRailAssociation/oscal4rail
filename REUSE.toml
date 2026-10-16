@@ -26,6 +26,13 @@ precedence = "override"
 SPDX-FileCopyrightText = "National Institute of Standards and Technology (NIST), U.S. Department of Commerce"
 SPDX-License-Identifier = "CC0-1.0"
 
+# OSCAL4Rail constraint schemas are first-party, authored here (Apache-2.0).
+[[annotations]]
+path = "schemas/oscal4rail/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 DB Systel GmbH"
+SPDX-License-Identifier = "Apache-2.0"
+
 # Catalog files: the BS-KI example catalog was created at Hack4Rail,
 # the hackathon of the OpenRail Association (with DB, SBB, OEBB). Licensed
 # Apache-2.0. See NOTICE.md.
