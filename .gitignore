@@ -29,3 +29,6 @@ docs/ISSUES-PLAN.md
 # Local working artifacts (never part of the framework)
 *.local.*
 scratch/
+
+# Presentation diagrams (draw.io sources + PNG exports) — not persistent framework content
+docs/reference/diagrams/
