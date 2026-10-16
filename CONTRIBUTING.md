@@ -24,6 +24,33 @@ Thank you for contributing! OSCAL4Rail is an open standard maintained by the Ope
 
 Rationale: OSCAL4Rail is an international, cross-organisation framework (DB, SBB, ÖBB, and beyond). A single working language keeps the framework contributable by everyone and ready for the OpenRail Association.
 
+### File naming (prose docs)
+
+Prose documents under `docs/` (specs, how-tos, tutorials) are English-first. The
+English version is the default and is **suffixless** (e.g. `catalog-format.md`).
+A translation carries a language suffix (`catalog-format.de.md`). ADRs keep their
+own `ADR-NNN-<slug>.md` scheme.
+
+This filename-suffix convention applies **only to prose docs** — never to OSCAL
+artifacts or schemas (see below).
+
+## Serialization (OSCAL artifacts)
+
+OSCAL has three interchangeable serializations (XML, JSON, YAML). This project
+uses **one canonical serialization and generates the others** — see
+[ADR-012](docs/adr/ADR-012-canonical-serialization.md).
+
+- **YAML is canonical.** Catalogs, profiles, mappings, and assessment results are
+  authored, reviewed, and committed as `.yaml`. YAML is the single source of truth.
+- **JSON and XML are generated, never hand-maintained.** Produce them from the
+  canonical YAML with the official OSCAL tools (`oscal-cli convert`;
+  `compliance-trestle` for authoring/validation). Do not write a custom converter.
+- **Schemas are JSON Schema** (`.schema.json`, Draft-07). One schema validates all
+  three serializations.
+- **Language is not carried by the file extension** for OSCAL artifacts. It lives in
+  `metadata/props[name="language"]` and the directory level
+  `catalogs/<regulation>/<lang>/`.
+
 ## Submitting a New Catalog
 
 1. Fork the repository
