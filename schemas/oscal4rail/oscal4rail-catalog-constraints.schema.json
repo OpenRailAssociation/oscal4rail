@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/OpenRailAssociation/oscal4rail/schemas/oscal4rail/oscal4rail-catalog-constraints.schema.json",
+  "title": "OSCAL4Rail Catalog Constraints (additive over NIST OSCAL)",
+  "description": "Standalone constraint schema that checks the railway-specific conventions of an OSCAL4Rail catalog, in addition to (not instead of) the NIST OSCAL Catalog schema. Run as a second validation pass. See docs/reference/catalog-format.md and the design decision on issue #3. This schema deliberately does NOT $ref the NIST schema (Variant A, two-pass).",
+  "type": "object",
+  "required": ["catalog"],
+  "properties": {
+    "catalog": {
+      "type": "object",
+      "required": ["metadata", "groups"],
+      "properties": {
+        "metadata": {
+          "type": "object",
+          "required": ["props"],
+          "properties": {
+            "props": {
+              "type": "array",
+              "allOf": [
+                { "contains": { "$ref": "#/$defs/prop-country" } },
+                { "contains": { "$ref": "#/$defs/prop-language" } },
+                { "contains": { "$ref": "#/$defs/prop-source-document" } }
+              ]
+            }
+          }
+        },
+        "groups": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/group" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "o4r-id": {
+      "description": "Chapter-based ID: <regulation>-<chapter>[.<section>][.<subsection>...][-<context>]. Never page-based. See catalog-format.md §2.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-[0-9]+(\\.[0-9]+)*(-[a-z0-9-]+)?$"
+    },
+    "prop-country": {
+      "type": "object",
+      "required": ["name", "value"],
+      "properties": {
+        "name": { "const": "country" },
+        "value": { "type": "string", "minLength": 1 }
+      }
+    },
+    "prop-language": {
+      "type": "object",
+      "required": ["name", "value"],
+      "properties": {
+        "name": { "const": "language" },
+        "value": { "type": "string", "minLength": 1 }
+      }
+    },
+    "prop-source-document": {
+      "type": "object",
+      "required": ["name", "value"],
+      "properties": {
+        "name": { "const": "source-document" },
+        "value": { "type": "string", "minLength": 1 }
+      }
+    },
+    "prop-source-chapter": {
+      "type": "object",
+      "required": ["name", "value"],
+      "properties": {
+        "name": { "const": "source-chapter" },
+        "value": { "type": "string", "minLength": 1 }
+      }
+    },
+    "applicability-prop": {
+      "description": "Conditional: a prop named 'applicability' must carry a non-empty obligation (value) AND a non-empty context (class). Props with any other name are not constrained here. See catalog-format.md §6.",
+      "type": "object",
+      "if": {
+        "properties": { "name": { "const": "applicability" } },
+        "required": ["name"]
+      },
+      "then": {
+        "required": ["value", "class"],
+        "properties": {
+          "value": { "type": "string", "minLength": 1 },
+          "class": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "statement-part": {
+      "type": "object",
+      "required": ["name", "prose"],
+      "properties": {
+        "name": { "const": "statement" },
+        "prose": { "type": "string", "minLength": 1 }
+      }
+    },
+    "group": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "$ref": "#/$defs/o4r-id" },
+        "controls": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/control" }
+        },
+        "groups": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/group" }
+        }
+      }
+    },
+    "control": {
+      "type": "object",
+      "required": ["id", "parts", "props"],
+      "properties": {
+        "id": { "$ref": "#/$defs/o4r-id" },
+        "parts": {
+          "type": "array",
+          "contains": { "$ref": "#/$defs/statement-part" }
+        },
+        "props": {
+          "type": "array",
+          "contains": { "$ref": "#/$defs/prop-source-chapter" },
+          "items": { "$ref": "#/$defs/applicability-prop" }
+        }
+      }
+    }
+  }
+}
