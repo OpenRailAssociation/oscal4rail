@@ -32,3 +32,6 @@ scratch/
 
 # Presentation diagrams (draw.io sources + PNG exports) — not persistent framework content
 docs/reference/diagrams/
+
+# Fetched example upstreams (reproducible via tools/fetch_bsi_example.py, not vendored)
+examples/upstream/**/_fetched/

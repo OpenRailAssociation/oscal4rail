@@ -1,0 +1,24 @@
+{
+  "_comment": "OSCAL4Rail example upstream manifest for the BSI 'Stand-der-Technik-Bibliothek' (CC-BY-SA-4.0). Single source of truth for the pinned upstream used by examples/profiles/. Follows the same reproducible-acquisition policy as schemas/nist/manifest.json (ADR-008): we DO NOT vendor these files into the repo; we fetch them from a pinned source and verify SHA256. The BSI repository publishes no release tags, so we pin on a commit SHA instead of a release tag. To bump: change 'commit', re-run tools/fetch_bsi_example.py --update-manifest, review the diff, commit.",
+  "source_repo": "BSI-Bund/Stand-der-Technik-Bibliothek",
+  "source_url": "https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek",
+  "license": "CC-BY-SA-4.0",
+  "attribution": "© Bundesamt für Sicherheit in der Informationstechnik (BSI), Stand-der-Technik-Bibliothek, CC-BY-SA-4.0.",
+  "commit": "a12831136f4122a4c43854622180a24f2576a41e",
+  "retrieved": "2026-10-19",
+  "raw_base": "https://raw.githubusercontent.com/BSI-Bund/Stand-der-Technik-Bibliothek/a12831136f4122a4c43854622180a24f2576a41e/control_layer",
+  "files": {
+    "grundschutz-plusplus-resolved-catalog": {
+      "path": "Grundschutz++/Grundschutz++-resolved_catalog.json",
+      "sha256": "27a9d50092bd6c8fef5c0f83495e125bd54383a1ebf5d4f763803fce0380c645"
+    },
+    "methodik-grundschutz-plusplus-catalog": {
+      "path": "Grundschutz++/sources/catalogs/Methodik-Grundschutz++/BSI-Methodik-Grundschutz++-catalog.json",
+      "sha256": "8a775a6ecb2ac94e5f546f46a5853a5e2bad6303f95c3de6a9ee9eea8b70ea97"
+    },
+    "iso27001-to-gspp-mapping": {
+      "path": "Mappings/ISO-27001-zu-GSpp/ISO27001-AnnexA-to-GS++-mapping_collection.json",
+      "sha256": "ffb785b2b0026e4c95f3eaee7a59f7ca894a298fb90743b5237a348870e91662"
+    }
+  }
+}
