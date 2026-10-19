@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/OpenRailAssociation/oscal4rail/schemas/oscal4rail/oscal4rail-profile-cascade-constraints.schema.json",
+  "title": "OSCAL4Rail Cascade Profile Constraints (additive over NIST OSCAL Profile)",
+  "description": "Standalone constraint schema for an OSCAL4Rail cascade profile: one level of the Regulatory Cascade expressed as a NIST OSCAL profile that selects controls from an upstream catalog. Checks the railway-specific extension props (cascade-level, parent-catalog-ref, conformance-constraint) in addition to (not instead of) the NIST OSCAL Profile schema. Run as a second validation pass. See docs/reference/cascade-as-profiles.md. Like the catalog constraints schema, this deliberately does NOT $ref the NIST schema (two-pass validation).",
+  "type": "object",
+  "required": ["profile"],
+  "properties": {
+    "profile": {
+      "type": "object",
+      "required": ["metadata", "imports"],
+      "properties": {
+        "metadata": {
+          "type": "object",
+          "required": ["props"],
+          "properties": {
+            "props": {
+              "type": "array",
+              "allOf": [
+                { "contains": { "$ref": "#/$defs/prop-cascade-level" } },
+                { "contains": { "$ref": "#/$defs/prop-parent-catalog-ref" } }
+              ],
+              "items": { "$ref": "#/$defs/o4r-prop" }
+            }
+          }
+        },
+        "imports": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["href"],
+            "properties": {
+              "href": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "o4r-ns": {
+      "description": "The OSCAL4Rail extension namespace. All railway extension props live under this ns so every artifact stays valid NIST OSCAL. See catalog-format.md §5.",
+      "const": "https://github.com/OpenRailAssociation/oscal4rail/ns"
+    },
+    "cascade-level-enum": {
+      "description": "The cascade levels from the Regulatory Cascade Model (arc42 §1 / docs/reference/cascade-as-profiles.md). Most-significant first.",
+      "enum": [
+        "international",
+        "eu",
+        "national",
+        "agency",
+        "industry",
+        "company",
+        "system"
+      ]
+    },
+    "prop-cascade-level": {
+      "description": "Mandatory on a cascade profile: which level of the cascade this profile represents. Carried in the oscal4rail ns.",
+      "type": "object",
+      "required": ["name", "ns", "value"],
+      "properties": {
+        "name": { "const": "cascade-level" },
+        "ns": { "$ref": "#/$defs/o4r-ns" },
+        "value": { "$ref": "#/$defs/cascade-level-enum" }
+      }
+    },
+    "prop-parent-catalog-ref": {
+      "description": "Mandatory on a cascade profile: a stable reference to the upstream (parent) catalog this level specializes. Value is a manifest key, URI, or pinned reference resolvable by tooling; the concrete upstream location is carried by the NIST import/@href. Carried in the oscal4rail ns.",
+      "type": "object",
+      "required": ["name", "ns", "value"],
+      "properties": {
+        "name": { "const": "parent-catalog-ref" },
+        "ns": { "$ref": "#/$defs/o4r-ns" },
+        "value": { "type": "string", "minLength": 1 }
+      }
+    },
+    "prop-conformance-constraint": {
+      "description": "Optional on a cascade profile: the type of conformance relationship to the parent. Conformance flows downward — a child may only specialize, never contradict its parent (ADR-006). The vocabulary mirrors the cascade verbs in arc42 §1. This prop LABELS the relationship declaratively; enforcing it is the job of the validator / Change Impact layer, not this schema.",
+      "type": "object",
+      "required": ["name", "ns", "value"],
+      "properties": {
+        "name": { "const": "conformance-constraint" },
+        "ns": { "$ref": "#/$defs/o4r-ns" },
+        "value": {
+          "enum": [
+            "specializes",
+            "concretizes",
+            "adapts",
+            "implements",
+            "operationalizes",
+            "references"
+          ]
+        }
+      }
+    },
+    "o4r-prop": {
+      "description": "Conditional checks on the three OSCAL4Rail cascade props. A prop with any other name is not constrained here. When name is one of the cascade props, its ns and value vocabulary are enforced.",
+      "type": "object",
+      "allOf": [
+        {
+          "if": { "properties": { "name": { "const": "cascade-level" } }, "required": ["name"] },
+          "then": { "$ref": "#/$defs/prop-cascade-level" }
+        },
+        {
+          "if": { "properties": { "name": { "const": "parent-catalog-ref" } }, "required": ["name"] },
+          "then": { "$ref": "#/$defs/prop-parent-catalog-ref" }
+        },
+        {
+          "if": { "properties": { "name": { "const": "conformance-constraint" } }, "required": ["name"] },
+          "then": { "$ref": "#/$defs/prop-conformance-constraint" }
+        }
+      ]
+    }
+  }
+}

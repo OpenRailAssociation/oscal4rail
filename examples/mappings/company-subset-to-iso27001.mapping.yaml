@@ -1,0 +1,83 @@
+# SPDX-FileCopyrightText: 2026 DB Systel GmbH
+# SPDX-License-Identifier: Apache-2.0
+#
+# OSCAL4Rail cascade example — cross-framework Control Mapping (AC4 of issue #4).
+#
+# This is a NIST OSCAL mapping-collection (v1.2.x model) that relates the controls selected
+# by examples/profiles/company-over-bsi-grundschutz.profile.yaml to ISO/IEC 27001:2022
+# Annex A controls. It demonstrates the cross-framework linking mechanism the Regulatory
+# Cascade uses at its international boundary (international ISO ↔ industry/national BSI),
+# reusing the NIST Control Mapping model instead of a bespoke construct.
+#
+# Framework ≠ Content (ADR-007): the map entries assert *relationships between identifiers*
+# (GC.* ↔ ISO A.*). They carry no requirement text from either framework. Both ID schemes
+# are published by their respective owners (BSI Grundschutz++; ISO/IEC 27001:2022).
+#
+# The relationships below are ILLUSTRATIVE and non-normative — they show the shape of a
+# cross-framework mapping. An authoritative ISO↔GS++ mapping is published by the BSI itself
+# (Mappings/ISO-27001-zu-GSpp/, fetched via tools/fetch_bsi_example.py); see
+# docs/reference/cascade-as-profiles.md §Mapping for how the two relate.
+#
+# id-ref values on the GS++ side are verbatim control IDs from the pinned upstream resolved
+# catalog; the ISO side uses ISO/IEC 27001:2022 Annex A clause numbers.
+
+mapping-collection:
+  uuid: 2d9b1c6e-4a07-4f5b-9e3a-8c1d6b2f0a55
+  metadata:
+    title: 'OSCAL4Rail cascade example: company subset ↔ ISO/IEC 27001:2022 Annex A'
+    published: '2026-10-19T00:00:00Z'
+    last-modified: '2026-10-19T00:00:00Z'
+    version: '0.1.0'
+    oscal-version: 1.2.3
+    props:
+    - name: cascade-level
+      ns: https://github.com/OpenRailAssociation/oscal4rail/ns
+      value: international
+      remarks: >-
+        This mapping expresses the international boundary of the cascade: the industry/national
+        catalog (BSI Grundschutz++) related to an international standard (ISO/IEC 27001).
+  provenance:
+    method: human
+    matching-rationale: semantic
+    status: draft
+    mapping-description: >-
+      Illustrative, non-normative example mapping produced for OSCAL4Rail issue #4 to
+      demonstrate the NIST Control Mapping mechanism across frameworks. Not an authoritative
+      crosswalk; the BSI publishes the authoritative ISO↔GS++ mapping.
+  mappings:
+  - uuid: 9f2a7c41-6b8d-4e2f-a1c3-5d0e9b4a7c62
+    source-resource:
+      type: catalog
+      href: ../upstream/bsi/_fetched/grundschutz-plusplus-resolved-catalog.json
+      remarks: BSI Grundschutz++ resolved catalog (© BSI, CC-BY-SA-4.0; fetched, pinned).
+    target-resource:
+      type: catalog
+      href: 'https://www.iso.org/standard/27001'
+      remarks: ISO/IEC 27001:2022, Annex A (referenced by identifier only; not redistributed).
+    maps:
+    - uuid: 3c1f8a20-7d44-4b9e-8f12-6a2e0c9d3b71
+      relationship: equivalent-to
+      sources:
+      - type: control
+        id-ref: GC.1.1   # Errichtung und Aufrechterhaltung eines ISMS
+      targets:
+      - type: control
+        id-ref: 'A.5.1'  # Policies for information security
+    - uuid: 4d2a9b31-8e55-4c0f-9023-7b3f1d0e4c82
+      relationship: subset-of
+      sources:
+      - type: control
+        id-ref: GC.5.1   # Festlegung von Zielen für die Informationssicherheit
+      targets:
+      - type: control
+        id-ref: 'A.5.1'  # Policies for information security
+      - type: control
+        id-ref: 'A.5.4'  # Management responsibilities
+    - uuid: 5e3b0c42-9f66-4d10-a134-8c4a2e1f5d93
+      relationship: equivalent-to
+      sources:
+      - type: control
+        id-ref: GC.6.1   # Festlegung des Geltungsbereichs
+      targets:
+      - type: control
+        id-ref: 'A.5.1'  # Policies for information security

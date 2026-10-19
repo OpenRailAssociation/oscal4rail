@@ -15,7 +15,7 @@ import yaml
 from jsonschema import Draft7Validator
 
 # Schema directory relative to this script
-SCHEMA_DIR = Path(__file__).parent.parent / "schemas"
+SCHEMA_DIR = Path(__file__).parent.parent / "schemas" / "nist"
 
 # Map OSCAL root element → schema file
 SCHEMA_MAP = {
