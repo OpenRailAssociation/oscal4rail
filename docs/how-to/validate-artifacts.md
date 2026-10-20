@@ -8,10 +8,10 @@ for the design decisions behind the validator.
 
 It runs **two passes** (see [`schemas/README.md`](../../schemas/README.md)):
 
-1. **NIST base schema** (always) — structural validity against the pinned NIST
+1. **NIST base schema** (always): structural validity against the pinned NIST
    OSCAL schema for the detected model (`schemas/nist/`, pinned via
    `manifest.json`, [ADR-008](../adr/ADR-008-reproducible-schema-acquisition.md)).
-2. **OSCAL4Rail constraints** (with `--strict`) — the additive railway
+2. **OSCAL4Rail constraints** (with `--strict`): the additive railway
    conventions (`schemas/oscal4rail/`), **auto-mapped by model**:
    `catalog` → catalog constraints, `profile` → cascade constraints.
 

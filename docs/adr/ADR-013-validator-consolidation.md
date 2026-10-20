@@ -31,9 +31,8 @@ validator itself ([#5](https://github.com/OpenRailAssociation/oscal4rail/issues/
 
 ### Facts (verified 2026-10-20)
 
-1. The repo contains **one** `tools/validate.py` (NIST pass only). The "two duplicate
-   validate.py" noted in #5 no longer applies — there is a single script to consolidate,
-   not two to merge.
+1. The repo contains **one** `tools/validate.py` (NIST pass only); the "two duplicate
+   validate.py" premise in #5 no longer holds.
 2. Two O4R constraint schemas exist, each applicable to exactly one model:
    `oscal4rail-catalog-constraints.schema.json` (→ `catalog`) and
    `oscal4rail-profile-cascade-constraints.schema.json` (→ `profile`).
@@ -48,13 +47,13 @@ validator itself ([#5](https://github.com/OpenRailAssociation/oscal4rail/issues/
 A single consolidated `tools/validate` with the following behaviour:
 
 1. **Two-pass validation.** Pass 1: NIST base schema (by detected model). Pass 2: the
-   OSCAL4Rail constraints — **auto-mapped by model** (`catalog` → catalog constraints,
+   OSCAL4Rail constraints, **auto-mapped by model** (`catalog` → catalog constraints,
    `profile` → cascade constraints), enabled with `--strict`.
 2. **Skip-and-report for models without an O4R schema.** When no O4R schema applies, the
    O4R pass is **skipped**, not failed. The skip is **recorded in the report** so coverage
    gaps are observable (no silent drift). A skip keeps the exit code at `0`.
 3. **`oscal-version` compared against the pinned tag** (ADR-008), read from
-   `schemas/nist/manifest.json` — **reported, not enforced** in this version (see
+   `schemas/nist/manifest.json`: **reported, not enforced** in this version (see
    "Consciously deferred" below). A mismatch is a recorded report finding; it does **not**
    fail the run.
 4. **Report beside the validated file**, in **both** Markdown (human-readable) and JSON
@@ -88,7 +87,7 @@ A single consolidated `tools/validate` with the following behaviour:
 
 ### Positive
 - One inspectable, dependency-lean validator (tech-stack principle: `jsonschema`, Draft-07).
-- Coverage gaps are **visible** (reported), not hidden — observability by design.
+- Coverage gaps are **visible** (reported), not hidden, observability by design.
 - CI gets a single pass/fail plus a durable per-file report in two formats (one run → MD + JSON).
 
 ### Negative / Risks
