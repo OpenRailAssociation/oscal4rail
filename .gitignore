@@ -30,6 +30,11 @@ docs/ISSUES-PLAN.md
 *.local.*
 scratch/
 
+# Generated validation reports (tools/validate.py writes them beside the
+# artifact; they are generated, not versioned — SSOT is catalog + validator).
+*.validation.md
+*.validation.json
+
 # Presentation diagrams (draw.io sources + PNG exports) — not persistent framework content
 docs/reference/diagrams/
 
