@@ -57,14 +57,3 @@ path = "examples/upstream/**/manifest.json"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 DB Systel GmbH"
 SPDX-License-Identifier = "Apache-2.0"
-
-# Fetched example upstream catalogs are third-party BSI content, pinned and
-# fetched reproducibly via tools/fetch_bsi_example.py (ADR-008 policy), NOT
-# vendored (git-ignored _fetched/). They remain under the BSI license.
-# Attribution: Bundesamt fuer Sicherheit in der Informationstechnik (BSI),
-# Stand-der-Technik-Bibliothek. See examples/upstream/bsi/manifest.json and NOTICE.md.
-[[annotations]]
-path = "examples/upstream/**/_fetched/**"
-precedence = "override"
-SPDX-FileCopyrightText = "Bundesamt fuer Sicherheit in der Informationstechnik (BSI)"
-SPDX-License-Identifier = "CC-BY-SA-4.0"
