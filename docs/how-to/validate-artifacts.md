@@ -16,12 +16,12 @@ It runs **two passes** (see [`schemas/README.md`](../../schemas/README.md)):
    `catalog` → catalog constraints, `profile` → cascade constraints.
 
 Models without an O4R schema (e.g. `assessment-results`, `component-definition`,
-`mapping`) **skip** the second pass; the skip is recorded in the report (no
-silent drift), and a skip does not fail the run.
+`mapping`) skip the second pass. The skip is recorded in the report. A skip does
+not fail the run.
 
 The validator also compares the artifact's `oscal-version` against the pinned
-tag. This is **reported, not enforced** (ADR-013): a mismatch is a report
-finding, not a failure.
+tag. This is reported, not enforced (ADR-013). A mismatch is a report finding,
+not a failure.
 
 ## Usage
 
@@ -45,15 +45,15 @@ not change the exit code.
 
 ## The validation report
 
-By default the validator writes a **full run report beside the validated file**,
-in two formats generated from one run:
+By default the validator writes a full run report beside the validated file, in
+two formats from one run:
 
 - `<name>.validation.md` — human-readable
 - `<name>.validation.json` — machine-/agent-readable
 
-> These report files are **generated, not versioned**: the single source of
-> truth is the catalog plus the validator. They are excluded via `.gitignore`
-> (`*.validation.md`, `*.validation.json`) and regenerated on demand (and in CI).
+> These report files are generated, not versioned. The source of truth is the
+> catalog plus the validator. They are excluded via `.gitignore`
+> (`*.validation.md`, `*.validation.json`) and regenerated on demand and in CI.
 
 ### Report structure (example)
 

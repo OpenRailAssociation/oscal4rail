@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2026 DB Systel GmbH
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# ADR-013: Consolidated Validator — Two-Pass, Auto-Mapped O4R Constraints, Report Beside the File
+# ADR-013: Consolidated Validator (Two-Pass, Auto-Mapped O4R Constraints, Report Beside the File)
 
 **Status:** Accepted
 
@@ -66,18 +66,16 @@ A single consolidated `tools/validate` with the following behaviour:
 
 ### Consciously deferred to a future release
 
-- **Hard `oscal-version` enforcement.** The pinned-version match (ADR-008) is **reported but
-  not enforced** for now. Reason: the only in-repo test catalog, `bs-ki-de.yaml`, still
-  declares `oscal-version: 1.1.3` while the manifest pins `1.2.3`. Enforcing the match would
-  require bumping BS-KI immediately — but BS-KI will be revised anyway once the Catalog
-  Railway Profile schema is finalized. Bumping it now would mean repeated, throw-away catalog
-  updates. We therefore keep the mismatch **visible in the report** (no silent drift) and
-  defer hard enforcement until the catalog is updated against the finalized schema.
-- **`--require-o4r` (strict coverage mode).** A flag that would turn a skipped/absent O4R
-  pass into a **failure** is **not** part of this version. We deliberately accept, for now,
-  that models without an O4R schema pass with a recorded skip. Tracked as a future-release
-  feature in [#42](https://github.com/OpenRailAssociation/oscal4rail/issues/42) — intentionally
-  **not** mapped to a planned v0.x milestone.
+- **Hard `oscal-version` enforcement.** The pinned-version match (ADR-008) is reported, not
+  enforced. Reason: the only in-repo test catalog, `bs-ki-de.yaml`, still declares
+  `oscal-version: 1.1.3` while the manifest pins `1.2.3`. BS-KI will be revised anyway once
+  the Catalog Railway Profile schema is final. Bumping it now, then again later, is wasted
+  work. We keep the mismatch visible in the report and defer hard enforcement until the
+  catalog is updated against the final schema.
+- **`--require-o4r` (strict coverage mode).** A flag that turns a skipped O4R pass into a
+  failure is out of scope here. For now, models without an O4R schema pass with a recorded
+  skip. Tracked for a future release in
+  [#42](https://github.com/OpenRailAssociation/oscal4rail/issues/42); not on a v0.x milestone.
 
 ### Out of scope here (tracked elsewhere)
 
