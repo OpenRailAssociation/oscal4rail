@@ -1,0 +1,251 @@
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 DB Systel GmbH
+# SPDX-License-Identifier: Apache-2.0
+"""Back-generate a human-readable Markdown document from an OSCAL4Rail catalog.
+
+This is the **translation logic** (OSCAL YAML → structured Markdown), not a
+final-format generator. The Markdown output is the universal intermediate from
+which consumers produce their target format:
+
+  Markdown → pandoc → Word (.docx)
+  Markdown → Hugo / HTML template → HTML (corporate-styled)
+  OSCAL YAML → openpyxl / XML → Excel (.xlsx)
+  any of the above → print → PDF
+
+The tool renders each control verbatim (prose taken 1:1 from the catalog),
+preserves source-chapter references and obligation levels, and supports a
+round-trip verification mode (--verify) that checks every prose value from
+the YAML appears in the generated output.
+
+See issue #6 and docs/how-to/generate-documents.md.
+"""
+
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+import yaml
+
+
+def _meta_prop(props: list[dict], name: str) -> str | None:
+    """Return the value of the first prop with the given name, or None."""
+    for p in props:
+        if p.get("name") == name:
+            return p.get("value")
+    return None
+
+
+def _applicability_rows(props: list[dict]) -> list[tuple[str, str, str]]:
+    """Extract (class, value, remarks) tuples for all applicability props."""
+    rows = []
+    for p in props:
+        if p.get("name") == "applicability":
+            rows.append((
+                p.get("class", ""),
+                p.get("value", ""),
+                p.get("remarks", ""),
+            ))
+    return rows
+
+
+def _render_metadata(meta: dict) -> list[str]:
+    """Render the catalog metadata block."""
+    title = meta.get("title", "(untitled)")
+    version = meta.get("version", "")
+    props = meta.get("props", [])
+    country = _meta_prop(props, "country") or ""
+    language = _meta_prop(props, "language") or ""
+    source_doc = _meta_prop(props, "source-document") or ""
+    source_url = _meta_prop(props, "source-url") or ""
+
+    lines = [f"# {title}", ""]
+    info = []
+    if version:
+        info.append(f"Version {version}")
+    if country:
+        info.append(f"Land: {country}")
+    if language:
+        info.append(f"Sprache: {language}")
+    if source_doc:
+        info.append(f"Quelle: {source_doc}")
+    if info:
+        lines.append(f"> {' | '.join(info)}")
+        if source_url:
+            lines.append(f"> URL: {source_url}")
+        lines.append("")
+    return lines
+
+
+def _render_control(ctrl: dict, depth: int, catalog_path: str) -> list[str]:
+    """Render one control as Markdown at the given heading depth."""
+    cid = ctrl.get("id", "?")
+    title = ctrl.get("title", "")
+    props = ctrl.get("props", [])
+    parts = ctrl.get("parts", [])
+    chapter = _meta_prop(props, "source-chapter") or cid
+
+    prefix = "#" * min(depth, 6)
+    lines = [f"{prefix} {chapter} – {title}", ""]
+
+    # Source reference (so the owner can navigate back to the YAML)
+    lines.append(f"> 📍 `{catalog_path}` · ID: `{cid}`")
+    lines.append("")
+
+    # Statement (verbatim prose)
+    for part in parts:
+        if part.get("name") == "statement":
+            prose = part.get("prose", "")
+            if prose:
+                lines.append(prose)
+                lines.append("")
+
+    # Guidance parts
+    for part in parts:
+        if part.get("name") == "guidance":
+            gtitle = part.get("title", "Guidance")
+            prose = part.get("prose", "")
+            lines.append(f"{'#' * min(depth + 1, 6)} {gtitle}")
+            lines.append("")
+            if prose:
+                lines.append(prose)
+                lines.append("")
+
+    # Applicability table
+    app_rows = _applicability_rows(props)
+    if app_rows:
+        lines.append("| Kontext | Verbindlichkeit | Bemerkung |")
+        lines.append("|---------|-----------------|-----------|")
+        for cls, val, rem in app_rows:
+            lines.append(f"| {cls} | {val} | {rem} |")
+        lines.append("")
+
+    # Source documents (additional references on controls)
+    for p in props:
+        if p.get("name") == "source-document":
+            doc = p.get("value", "")
+            rem = p.get("remarks", "")
+            ref = f"> Quelldokument: {doc}"
+            if rem:
+                ref += f" ({rem})"
+            lines.append(ref)
+            lines.append("")
+
+    return lines
+
+
+def _render_group(group: dict, depth: int, catalog_path: str) -> list[str]:
+    """Render a group (chapter) and its controls/subgroups recursively."""
+    gid = group.get("id", "")
+    title = group.get("title", "")
+    # Derive chapter number from id (e.g. bs-ki-2 -> 2, bs-ki-3.1 -> 3.1)
+    chapter = gid.rsplit("-", 1)[-1] if "-" in gid else gid
+
+    prefix = "#" * min(depth, 6)
+    lines = [f"{prefix} {chapter} – {title}", ""]
+
+    for ctrl in group.get("controls", []):
+        lines += _render_control(ctrl, depth + 1, catalog_path)
+
+    for sub in group.get("groups", []):
+        lines += _render_group(sub, depth + 1, catalog_path)
+
+    return lines
+
+
+def generate_markdown(catalog: dict, catalog_path: str = "") -> str:
+    """Translate an OSCAL catalog dict to structured Markdown."""
+    meta = catalog.get("metadata", {})
+    groups = catalog.get("groups", [])
+
+    lines = _render_metadata(meta)
+    for g in groups:
+        lines += _render_group(g, 2, catalog_path)
+
+    return "\n".join(lines)
+
+
+def verify_roundtrip(catalog: dict, markdown: str, catalog_path: str = "") -> list[dict]:
+    """Check that every prose value from the catalog appears verbatim in the MD.
+
+    Returns a list of mismatch records (empty = pass). Each record carries the
+    control id and part name so the author can navigate back to the exact spot
+    in the catalog and fix it.
+    """
+    mismatches = []
+
+    def _walk_controls(obj: dict, path: str) -> None:
+        for ctrl in obj.get("controls", []):
+            cid = ctrl.get("id", "?")
+            for i, part in enumerate(ctrl.get("parts", [])):
+                prose = part.get("prose", "")
+                if prose and prose not in markdown:
+                    mismatches.append({
+                        "group_path": path,
+                        "control_id": cid,
+                        "part_name": part.get("name", f"#{i}"),
+                        "snippet": prose[:60].replace("\n", " "),
+                    })
+        for sub in obj.get("groups", []):
+            _walk_controls(sub, f"{path}/{sub.get('id', '?')}")
+
+    for g in catalog.get("groups", []):
+        _walk_controls(g, g.get("id", "?"))
+
+    return mismatches
+
+
+def main(argv: list[str]) -> int:
+    ap = argparse.ArgumentParser(
+        description="Back-generate a Markdown document from an OSCAL4Rail catalog (translation logic).",
+    )
+    ap.add_argument("file", help="OSCAL catalog (YAML or JSON)")
+    ap.add_argument("-o", "--output", help="output path (default: <file>.generated.md beside the input)")
+    ap.add_argument("--stdout", action="store_true", help="write to stdout instead of a file")
+    ap.add_argument("--verify", action="store_true", help="check round-trip: every prose value appears verbatim in the output")
+    ap.add_argument("--quiet", action="store_true", help="suppress informational messages")
+    args = ap.parse_args(argv)
+
+    src = Path(args.file)
+    if not src.exists():
+        print(f"⚠️  {src}: file not found", file=sys.stderr)
+        return 1
+
+    with open(src) as f:
+        data = yaml.safe_load(f)
+
+    catalog = data.get("catalog")
+    if not catalog:
+        print(f"⚠️  {src}: no 'catalog' root element found", file=sys.stderr)
+        return 1
+
+    md = generate_markdown(catalog, catalog_path=str(src))
+
+    if args.stdout:
+        print(md)
+    else:
+        out = Path(args.output) if args.output else src.parent / "_rendered" / f"{src.stem}.md"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(md)
+        if not args.quiet:
+            print(f"✅ {src} → {out}")
+
+    if args.verify:
+        mismatches = verify_roundtrip(catalog, md, catalog_path=str(src))
+        if mismatches:
+            print(f"❌ Round-trip verification failed ({len(mismatches)} mismatch(es)):")
+            for m in mismatches:
+                print(f"  - control `{m['control_id']}` (part: {m['part_name']}) — prose not found verbatim")
+                print(f"    at: {m['group_path']}/{m['control_id']}")
+                print(f"    snippet: \"{m['snippet']}...\"")
+                print(f"    find it in the catalog: grep -n \"id: {m['control_id']}\" {src}")
+            return 1
+        if not args.quiet:
+            print("✅ Round-trip: all prose values found verbatim in output")
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
