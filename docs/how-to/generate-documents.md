@@ -98,12 +98,23 @@ This means two things:
 
 Company-specific rendering lives in a **separate file**, `tools/custom_renderer.py`.
 You edit that file only; the core (`tools/generate_doc.py`) is never touched, so
-it stays upgradeable as the schema and the core evolve. The core imports
-`custom_renderer` and calls its `render()` for every control. If the file is
-missing, the core still runs (unknown props keep appearing in the generic table).
+it stays upgradeable as the schema and the core evolve.
 
-`tools/custom_renderer.py` ships empty (renders nothing extra). To give a custom
-prop a dedicated layout:
+**Setup (once):**
+
+```bash
+cp tools/custom_renderer.example.py tools/custom_renderer.py
+```
+
+`tools/custom_renderer.py` is **git-ignored and user-owned**: framework updates
+never overwrite it, so your customization survives a `git pull`. The versioned
+`tools/custom_renderer.example.py` is the template; updates may refresh it for
+you to compare against. If `custom_renderer.py` is absent, the core still runs
+(it prints a note and renders nothing extra; unknown props stay in the generic
+table).
+
+The core imports `custom_renderer` and calls its `render()` for every control.
+To give a custom prop a dedicated layout:
 
 1. Implement the layout in `render(ctrl, depth)`:
 

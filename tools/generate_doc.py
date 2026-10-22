@@ -37,16 +37,36 @@ from pathlib import Path
 
 import yaml
 
-# Import the company-specific renderer if present. If the file is missing or
-# has no render()/CLAIMED_PROPS, the core falls back to rendering nothing extra
-# (unknown props still appear in the generic table — no silent drift).
+# Import the company-specific renderer if present. The real file
+# (tools/custom_renderer.py) is git-ignored and user-owned; copy it once from
+# tools/custom_renderer.example.py. If it is absent or malformed, the core falls
+# back to rendering nothing extra (unknown props still appear in the generic
+# table — no silent drift).
 try:
     import custom_renderer  # type: ignore
     _custom_render = getattr(custom_renderer, "render", lambda ctrl, depth: [])
     _custom_claimed = set(getattr(custom_renderer, "CLAIMED_PROPS", set()))
-except Exception:  # noqa: BLE001 — any import problem must not break the core
+    _custom_status = None
+except ModuleNotFoundError:
     _custom_render = lambda ctrl, depth: []  # noqa: E731
     _custom_claimed = set()
+    # Normal state (fresh checkout / no customization): a note, not an error.
+    # Emitted in main() unless --quiet (so CI/pipelines stay silent).
+    _custom_status = (
+        "note",
+        "tools/custom_renderer.py not found — using the neutral default. "
+        "To customize, copy tools/custom_renderer.example.py to "
+        "tools/custom_renderer.py and edit it.",
+    )
+except Exception:  # noqa: BLE001 — any other import problem must not break the core
+    _custom_render = lambda ctrl, depth: []  # noqa: E731
+    _custom_claimed = set()
+    # A broken custom file IS a real problem: always surfaced, even with --quiet.
+    _custom_status = (
+        "warning",
+        "tools/custom_renderer.py could not be loaded — using the neutral "
+        "default. Check the file for errors.",
+    )
 
 
 # Props the core renders with a dedicated layout, plus anything the custom
@@ -262,6 +282,13 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--verify", action="store_true", help="check round-trip: every prose value appears verbatim in the output")
     ap.add_argument("--quiet", action="store_true", help="suppress informational messages")
     args = ap.parse_args(argv)
+
+    # Surface the custom-renderer status: a "note" (file absent) only when not
+    # --quiet; a "warning" (file broken) always, since that is a real problem.
+    if _custom_status is not None:
+        level, msg = _custom_status
+        if level == "warning" or not args.quiet:
+            print(f"{level}: {msg}", file=sys.stderr)
 
     src = Path(args.file)
     if not src.exists():
