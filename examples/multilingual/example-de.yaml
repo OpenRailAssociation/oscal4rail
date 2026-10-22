@@ -1,0 +1,42 @@
+# SPDX-FileCopyrightText: 2026 DB Systel GmbH
+# SPDX-License-Identifier: Apache-2.0
+#
+# OSCAL4Rail multilingual example: Pattern A (one file per language), German side.
+#
+# SYNTHETIC. "example" is an invented placeholder regulation, not a real one
+# (Framework ≠ Content, ADR-007). The prose below is illustrative filler, not a
+# quoted requirement; it exists only to show the shape of the multilingual model.
+#
+# Pattern A: language is carried by metadata/props[name="language"]; the sibling
+# French file (example-fr.yaml) reuses the SAME control IDs. Same ID = same rule
+# (docs/reference/catalog-format.md §8.1). The two files cross-reference each other
+# via metadata/links rel="alternate" (§8.4).
+catalog:
+  uuid: 1a2b3c4d-0001-4000-8000-000000000001
+  metadata:
+    title: Example Standard (placeholder, synthetic)
+    published: '2026-01-01T00:00:00Z'
+    last-modified: '2026-10-22T00:00:00Z'
+    version: '1.0'
+    oscal-version: 1.2.3
+    props:
+    - name: language
+      value: de
+    - name: source-document
+      value: EXAMPLE_DE.pdf
+    links:
+    - rel: alternate
+      href: ./example-fr.yaml
+      text: fr
+  groups:
+  - id: example-1
+    title: Allgemeine Informationen
+    controls:
+    - id: example-1.1
+      title: Aktuelle Uhrzeit
+      parts:
+      - name: statement
+        prose: Die aktuelle Uhrzeit ist an der Haltestelle darzustellen. (Synthetischer Platzhaltertext.)
+      props:
+      - name: source-chapter
+        value: '1.1'

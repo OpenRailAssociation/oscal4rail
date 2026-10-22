@@ -1,0 +1,50 @@
+# SPDX-FileCopyrightText: 2026 DB Systel GmbH
+# SPDX-License-Identifier: Apache-2.0
+#
+# OSCAL4Rail multilingual example: Pattern B (one file, per-language parts).
+#
+# SYNTHETIC. "example" is an invented placeholder regulation, not a real one
+# (Framework ≠ Content, ADR-007). Prose is illustrative filler, not quoted
+# requirements and not machine translations.
+#
+# Pattern B fits a single source that is itself multilingual (parallel columns).
+# One control, one ID (example-1.1); the linguistic content is carried as one
+# statement part PER LANGUAGE, each tagged with its own language prop. Same ID =
+# same rule (docs/reference/catalog-format.md §8.1 / §8.3). NIST has no part/@lang
+# in its JSON model, so the conformant carrier is props[name="language"] on the part.
+catalog:
+  uuid: 1a2b3c4d-0003-4000-8000-000000000003
+  metadata:
+    title: Example Standard (placeholder, synthetic, multilingual source)
+    published: '2026-01-01T00:00:00Z'
+    last-modified: '2026-10-22T00:00:00Z'
+    version: '1.0'
+    oscal-version: 1.2.3
+    props:
+    - name: language
+      value: de
+      remarks: Primary language of titles; per-language prose is tagged on each statement part.
+    - name: language
+      value: fr
+    - name: source-document
+      value: EXAMPLE_MULTILINGUAL.pdf
+  groups:
+  - id: example-1
+    title: Allgemeine Informationen
+    controls:
+    - id: example-1.1
+      title: Aktuelle Uhrzeit
+      parts:
+      - name: statement
+        props:
+        - name: language
+          value: de
+        prose: Die aktuelle Uhrzeit ist an der Haltestelle darzustellen. (Synthetischer Platzhaltertext.)
+      - name: statement
+        props:
+        - name: language
+          value: fr
+        prose: "L'heure actuelle doit être affichée à l'arrêt. (Texte d'espace réservé synthétique.)"
+      props:
+      - name: source-chapter
+        value: '1.1'
