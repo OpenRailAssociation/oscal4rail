@@ -25,12 +25,9 @@ See issue #6 and docs/how-to/generate-documents.md.
 #
 # This is the neutral, shared core. The ONLY intended place for
 # company-specific / custom rendering is the function `_render_custom()`
-# (search for "HIER STARTET DIE KUNDENSPEZIFISCHE RENDERUNG"). Put your changes
+# (search for "CUSTOMER-SPECIFIC RENDERING STARTS HERE"). Put your changes
 # there and nowhere else, so the core stays upgradeable as the OSCAL4Rail
 # schema evolves.
-#
-# KEIN editieren im Core. Kundenspezifische Anpassungen AUSSCHLIESSLICH in
-# `_render_custom()` — dort ist der markierte, bearbeitbare Block.
 # ============================================================================
 
 from __future__ import annotations
@@ -40,6 +37,53 @@ import sys
 from pathlib import Path
 
 import yaml
+
+
+# ============================================================================
+# CUSTOMER-SPECIFIC RENDERING — THIS IS THE ONE PLACE TO EDIT.
+# Everything below this block is the neutral core; leave it unchanged.
+# ============================================================================
+
+# Props the core renders with a dedicated layout. Add the names you handle in
+# _render_custom() here so they are removed from the generic properties table.
+_KNOWN_CONTROL_PROPS = {"source-chapter", "applicability", "source-document"}
+_KNOWN_META_PROPS = {"country", "language", "source-document", "source-url"}
+
+
+def _render_custom(ctrl: dict, depth: int) -> list[str]:
+    """Extension point for a company-specific renderer.
+
+    Give a custom prop a dedicated layout here. Add any prop name you handle to
+    `_KNOWN_CONTROL_PROPS` (above) so it is removed from the generic properties
+    table. Anything you do NOT claim stays in that table, so the output is never
+    incomplete. See docs/how-to/generate-documents.md.
+
+    Returns a list of Markdown lines (empty = render nothing).
+    """
+    lines: list[str] = []
+
+    # ------------------------------------------------------------------------
+    # ### CUSTOMER-SPECIFIC RENDERING STARTS HERE — EDIT THIS BLOCK ###
+    # Build your company-specific output below. `ctrl` is the control dict,
+    # `depth` is the current heading depth. Append Markdown strings to `lines`.
+    #
+    # Example (uncomment and adapt):
+    #
+    #     owner = next((p["value"] for p in ctrl.get("props", [])
+    #                   if p.get("name") == "internal-owner"), None)
+    #     if owner:
+    #         lines.append(f"> Owner: {owner}")
+    #         lines.append("")
+    #
+    # ### END OF EDITABLE BLOCK — CUSTOMIZATION STOPS HERE ###
+    # ------------------------------------------------------------------------
+
+    return lines
+
+
+# ============================================================================
+# ### CORE — DO NOT EDIT BELOW THIS LINE ###
+# ============================================================================
 
 
 def _meta_prop(props: list[dict], name: str) -> str | None:
@@ -61,49 +105,6 @@ def _applicability_rows(props: list[dict]) -> list[tuple[str, str, str]]:
                 p.get("remarks", ""),
             ))
     return rows
-
-
-# Props the renderer handles with a dedicated layout. Everything else is
-# rendered generically (see _render_extra_props) so custom / company-specific
-# props — and props added by future schema versions — are never silently
-# dropped. The generator "knows" the O4R meta-schema props structurally and
-# shows all other props as-is.
-_KNOWN_CONTROL_PROPS = {"source-chapter", "applicability", "source-document"}
-_KNOWN_META_PROPS = {"country", "language", "source-document", "source-url"}
-
-
-def _render_custom(ctrl: dict, depth: int) -> list[str]:
-    """Extension point for a company-specific renderer.
-
-    Give a custom prop a dedicated layout here. Add any prop name you handle to
-    `_KNOWN_CONTROL_PROPS` so it is removed from the generic "Weitere
-    Eigenschaften" table. Anything you do NOT claim stays in the generic table,
-    so the output is never incomplete. See docs/how-to/generate-documents.md.
-
-    Returns a list of Markdown lines (empty = render nothing).
-    """
-    lines: list[str] = []
-
-    # ========================================================================
-    # ### CORE — DO NOT EDIT ABOVE THIS LINE ###
-    # ------------------------------------------------------------------------
-    # ### HIER STARTET DIE KUNDENSPEZIFISCHE RENDERUNG — HIER ANPASSEN ###
-    # Build your company-specific output below. `ctrl` is the control dict,
-    # `depth` is the current heading depth. Append Markdown strings to `lines`.
-    #
-    # Example (uncomment and adapt):
-    #
-    #     owner = next((p["value"] for p in ctrl.get("props", [])
-    #                   if p.get("name") == "internal-owner"), None)
-    #     if owner:
-    #         lines.append(f"> Owner: {owner}")
-    #         lines.append("")
-    #
-    # ### ENDE DES BEARBEITBAREN BLOCKS — HIER HÖRT DIE ANPASSUNG AUF ###
-    # ### CORE — DO NOT EDIT BELOW THIS LINE ###
-    # ========================================================================
-
-    return lines
 
 
 def _render_extra_props(props: list[dict], known: set[str], heading: str, depth: int) -> list[str]:
