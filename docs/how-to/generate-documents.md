@@ -29,17 +29,17 @@ the organization chooses the output format and applies their corporate template.
 ## Usage
 
 ```bash
-# render BS-KI to Markdown (output: catalogs/bs-ki/de/_rendered/bs-ki-de.md)
-python3 tools/generate_doc.py catalogs/bs-ki/de/bs-ki-de.yaml
+# render a catalog to Markdown (output: <dir>/_rendered/<name>.md)
+python3 tools/generate_doc.py path/to/catalog.yaml
 
 # render + verify round-trip (every prose value appears verbatim in the output)
-python3 tools/generate_doc.py --verify catalogs/bs-ki/de/bs-ki-de.yaml
+python3 tools/generate_doc.py --verify path/to/catalog.yaml
 
 # write to stdout instead of a file
-python3 tools/generate_doc.py --stdout catalogs/bs-ki/de/bs-ki-de.yaml
+python3 tools/generate_doc.py --stdout path/to/catalog.yaml
 
 # write to a custom path
-python3 tools/generate_doc.py -o /tmp/bs-ki.md catalogs/bs-ki/de/bs-ki-de.yaml
+python3 tools/generate_doc.py -o out.md path/to/catalog.yaml
 ```
 
 **Output location:** by default, the rendered Markdown is written to
@@ -54,14 +54,81 @@ the YAML appears 1:1 in the generated Markdown. A mismatch is an error
 
 For each control:
 
-- **Heading** with the source chapter reference and title (e.g. `### 2.1 – Aktuelle Uhrzeit`)
+- **Heading** with the source chapter reference and title (e.g. `### 2.1 – Control title`)
 - **Statement** prose, verbatim from the catalog (no paraphrasing, no reordering)
 - **Guidance** parts as sub-sections (when present)
-- **Applicability table** showing obligation level per context (`verbindlich` / `empfohlen`)
+- **Applicability table** showing obligation level per context
 - **Source document** references (when present)
+- **Additional properties** table for every other prop (see below)
 
 Catalog metadata (title, version, country, language, source URL) is rendered as
-a header block.
+a header block; any other metadata prop appears in a generic table too.
+
+## Custom properties and company-specific renderers
+
+The renderer knows the OSCAL4Rail meta-schema props structurally
+(`statement`, `applicability`, `source-chapter`, `country`, `language`,
+`source-document`). **Every other prop is rendered generically**, in a
+"Weitere Eigenschaften" / "Weitere Metadaten" table showing `name`, `value`,
+`ns`, `class`, and `remarks`.
+
+This means two things:
+
+1. **Custom / company-specific props are never silently dropped.** A prop under
+   your own namespace, for example:
+
+   ```yaml
+   props:
+     - name: internal-owner
+       ns: https://company.example/ns
+       value: Department XY
+       remarks: internal only
+   ```
+
+   appears in the generic table automatically; you do **not** need to modify
+   the generator for your props to show up. This protects against silent drift:
+   if a field exists in the catalog, the owner sees it in the rendered document.
+
+2. **The schema will evolve.** As later milestones extend the OSCAL4Rail schema
+   (new layers, new props), any new prop at least falls into the generic table.
+   When a new prop deserves a *dedicated* layout, extend the renderer
+   explicitly (see below). Keep the generator in sync with the schema it renders.
+
+### Building a company-specific renderer
+
+The core renderer provides a dedicated extension point: the function
+`_render_custom(ctrl, depth)` in `tools/generate_doc.py`. The neutral core
+returns nothing there; it is already wired into the control rendering, so you
+only fill it in. The structurally-known props are declared as sets at the top:
+
+```python
+_KNOWN_CONTROL_PROPS = {"source-chapter", "applicability", "source-document"}
+_KNOWN_META_PROPS = {"country", "language", "source-document", "source-url"}
+```
+
+To give a custom prop a dedicated layout (instead of the generic table):
+
+1. Implement the layout in `_render_custom` (it already receives the control and
+   the heading depth, and is called before the generic table):
+
+   ```python
+   def _render_custom(ctrl, depth):
+       lines = []
+       owner = next((p["value"] for p in ctrl.get("props", [])
+                     if p.get("name") == "internal-owner"), None)
+       if owner:
+           lines.append(f"> Owner: {owner}")
+           lines.append("")
+       return lines
+   ```
+
+2. Add the prop name (e.g. `internal-owner`) to the relevant `_KNOWN_*` set so it
+   is removed from the generic table and not shown twice.
+
+Everything you do **not** claim this way keeps appearing in the generic table,
+so the output stays complete. This is the toolkit approach: one neutral core
+renderer, extended per organization into a company-specific generator, with the
+OSCAL YAML always the single source of truth.
 
 ## Example pipelines: Markdown to target format
 
@@ -71,8 +138,8 @@ your corporate template.
 ### Markdown → Word (.docx)
 
 ```bash
-pandoc catalogs/bs-ki/de/_rendered/bs-ki-de.md \
-  -o bs-ki-de.docx \
+pandoc path/to/_rendered/catalog.md \
+  -o catalog.docx \
   --reference-doc=corporate-template.docx
 ```
 
@@ -84,15 +151,12 @@ automatically.
 
 ```bash
 # simple standalone page
-pandoc catalogs/bs-ki/de/_rendered/bs-ki-de.md \
-  -o bs-ki-de.html --standalone --css=corporate.css
+pandoc path/to/_rendered/catalog.md \
+  -o catalog.html --standalone --css=corporate.css
 
-# or via Hugo (for the project website, see issue #36)
-# place the rendered .md in the Hugo content tree; Hugo applies the site theme
+# or feed the rendered .md into a static-site generator (e.g. Hugo)
+# that applies your site theme
 ```
-
-For DB-internal reports (Project 2): use DB UX v3 Whitelabel styling.
-For OSS artifacts (Project 1): use OSRD-UI / osrd-design as reference.
 
 ### OSCAL YAML → Excel (.xlsx)
 
@@ -103,7 +167,7 @@ not from the Markdown intermediate:
 import yaml
 from openpyxl import Workbook
 
-data = yaml.safe_load(open("catalogs/bs-ki/de/bs-ki-de.yaml"))
+data = yaml.safe_load(open("path/to/catalog.yaml"))
 wb = Workbook()
 ws = wb.active
 ws.append(["ID", "Chapter", "Title", "Statement", "Applicability", "Obligation"])
@@ -122,7 +186,7 @@ def walk(obj):
 for g in data["catalog"]["groups"]:
     walk(g)
 
-wb.save("bs-ki-de.xlsx")
+wb.save("catalog.xlsx")
 ```
 
 ### Any of the above → PDF
@@ -131,13 +195,13 @@ PDF is a print format. Generate it from Word or HTML:
 
 ```bash
 # from HTML (via weasyprint)
-weasyprint bs-ki-de.html bs-ki-de.pdf
+weasyprint catalog.html catalog.pdf
 
 # from Word (via LibreOffice)
-libreoffice --headless --convert-to pdf bs-ki-de.docx
+libreoffice --headless --convert-to pdf catalog.docx
 
 # from Markdown directly (pandoc + LaTeX or weasyprint)
-pandoc bs-ki-de.md -o bs-ki-de.pdf
+pandoc catalog.md -o catalog.pdf
 ```
 
 ## Traceability: finding the spot in the catalog
@@ -152,12 +216,12 @@ Two mechanisms support this:
    carries a reference line with the catalog path and the control ID:
 
    ```markdown
-   ### 2.1 – Aktuelle Uhrzeit
+   ### 2.1 – Control title
 
-   > 📍 `catalogs/bs-ki/de/bs-ki-de.yaml` · ID: `bs-ki-2.1`
+   > 📍 `path/to/catalog.yaml` · ID: `<regulation>-2.1`
    ```
 
-   The owner searches the YAML for `id: bs-ki-2.1` and lands on the exact control.
+   The owner searches the YAML for `id: <regulation>-2.1` and lands on the exact control.
 
 2. **Navigation hints on verification failure.** When `--verify` finds a prose
    mismatch, it reports the control ID, the part, a snippet, and a ready-to-run
@@ -165,10 +229,10 @@ Two mechanisms support this:
 
    ```
    ❌ Round-trip verification failed (1 mismatch(es)):
-     - control `bs-ki-2.1` (part: statement) — prose not found verbatim
-       at: bs-ki-2/bs-ki-2.1
-       snippet: "Bei Haltestellen mit weniger als 800 Ein- und Aussteigern pr..."
-       find it in the catalog: grep -n "id: bs-ki-2.1" catalogs/bs-ki/de/bs-ki-de.yaml
+     - control `<regulation>-2.1` (part: statement) — prose not found verbatim
+       at: <regulation>-2/<regulation>-2.1
+       snippet: "First characters of the affected prose..."
+       find it in the catalog: grep -n "id: <regulation>-2.1" path/to/catalog.yaml
    ```
 
 The control ID is the stable, chapter-based key (never page-based), so it
@@ -188,5 +252,3 @@ their own text word for word.
 
 - [ADR-013](../adr/ADR-013-validator-consolidation.md): validator (validates the input)
 - Issue #6: this tool
-- Issue #36: project website (Hugo renders the same Markdown for the public site)
-- Issue #30: catalog back-generator with styled HTML (distinct scope)

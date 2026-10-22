@@ -50,6 +50,62 @@ def _applicability_rows(props: list[dict]) -> list[tuple[str, str, str]]:
     return rows
 
 
+# Props the renderer handles with a dedicated layout. Everything else is
+# rendered generically (see _render_extra_props) so custom / company-specific
+# props — and props added by future schema versions — are never silently
+# dropped. The generator "knows" the O4R meta-schema props structurally and
+# shows all other props as-is.
+_KNOWN_CONTROL_PROPS = {"source-chapter", "applicability", "source-document"}
+_KNOWN_META_PROPS = {"country", "language", "source-document", "source-url"}
+
+
+def _render_custom(ctrl: dict, depth: int) -> list[str]:
+    """Extension point for a company-specific renderer.
+
+    The neutral core renderer returns nothing here. To build a company-specific
+    generator, fork this file and implement custom layout for your own props in
+    this function (e.g. render `internal-owner` as a dedicated line, or lay out a
+    company approval block). Add the prop names you handle here to
+    `_KNOWN_CONTROL_PROPS` so they are removed from the generic "Weitere
+    Eigenschaften" table. Anything you do NOT claim stays in the generic table,
+    so the output is never incomplete.
+
+    Example (uncomment and adapt):
+
+        lines = []
+        owner = next((p["value"] for p in ctrl.get("props", [])
+                      if p.get("name") == "internal-owner"), None)
+        if owner:
+            lines.append(f"> Owner: {owner}")
+            lines.append("")
+        return lines
+
+    Returns a list of Markdown lines (empty = render nothing).
+    """
+    return []
+
+
+def _render_extra_props(props: list[dict], known: set[str], heading: str, depth: int) -> list[str]:
+    """Render every prop whose name is NOT in `known` as a generic table.
+
+    Guarantees that custom/company props (often under their own `ns`) and
+    props introduced by newer schema versions remain visible. No allowlist
+    filtering beyond the structurally-rendered known props.
+    """
+    extra = [p for p in props if p.get("name") not in known]
+    if not extra:
+        return []
+    prefix = "#" * min(depth, 6)
+    lines = [f"{prefix} {heading}", "", "| Name | Wert | ns | class | Bemerkung |", "|------|------|----|-------|-----------|"]
+    for p in extra:
+        lines.append(
+            f"| {p.get('name','')} | {p.get('value','')} | {p.get('ns','')} "
+            f"| {p.get('class','')} | {p.get('remarks','')} |"
+        )
+    lines.append("")
+    return lines
+
+
 def _render_metadata(meta: dict) -> list[str]:
     """Render the catalog metadata block."""
     title = meta.get("title", "(untitled)")
@@ -75,6 +131,8 @@ def _render_metadata(meta: dict) -> list[str]:
         if source_url:
             lines.append(f"> URL: {source_url}")
         lines.append("")
+    # Any metadata prop not shown in the info line above, rendered generically.
+    lines += _render_extra_props(props, _KNOWN_META_PROPS, "Weitere Metadaten", 2)
     return lines
 
 
@@ -131,6 +189,14 @@ def _render_control(ctrl: dict, depth: int, catalog_path: str) -> list[str]:
                 ref += f" ({rem})"
             lines.append(ref)
             lines.append("")
+
+    # Extension point: company-specific rendering for custom props.
+    # The neutral core returns nothing here; fork and implement in _render_custom.
+    lines += _render_custom(ctrl, depth)
+
+    # Any remaining props (custom / company-specific, or introduced by a newer
+    # schema version) rendered generically so nothing is silently dropped.
+    lines += _render_extra_props(props, _KNOWN_CONTROL_PROPS, "Weitere Eigenschaften", depth + 1)
 
     return lines
 
