@@ -62,27 +62,35 @@ _KNOWN_META_PROPS = {"country", "language", "source-document", "source-url"}
 def _render_custom(ctrl: dict, depth: int) -> list[str]:
     """Extension point for a company-specific renderer.
 
-    The neutral core renderer returns nothing here. To build a company-specific
-    generator, fork this file and implement custom layout for your own props in
-    this function (e.g. render `internal-owner` as a dedicated line, or lay out a
-    company approval block). Add the prop names you handle here to
-    `_KNOWN_CONTROL_PROPS` so they are removed from the generic "Weitere
+    Give a custom prop a dedicated layout here. Add any prop name you handle to
+    `_KNOWN_CONTROL_PROPS` so it is removed from the generic "Weitere
     Eigenschaften" table. Anything you do NOT claim stays in the generic table,
-    so the output is never incomplete.
-
-    Example (uncomment and adapt):
-
-        lines = []
-        owner = next((p["value"] for p in ctrl.get("props", [])
-                      if p.get("name") == "internal-owner"), None)
-        if owner:
-            lines.append(f"> Owner: {owner}")
-            lines.append("")
-        return lines
+    so the output is never incomplete. See docs/how-to/generate-documents.md.
 
     Returns a list of Markdown lines (empty = render nothing).
     """
-    return []
+    lines: list[str] = []
+
+    # ========================================================================
+    # ### CORE — DO NOT EDIT ABOVE THIS LINE ###
+    # ------------------------------------------------------------------------
+    # ### HIER STARTET DIE KUNDENSPEZIFISCHE RENDERUNG — HIER ANPASSEN ###
+    # Build your company-specific output below. `ctrl` is the control dict,
+    # `depth` is the current heading depth. Append Markdown strings to `lines`.
+    #
+    # Example (uncomment and adapt):
+    #
+    #     owner = next((p["value"] for p in ctrl.get("props", [])
+    #                   if p.get("name") == "internal-owner"), None)
+    #     if owner:
+    #         lines.append(f"> Owner: {owner}")
+    #         lines.append("")
+    #
+    # ### ENDE DES BEARBEITBAREN BLOCKS — HIER HÖRT DIE ANPASSUNG AUF ###
+    # ### CORE — DO NOT EDIT BELOW THIS LINE ###
+    # ========================================================================
+
+    return lines
 
 
 def _render_extra_props(props: list[dict], known: set[str], heading: str, depth: int) -> list[str]:
