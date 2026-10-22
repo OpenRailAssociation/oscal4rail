@@ -96,23 +96,19 @@ This means two things:
 
 ### Building a company-specific renderer
 
-The core renderer provides a dedicated extension point: the function
-`_render_custom(ctrl, depth)` in `tools/generate_doc.py`. The neutral core
-returns nothing there; it is already wired into the control rendering, so you
-only fill it in. The structurally-known props are declared as sets at the top:
+Company-specific rendering lives in a **separate file**, `tools/custom_renderer.py`.
+You edit that file only; the core (`tools/generate_doc.py`) is never touched, so
+it stays upgradeable as the schema and the core evolve. The core imports
+`custom_renderer` and calls its `render()` for every control. If the file is
+missing, the core still runs (unknown props keep appearing in the generic table).
 
-```python
-_KNOWN_CONTROL_PROPS = {"source-chapter", "applicability", "source-document"}
-_KNOWN_META_PROPS = {"country", "language", "source-document", "source-url"}
-```
+`tools/custom_renderer.py` ships empty (renders nothing extra). To give a custom
+prop a dedicated layout:
 
-To give a custom prop a dedicated layout (instead of the generic table):
-
-1. Implement the layout in `_render_custom` (it already receives the control and
-   the heading depth, and is called before the generic table):
+1. Implement the layout in `render(ctrl, depth)`:
 
    ```python
-   def _render_custom(ctrl, depth):
+   def render(ctrl, depth):
        lines = []
        owner = next((p["value"] for p in ctrl.get("props", [])
                      if p.get("name") == "internal-owner"), None)
@@ -122,13 +118,17 @@ To give a custom prop a dedicated layout (instead of the generic table):
        return lines
    ```
 
-2. Add the prop name (e.g. `internal-owner`) to the relevant `_KNOWN_*` set so it
-   is removed from the generic table and not shown twice.
+2. Add the prop name to `CLAIMED_PROPS` in the same file so it is removed from
+   the generic table and not shown twice:
+
+   ```python
+   CLAIMED_PROPS = {"internal-owner"}
+   ```
 
 Everything you do **not** claim this way keeps appearing in the generic table,
 so the output stays complete. This is the toolkit approach: one neutral core
-renderer, extended per organization into a company-specific generator, with the
-OSCAL YAML always the single source of truth.
+renderer plus a separate company file, with the OSCAL YAML always the single
+source of truth.
 
 ## Example pipelines: Markdown to target format
 
