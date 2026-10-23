@@ -1,0 +1,50 @@
+# SPDX-FileCopyrightText: 2026 DB Systel GmbH
+# SPDX-License-Identifier: Apache-2.0
+#
+# OSCAL4Rail multilingual example: edge case: divergent chapter numbering.
+#
+# SYNTHETIC / ILLUSTRATIVE. Shows the shape only (Framework ≠ Content, ADR-007).
+#
+# Normal case (examples/multilingual/example-de.yaml ↔ example-fr.yaml) needs NO
+# mapping: the shared chapter-based ID IS the equivalence. This file covers the
+# EXCEPTION: a language version that numbers its chapters differently, so the IDs
+# cannot match (here: German example-1.1 ↔ French example-2.3). The equivalence is
+# then made explicit with the NIST Control Mapping model, not a bespoke construct
+# (docs/reference/catalog-format.md §8.5).
+#
+# relationship is an open NIST token; OSCAL4Rail uses "equivalent" and pairs it with
+# the schema-required matching-rationale. mapping-item.type uses the NIST-defined
+# subject type "control". The map entries assert a relationship between IDENTIFIERS
+# only; they carry no requirement text.
+mapping-collection:
+  uuid: 1a2b3c4d-0004-4000-8000-000000000004
+  metadata:
+    title: 'OSCAL4Rail multilingual example: de ↔ fr control equivalence (divergent numbering)'
+    published: '2026-10-22T00:00:00Z'
+    last-modified: '2026-10-22T00:00:00Z'
+    version: '0.1.0'
+    oscal-version: 1.2.3
+  provenance:
+    method: human
+    matching-rationale: semantic
+    status: under-development
+    mapping-description: Equivalence of the same requirement across two language versions whose chapter numbering diverges.
+  mappings:
+  - uuid: 1a2b3c4d-0005-4000-8000-000000000005
+    source-resource:
+      type: catalog
+      href: ./example-de.yaml
+    target-resource:
+      type: catalog
+      href: ./example-fr-divergent.yaml
+    maps:
+    - uuid: 1a2b3c4d-0006-4000-8000-000000000006
+      relationship: equivalent
+      matching-rationale: semantic
+      sources:
+      - type: control
+        id-ref: example-1.1
+      targets:
+      - type: control
+        id-ref: example-2.3
+      remarks: Same requirement; the French source numbers this chapter 2.3 instead of 1.1.

@@ -1,0 +1,42 @@
+# SPDX-FileCopyrightText: 2026 DB Systel GmbH
+# SPDX-License-Identifier: Apache-2.0
+#
+# OSCAL4Rail multilingual example: Pattern A (one file per language), French side.
+#
+# SYNTHETIC. "example" is an invented placeholder regulation, not a real one
+# (Framework ≠ Content, ADR-007). The prose below is illustrative filler, not a
+# quoted requirement, and NOT a machine translation of the German file: in a real
+# catalog each language version is verbatim from its own language source
+# (docs/reference/catalog-format.md §8.1). Here it is invented filler on both sides.
+#
+# Pattern A: the control ID example-1.1 is IDENTICAL to the German sibling. Same ID
+# = same rule; only title and statement prose (the linguistic content) differ.
+catalog:
+  uuid: 1a2b3c4d-0002-4000-8000-000000000002
+  metadata:
+    title: Norme exemple (espace réservé, synthétique)
+    published: '2026-01-01T00:00:00Z'
+    last-modified: '2026-10-22T00:00:00Z'
+    version: '1.0'
+    oscal-version: 1.2.3
+    props:
+    - name: language
+      value: fr
+    - name: source-document
+      value: EXAMPLE_FR.pdf
+    links:
+    - rel: alternate
+      href: ./example-de.yaml
+      text: de
+  groups:
+  - id: example-1
+    title: Informations générales
+    controls:
+    - id: example-1.1
+      title: Heure actuelle
+      parts:
+      - name: statement
+        prose: "L'heure actuelle doit être affichée à l'arrêt. (Texte d'espace réservé synthétique.)"
+      props:
+      - name: source-chapter
+        value: '1.1'
