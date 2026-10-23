@@ -35,3 +35,10 @@ docs/reference/diagrams/
 
 # Fetched example upstreams (reproducible via tools/fetch_bsi_example.py, not vendored)
 examples/upstream/**/_fetched/
+
+# Rendered documents (reproducible via tools/generate_doc.py, not vendored)
+**/_rendered/
+
+# Company-specific renderer: the real file is user-owned and must survive
+# framework updates. Only the template (custom_renderer.example.py) is versioned.
+tools/custom_renderer.py
