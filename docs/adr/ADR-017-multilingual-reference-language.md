@@ -1,4 +1,4 @@
-# ADR-015: Multilingual Model: Same Rule Across Languages, with an Optional `reference-language` Marker
+# ADR-017: Multilingual Model: Same Rule Across Languages, with an Optional `reference-language` Marker
 
 **Status:** Accepted
 
