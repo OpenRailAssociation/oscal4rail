@@ -2,7 +2,7 @@
 
 **Status:** Proposed
 **Date:** 2026-08-03
-**Deciders:** Jens Grote, Arpad Vasarhelyi
+**Deciders:** Jens Grote
 
 ## Context
 

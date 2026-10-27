@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-01
 
-**Deciders:** Jens Grote, Arpad Vasarhelyi
+**Deciders:** Jens Grote
 
 **Technical Story:** How to model the metadata (document head) of a regulatory document so that
 one schema serves the whole rail sector while adapting per country, per company, and per vehicle

@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-01
 
-**Deciders:** Jens Grote, Arpad Vasarhelyi
+**Deciders:** Jens Grote
 
 **Technical Story:** Generalization of the metadata model (ADR-009) after analyzing how
 regulatory authority actually layers in the rail sector: multiple parallel authority streams

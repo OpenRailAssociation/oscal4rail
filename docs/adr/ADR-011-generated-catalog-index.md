@@ -4,7 +4,7 @@
 
 **Date:** 2026-10-01
 
-**Deciders:** Jens Grote, Arpad Vasarhelyi
+**Deciders:** Jens Grote
 
 **Technical Story:** With potentially thousands of catalogs (one per regulatory document), an
 assessment needs a single place to answer "which regulations exist and where do they belong"
