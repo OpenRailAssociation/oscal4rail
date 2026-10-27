@@ -1,9 +1,20 @@
 # ADR-006: OSCAL4Rail und Rulemapping – Komplementarität oder Konkurrenz?
 
-**Status:** Accepted
+**Status:** Accepted (amended — see note below)
 **Date:** 2026-06-25
 **Deciders:** Jens Grote
 **Technical Story:** Evaluation des Rulemapping-Builder-Exports (Pilot BS-KI 2.1, 2026-06-25)
+
+> **Amendment (2026-10-27, [ADR-014](./ADR-014-rules-layer-placement.md)).** Dieser ADR
+> begründete die Platzierung der Entscheidungslogik (externe Rulemap, referenziert via
+> `link rel="decision-logic"`, statt Vermischung von Daten und Logik im Katalog). ADR-014
+> **bestätigt** diese Richtung und macht den **Platzierungs- und Versionskopplungs-Mechanismus
+> verbindlich** (separates verlinktes Logik-Artefakt; Versionskopplung über das NIST-Feld
+> `metadata.version`, erzwungen durch das Validierungstool). In **genau diesem Teilaspekt**
+> ist ADR-006 durch ADR-014 präzisiert/abgelöst. Die übrige Positionierung (Rulemapping und
+> OSCAL4Rail lösen verschiedene Probleme für verschiedene Zielgruppen) bleibt unverändert
+> gültig. Die Wahl des konkreten Rules-**Formats** ist weiterhin offen und wird nach der
+> Analysephase (AP0, Issues #13–#22) in einem eigenen ADR entschieden.
 
 ---
 
