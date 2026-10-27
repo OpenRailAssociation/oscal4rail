@@ -5,16 +5,16 @@
 **Deciders:** Jens Grote
 **Technical Story:** Evaluation des Rulemapping-Builder-Exports (Pilot BS-KI 2.1, 2026-06-25)
 
-> **Amendment (2026-10-27, [ADR-014](./ADR-014-rules-layer-placement.md)).** Dieser ADR
-> begründete die Platzierung der Entscheidungslogik (externe Rulemap, referenziert via
-> `link rel="decision-logic"`, statt Vermischung von Daten und Logik im Katalog). ADR-014
-> **bestätigt** diese Richtung und macht den **Platzierungs- und Versionskopplungs-Mechanismus
-> verbindlich** (separates verlinktes Logik-Artefakt; Versionskopplung über das NIST-Feld
-> `metadata.version`, erzwungen durch das Validierungstool). In **genau diesem Teilaspekt**
-> ist ADR-006 durch ADR-014 präzisiert/abgelöst. Die übrige Positionierung (Rulemapping und
-> OSCAL4Rail lösen verschiedene Probleme für verschiedene Zielgruppen) bleibt unverändert
-> gültig. Die Wahl des konkreten Rules-**Formats** ist weiterhin offen und wird nach der
-> Analysephase (AP0, Issues #13–#22) in einem eigenen ADR entschieden.
+> **Amendment (2026-10-27, [ADR-014](./ADR-014-rules-layer-placement.md)).** This ADR
+> argued for the placement of decision logic (an external rulemap, referenced via
+> `link rel="decision-logic"`, rather than mixing data and logic in the catalog).
+> ADR-014 **confirms** that direction and makes the **placement and version-coupling
+> mechanism binding** (separate linked logic artifact; version coupling via the NIST
+> `metadata.version` field, enforced by the validation tool). In **exactly this
+> aspect**, ADR-006 is refined/superseded by ADR-014. The broader positioning
+> (Rulemapping and OSCAL4Rail solve different problems for different audiences) remains
+> unchanged. The choice of the concrete rules **format** is still open and will be
+> decided after the analysis phase (AP0, issues #13–#22) in a separate ADR.
 
 ---
 
