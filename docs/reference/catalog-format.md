@@ -132,6 +132,7 @@ statement can be traced back to its exact source and verified by the owner.
 |---|---|---|---|
 | `country` | yes | ISO country of the regulation | `CH` |
 | `language` | yes | ISO 639-1 language of this file | `de` |
+| `reference-language` | recommended when multilingual | Language(s) that *govern* if versions diverge; [ISO 639] code(s) or the sentinel `all` (§8.2) | `de` |
 | `source-document` | yes | Source file the catalog was extracted from | `BS-KI_DE.pdf` |
 | `source-url` | recommended | Canonical public URL of the source | `https://www.oev-info.ch/...` |
 | `source-version` | recommended | Version label used by the source | `'1.0'` |
@@ -309,38 +310,206 @@ missing context makes the obligation meaningless.
 
 ---
 
-## 8. Multilingual strategy
+## 8. Multilingual model
 
-The same regulation may be published in several languages (e.g. BS-KI in DE, FR,
-IT). OSCAL4Rail keeps **one file per language**.
+A regulation may exist in several languages. The framework records *how* a catalog
+carries more than one language, using only NIST OSCAL mechanisms. It does not
+decide which languages a catalog has, and it does not translate.
 
-**Directory and file convention:**
+### 8.1 The governing invariant: same rule, not a second rule
+
+**Multiple language versions are the *same* requirement, expressed in different
+languages, never an additional requirement.** The identity of a requirement lives
+in its **stable, chapter-based ID** (§2), not in its text. Two language versions
+that share the same control ID are, by definition, *one and the same rule*; a
+different ID would wrongly turn “the same rule in another language” into a second,
+unrelated rule.
+
+Consequences that follow directly from this invariant:
+
+- **ID = identity, language = expression.** The same stable ID is reused across all
+  language versions of a requirement. Chapter numbers and IDs stay consistent across
+  languages; only `title` and the `statement` prose (the *linguistic* content) differ.
+- **The author/owner decides the languages.** A requirement may exist in one
+  language, or in many (identified by an [ISO 639] code). The framework imposes
+  neither a minimum set nor completeness; the set of languages is edited by the
+  governance owner to suit their need.
+- **No machine translation (verbatim invariant, §3 restated).** Each language
+  version is verbatim from *its own* language source. The framework never generates
+  a translation and never paraphrases one language from another.
+- **The owner verifies the linguistic equivalence (Meaningful Human Control).**
+  Whether a language version faithfully expresses *the same* requirement is judged by
+  the governance owner, not by the framework and not by any tool. A shared ID is the
+  framework’s *claim* of sameness; confirming that claim is the owner’s editorial act.
+
+### 8.2 Reference language: which language version governs
+
+§8.1 says every language version is the *same* rule. In practice the versions can
+drift apart: a translation is sharpened, a typo is fixed on one side only. The
+framework therefore lets the owner **declare which language version governs if the
+versions diverge**, through an optional catalog-metadata prop
+`reference-language` (§4.1).
+
+This is a **marker, not an instruction to translate.** The framework never generates
+a language version from another and never derives controls in other languages from
+a `reference-language` value. The prop only records a fact the owner already knows:
+*"if in doubt, the definition in language X is authoritative."* Which version is
+authoritative is a regulatory fact owned by the author/owner, not a framework
+decision (Framework ≠ Content, ADR-007; Meaningful Human Control).
+
+**Value range (hard rule).** The value of a `reference-language` prop MUST be
+either:
+
+- a single [ISO 639] language code (e.g. `de`), or
+- the reserved sentinel **`all`**, meaning *all language versions present are equally
+  authoritative*, so no single version governs.
+
+No other values are permitted. A validator MUST reject anything that is neither a
+well-formed ISO 639 code nor the exact token `all`.
+
+**One authoritative language, or several, or all: three cases.**
+
+| Case | How to express it | Example |
+|---|---|---|
+| exactly one language governs | one `reference-language` prop with that ISO 639 code | BS-KI: `de` in the `de`, `fr`, and `it` files alike (“available in D/F/I, master = D”) |
+| a named subset governs equally | one `reference-language` prop per authoritative language | a norm authoritative in `en` and `fr` |
+| every version governs equally | a single `reference-language` prop with value `all` | an EU regulation whose official language versions are all equally authentic |
+
+**Invariants.**
+
+- `all` MUST NOT be combined with any ISO 639 code; the two forms are mutually
+  exclusive (`all` already means “every version”, so adding a code is contradictory).
+- Every non-`all` `reference-language` code SHOULD name a language that the
+  regulation actually exists in (a file with that `language` prop in Pattern A, or a
+  language-tagged part in Pattern B). A `reference-language` pointing at a language
+  that is not present is a finding.
+- `reference-language` is **optional**. Its absence asserts nothing: the owner has
+  simply not singled out a governing language. Absence is not the same as `all`.
+
+Why `all` and not a frozen 24-code list for the EU case: EU acts are authentic in
+*all official languages*, and that set changes over time. `all` states the
+regulatory intent (“every official version is equally authentic”) robustly, without
+embedding a list that silently goes stale when the set of languages changes. An
+explicit multi-code list remains available when the authoritative set is a fixed,
+named subset rather than “all”.
+
+### 8.3 Carrying language: NIST mechanism
+
+NIST OSCAL (the pinned [1.2.3] JSON model, `schemas/nist/manifest.json`) does **not**
+expose an XML-style `@lang` attribute in its JSON schema. Language is therefore
+carried, NIST-conformantly, through a **`prop` named `language`** whose value is an
+[ISO 639] code (§4.1). This is the single mechanism both patterns below build on.
+
+**Why a `prop`, not `@lang` (format-portability).** The leading format is YAML;
+the other serializations are produced from it with standard OSCAL tooling. Choosing
+`prop[name="language"]` keeps the language carrier identical across YAML, JSON, and
+XML, because `prop` exists in all three OSCAL serializations. An XML-only `@lang`
+attribute would not survive a conversion to the JSON/YAML model. The patterns here
+were round-tripped YAML↔JSON with the official OSCAL toolset
+([compliance-trestle]) with no loss, and the `language` props are preserved. XML
+output, when needed, is produced from the JSON model with NIST’s own
+XML/JSON converter. OSCAL4Rail neither forks that path nor invents its own.
+
+### 8.4 Two conformant patterns (choose per catalog)
+
+Because the invariant lives in the ID, not in the file layout, two NIST-native
+shapes satisfy it. Neither is excluded; the framework stays as close to the NIST
+model as possible and leaves the choice to the owner.
+
+| | **Pattern A: one file per language** | **Pattern B: one file, per-language parts** |
+|---|---|---|
+| When it fits | sources published separately per language | a single source that is itself multilingual (parallel columns) |
+| Language carried by | `metadata/props[name="language"]` on each file | `props[name="language"]` on each language-specific `part` |
+| Sameness carried by | identical control ID across the sibling files | one control ID, repeated language-tagged parts under it |
+| Cross-reference | `metadata/links` between the sibling files (§8.5) | not needed, the parts live under one control |
+| Equivalence of IDs | implicit (same ID) + optional mapping for edge cases (§8.6) | implicit (one ID) |
+
+Both are valid NIST OSCAL and both validate against the pinned catalog schema. A
+catalog MUST pick one pattern and apply it consistently; mixing A and B inside one
+regulation is a finding.
+
+**Pattern A, directory and file convention:**
 
 ```
 catalogs/<regulation>/<lang>/<regulation>-<lang>.yaml
 ```
 
-**Verbatim example** (the only language present today):
+Each language file declares its own `metadata/props[name="language"]` and a
+`source-document` pointing at that language’s source. The same control ID
+(`<regulation>-<chapter.section>`) denotes the same requirement in every sibling
+file. This is what makes the files linkable.
 
+**Pattern B, language-tagged parts.** The control carries one `statement` part per
+language, each tagged with its own `language` prop. `part` has a `props` array in
+the NIST model, so this needs no extension. (NIST’s JSON schema has no `part/@lang`;
+the `language` prop is the conformant carrier.)
+
+A worked, synthetic example of both patterns and the edge-case mapping lives in
+[`examples/multilingual/`](../../examples/multilingual/README.md). It uses an
+invented placeholder regulation, not a real one (Framework ≠ Content, ADR-007).
+
+### 8.5 Cross-reference between language files (Pattern A)
+
+Sibling language files reference each other through NIST `metadata/links`. The
+`link` assembly provides `href`, `rel`, `media-type`, and `text`.
+
+- `rel` is an open `TokenDatatype` in NIST (its only predefined example value is
+  `reference`). OSCAL4Rail uses the conventional value **`alternate`** to mean “an
+  alternate language version of the same catalog”. This is an OSCAL4Rail convention,
+  not a NIST-defined relationship value; it is declared here so a validator can
+  recognize it.
+- `text` SHOULD name the target language (e.g. the ISO 639 code) so the link is
+  self-describing.
+
+```yaml
+  metadata:
+    props:
+    - name: language
+      value: fr
+    links:
+    - rel: alternate
+      href: ../de/example-de.yaml
+      text: de
 ```
-catalogs/bs-ki/de/bs-ki-de.yaml
-```
 
-**Rules.**
+### 8.6 Edge case: divergent chapter numbering
 
-- Each language file declares its own `metadata/props[name="language"]` (and
-  `source-document` pointing at the language-specific source, e.g. `BS-KI_FR.pdf`).
-- **IDs are stable across languages.** `bs-ki-2.1` denotes the same requirement in
-  every language file. This is what makes the files linkable.
-- The *equivalence* relationship between language files (DE ↔ FR as “same
-  requirement, different language”) is expressed with the NIST **Control Mapping**
-  model, not with a bespoke construct. Anchoring that model is the subject of
-  [#7](https://github.com/OpenRailAssociation/oscal4rail/issues/7); this spec only
-  fixes the file/ID convention that makes the mapping possible.
+The normal case needs no mapping: the same chapter-based ID *is* the equivalence.
+But if a language version numbers its chapters differently (so the chapter-based IDs
+cannot match), the equivalence is made explicit with a NIST **Control Mapping**
+(`schemas/nist/oscal-mapping.json`), not a bespoke construct:
 
-**Invariant.** A control ID present in one language file SHOULD be present in all
-language files of the same regulation and version. Divergence is a finding for the
-multilingual consistency check (#7).
+- a `map` entry whose `sources` and `targets` are `mapping-item`s of `type: control`
+  (the NIST-defined subject types are `control` and `statement`),
+- carrying `relationship` (an open token; OSCAL4Rail uses **`equivalent`**) together
+  with the schema-required `matching-rationale`.
+
+This reuses exactly the mechanism the Regulatory Cascade uses at framework
+boundaries ([cascade-as-profiles]); here both sides are the *same* regulation in two
+languages.
+
+### 8.7 Consistency (what a check would assert)
+
+Stated so the model is testable; the automated check itself is tracked for a later
+milestone, not built here:
+
+- **Pattern A:** a control ID present in one language file SHOULD be present in all
+  sibling files of the same regulation and version; an unmatched ID is a finding
+  (unless an §8.6 mapping explicitly bridges it).
+- **Pattern B:** every control SHOULD carry the same set of `language` props its
+  siblings carry; a missing language is a finding.
+- **`reference-language` (§8.2):** each `reference-language` value MUST be a
+  well-formed [ISO 639] code or the exact token `all`; `all` MUST NOT be mixed with
+  codes; and a non-`all` code that names a language not present in the regulation is
+  a finding.
+- Either way, the check only reports *structural* divergence. It never asserts that
+  two language texts *mean* the same thing; that remains the owner’s editorial
+  judgment (§8.1, Meaningful Human Control).
+
+[ISO 639]: https://www.iso.org/iso-639-language-code
+[1.2.3]: https://github.com/usnistgov/OSCAL/releases/tag/v1.2.3
+[cascade-as-profiles]: cascade-as-profiles.md
+[compliance-trestle]: https://github.com/oscal-compass/compliance-trestle
 
 ---
 
@@ -366,7 +535,7 @@ Honest status, so the spec does not overstate precision:
 |---|---|
 | ID scheme `<regulation>-<chapter.section>[-<context>]`, chapter-based, never page-based | §2 |
 | Applicability model documented (context × obligation) | §6 |
-| Multilingual strategy (one file per language, linking convention) | §8 |
+| Multilingual model (same rule across languages; patterns A/B; cross-link and equivalence mapping) | §8 |
 | Mandatory props beyond NIST (`source-chapter`, `source-document`) | §4 |
 | Verbatim quoting documented as a hard invariant | §3 |
 
