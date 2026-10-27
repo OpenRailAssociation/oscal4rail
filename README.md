@@ -137,7 +137,7 @@ Railway-specific extensions are modeled as OSCAL `props` with namespace `ns="htt
 | **ADR-006** | [docs/adr/ADR-006](docs/adr/ADR-006-oscal4rail-vs-rulemapping.md) | OSCAL4Rail vs. Rulemapping positioning |
 | **ADR-007** | [docs/adr/ADR-007](docs/adr/ADR-007-tooling-foundation.md) | compliance-trestle + oscal-deep-diff as tooling foundation |
 | **ADR-012** | [docs/adr/ADR-012](docs/adr/ADR-012-canonical-serialization.md) | Canonical serialization: YAML leading, JSON/XML generated |
-| **ADR-013** | [docs/adr/ADR-013](docs/adr/ADR-013-oscal-agent-tooling-landscape.md) | OSCAL AI-agent tooling landscape: adopt vs. reference |
+| **ADR-015** | [docs/adr/ADR-015](docs/adr/ADR-015-oscal-agent-tooling-landscape.md) | OSCAL AI-agent tooling landscape: adopt vs. reference |
 | **Catalog Format** | [docs/reference/catalog-format.md](docs/reference/catalog-format.md) | Railway Profile over NIST OSCAL: IDs, verbatim, applicability, metadata layers |
 | **OSS Structure** | [docs/oss-structure.md](docs/oss-structure.md) | Future project structure and governance |
 | **Tutorial** | [docs/tutorials/getting-started.md](docs/tutorials/getting-started.md) | Extract your first regulation catalog |

@@ -1,4 +1,4 @@
-# ADR-013: OSCAL AI-Agent Tooling Landscape — Adopt vs. Reference
+# ADR-015: OSCAL AI-Agent Tooling Landscape — Adopt vs. Reference
 
 **Status:** Proposed
 **Date:** 2026-10-27
