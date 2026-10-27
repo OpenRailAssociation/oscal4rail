@@ -22,6 +22,8 @@ catalog:
     props:
     - name: language
       value: fr
+    - name: reference-language
+      value: de
     - name: source-document
       value: EXAMPLE_FR.pdf
     links:

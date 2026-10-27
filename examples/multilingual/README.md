@@ -21,12 +21,20 @@ owner verifies that each language version faithfully expresses the same rule
 (Meaningful Human Control). The framework only provides the option and keeps the
 sameness verifiable.
 
+When versions can drift, the owner may mark **which language governs** with an
+optional `reference-language` prop (catalog format §8.2): a single
+[ISO 639](https://www.iso.org/iso-639-language-code) code, or the sentinel `all`
+when every version is equally authoritative (e.g. an EU act). It is a marker only —
+the framework never translates or derives controls from it. In these synthetic
+files both the German and the French side carry `reference-language=de`, i.e.
+“available in DE/FR, master = DE”.
+
 ## Files
 
 | File | Pattern | Shows |
 |---|---|---|
-| `example-de.yaml` | A: one file per language | German file; `language=de`; `links rel=alternate` to the French sibling |
-| `example-fr.yaml` | A: one file per language | French file; **same** control ID `example-1.1`; back-link to German |
+| `example-de.yaml` | A: one file per language | German file; `language=de`; `reference-language=de` (§8.2); `links rel=alternate` to the French sibling |
+| `example-fr.yaml` | A: one file per language | French file; **same** control ID `example-1.1`; `reference-language=de` (DE governs); back-link to German |
 | `example-multilingual-parts.yaml` | B: one file, per-language parts | one control, one ID, one `statement` part per language tagged with a `language` prop |
 | `example-de-to-fr.mapping.yaml` | edge case | NIST Control Mapping (`relationship: equivalent`) for the exception where a language version numbers chapters differently |
 
