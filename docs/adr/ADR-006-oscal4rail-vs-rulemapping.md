@@ -2,7 +2,7 @@
 
 **Status:** Accepted
 **Date:** 2026-06-25
-**Deciders:** Jens Grote, Arpad Vasarhelyi
+**Deciders:** Jens Grote
 **Technical Story:** Evaluation des Rulemapping-Builder-Exports (Pilot BS-KI 2.1, 2026-06-25)
 
 ---
