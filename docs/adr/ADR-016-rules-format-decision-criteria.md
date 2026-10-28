@@ -185,6 +185,11 @@ continuous-monitoring (Framework ≠ operations).
 Optional follow-up: exchange with the GEMARA project (OpenSSF) at the audit/evaluation
 boundary, marking auditability as a shared interop gain rather than an O4R scope extension.
 
+**Interop condition (to verify):** the coupling holds **as long as GEMARA can read
+OSCAL** (consume O4R/OSCAL catalogs downstream). The only known connector,
+`gemara2oscal`, is **archived and one-directional (GEMARA→OSCAL)**; OSCAL→GEMARA
+readability is **not yet verified** and is an open point for the #26 interop exploration.
+
 ## Open points (to settle as analyses proceed)
 
 - Un-park **K4** after the tool evaluation.
