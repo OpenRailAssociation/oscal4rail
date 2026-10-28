@@ -105,8 +105,11 @@ Grades per criterion; "–" = parked (K4); Σ = Σ(weight × grade) over scored 
 | Candidate (issue) | K1 | K2 | K3 | K4 | K5 | K6 | K7 | K9 | K10 | K11 | K12 | **Σ** | Verdict |
 |-------------------|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:---:|:---:|:---:|:-----:|---------|
 | Catala (#15) | 1 | 4 | 5 | – | 4 | 1 | 6 | 2 | 6 | 2 | 1 | **87** | reference-only (format); optional executable upstream |
+| GEMARA (#16) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not an L2 rules format — see below); reference-only (format) + interop at the audit/evaluation boundary |
 
-### #15 Catala (INRIA) — Σ = 87 (K4 parked)
+### Scored candidates
+
+#### #15 Catala (INRIA) — Σ = 87 (K4 parked)
 
 Source: `github.com/CatalaLang/catala` (README, repo metadata), issue #15.
 
@@ -142,6 +145,45 @@ dependency (consistent with the minimal/portable tech-stack principle and the
 "unstable research project" caveat).
 
 **Feeds:** #12 (interface / upstream) and #8 (Rules Layer spec — elicitation concept as a pattern).
+
+### Assessed but not scored (different problem class)
+
+#### #16 GEMARA (OpenSSF) — assessed, not scored
+
+Source: `gemaraproj/gemara` (README, metadata), `gemara.openssf.org/model`, issue #16.
+
+**Why not scored against K1–K12:** the K-grid measures fitness as an **L2 rules
+(decision-logic) format**. GEMARA is not that — it is a **7-layer GRC meta-model**
+(CUE schemas + Go/Python SDK) describing categories of compliance activities
+(definition layers 1–3, measurement layers 5–7). Forcing a meta-model through a
+rules-format grid would produce a misleading total (Goodhart / false precision).
+It is therefore assessed qualitatively instead of scored.
+
+- **Scope & format:** machine-readable GRC meta-model; **CUE** schemas per layer
+  (control / threat / risk / policy / mapping / evaluation / audit catalogs & logs);
+  Go & Python SDKs. 7 layers: 1–3 *definition*, 4 *sensitive activities*,
+  5–7 *measurement*.
+- **Stewardship:** **OpenSSF / "a Series of LF Projects, LLC"** (Linux Foundation);
+  active (biweekly meetings); adopted in production (FINOS Common Cloud Controls L2,
+  OpenSSF Security Baseline L2, Privateer L5). License **Apache-2.0**.
+- **Relationship to O4R:** **peer meta-model, not a cascade framework.** No Regulatory
+  Cascade (vertical, versioned norm derivation; cross-border). It overlaps O4R only in
+  the middle (catalog / mapping / assessment) and brings a broader **horizontal GRC
+  activity cycle** (policy → evaluation → enforcement → audit) that is **outside** O4R's
+  framework scope — that cycle is the operations / consumer side (L4 Assessment
+  consumption, GovernanceAgent), not the O4R framework core (L1/L2/L3).
+- **OSCAL interaction:** bridges (names OSCAL as prior work; a `gemara2oscal`
+  transpiler exists but is **archived**).
+
+**Verdict:** **reference-only as a format** — the meta-model is currently unsuitable to
+adopt for O4R (no cascade, foreign CUE taxonomy, broader different scope).
+**Interop gain, not scope:** GEMARA's audit/evaluation layers (L5–L7) are a **coupling
+point** — O4R catalogs can feed GEMARA evaluation/audit schemas *downstream*.
+**Non-goal:** O4R does **not** extend its scope to audit / enforcement /
+continuous-monitoring (Framework ≠ operations).
+**Feeds:** #26 (Assessment boundary) as an interop option; **not** #8 (rules format).
+Optional follow-up: exchange with the GEMARA project (OpenSSF) at the audit/evaluation
+boundary, marking auditability as a shared interop gain rather than an O4R scope extension.
 
 ## Open points (to settle as analyses proceed)
 
