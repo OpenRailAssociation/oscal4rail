@@ -90,6 +90,59 @@ Relations between requirements are covered on four axes, all using the **same pa
 | horizontal (conflicting) | competing requirements | K11 (surface only; resolution in L4) |
 | lateral (non-conflicting) | equivalent-to / subset-of / depends-on / complements | NIST Mapping Collection, via K3 |
 
+## Candidate scores (work in progress)
+
+> Living section. Each candidate from #14–#22 is scored against the grid above,
+> with verbatim evidence. K4 remains **parked** (un-park decision deferred until
+> more candidates are scored). Totals use Σ(weight × grade) over the scored
+> criteria; **lower is better** (scored-weights sum = 27 → best 27, worst 162).
+> The final format selection is a **separate, later ADR**; these scores inform it.
+
+### Scoreboard (fills up as candidates are analyzed)
+
+Grades per criterion; "–" = parked (K4); Σ = Σ(weight × grade) over scored criteria.
+
+| Candidate (issue) | K1 | K2 | K3 | K4 | K5 | K6 | K7 | K9 | K10 | K11 | K12 | **Σ** | Verdict |
+|-------------------|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:---:|:---:|:---:|:-----:|---------|
+| Catala (#15) | 1 | 4 | 5 | – | 4 | 1 | 6 | 2 | 6 | 2 | 1 | **87** | reference-only (format); optional executable upstream |
+
+### #15 Catala (INRIA) — Σ = 87 (K4 parked)
+
+Source: `github.com/CatalaLang/catala` (README, repo metadata), issue #15.
+
+| K | Criterion | W | Grade | W×G | Rationale (evidence) |
+|---|-----------|:-:|:-----:|:---:|----------------------|
+| K1 | Decision-logic power | 3 | 1 | 3 | "the only programming language … embeds **default logic as a first-class feature**" (README); covers nesting, AND/OR, exceptions/overrides natively. |
+| K2 | Verbatim separation | 3 | 4 | 12 | Verbatim-faithful ("code-law faithfulness"), but **inverted SSOT** (Catala file is leading, readable text is *generated*) and no ADR-014 structural separation (statement vs. linked logic artifact). |
+| K3 | OSCAL attachment | 3 | 5 | 15 | No native OSCAL binding; usable only as an **upstream law** (national cascade level) via a **translation step** to O4R data (#12). Not completely unsuitable — a different approach. |
+| K4 | Schema validatability (CI) | 3 | *parked* | – | Un-park decision deferred. |
+| K5 | Stable, semantic IDs | 3 | 4 | 12 | Semantic, chapter-near names (scopes/fields), but **no format-native version/lifecycle construct** (predecessor/successor, retired); versioning via modules/Git, not as data in the format. |
+| K6 | Openness / license | 2 | 1 | 2 | **Apache-2.0** (OSI-approved, `gh api` + README); open, published standard (Catala book, formal semantics). Same license as O4R. |
+| K7 | Agent / machine evaluability | 2 | 6 | 12 | Logic only evaluable via the **Catala compiler** + a subsequent **translator to O4R**; not the OSCAL model, not canonical YAML. |
+| K9 | Stewardship & long-term health | 3 | 2 | 6 | **INRIA** (state-funded public research institute), productive use in French tax administration, active maintenance, high adoption (2431★). Caveat: self-declared "**unstable … research project**", no standards steward. |
+| K10 | Cascade compatibility | 3 | 6 | 18 | **No vertical cascade model** (no parent/child between norm levels, no versioned `deviates-from`). Module imports are technical composition, not governance specialization. |
+| K11 | Norm conflict | 2 | 2 | 4 | Default logic **detects and surfaces** competing rules (compiler flags undecidable exceptions as a conflict). Caveat: resolution is pulled into authoring time; the MHC decision point at application is absent. |
+| K12 | Determinism & auditability | 3 | 1 | 3 | "faithful-by-construction"; **formal semantics + partial compiler certification**; no LLM in the path; explainable (which branch/exception fired); lawyer-readable audit output. |
+
+**Profile:** strong in logic substance (K1, K12, K11) and licence/stewardship (K6, K9);
+weak in native O4R integration (K3, K7, K10) — **as expected**. We never expected an
+O4R-native format; what Catala delivers is a **deterministic, machine-readable result
+that is transformable into O4R**. The low integration grades judge *native format fit*,
+not *result transformability*.
+
+**Verdict:** **reference-only (as a format)** — not adopted. Twofold role:
+(a) **optional executable upstream** for a nation's law already encoded in Catala,
+behind the #12 interface via a translation step;
+(b) **conceptual template for a later adaptation/elicitation aid** for consuming
+companies — many of today's requirements are written in the "definition-under-conditions"
+pattern (interpretable text), and Catala's default logic is a model for the transition
+*interpretable → deterministic*, under the MHC guardrail (the owner interprets; the tool
+structures; sign-off). Tool-agnostic: referenced as a **pattern**, not pulled in as a
+dependency (consistent with the minimal/portable tech-stack principle and the
+"unstable research project" caveat).
+
+**Feeds:** #12 (interface / upstream) and #8 (Rules Layer spec — elicitation concept as a pattern).
+
 ## Open points (to settle as analyses proceed)
 
 - Un-park **K4** after the tool evaluation.
