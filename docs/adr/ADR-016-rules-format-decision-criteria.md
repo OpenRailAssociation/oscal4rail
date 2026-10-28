@@ -46,14 +46,21 @@ including if they automate that derivation downstream.
 - Each criterion is graded on the German **school-grade scale 1–6**: **1 = very good**
   (fully met) … **6 = insufficient** (not met). **Lower is better.**
 - Each criterion carries a **weight**: **high = 3**, **medium = 2**.
-- **Total score per candidate = Σ (weight × grade)**. The **lowest total wins.**
-- **No knock-out criteria are fixed up front.** Whether a 6 (or a specific criterion
-  such as K6/K9) becomes a knock-out is decided *after* seeing the results (deliberate,
-  to avoid premature hardening; may be hardened later).
+- **Score per candidate = weighted grade average** — like a **school report where main
+  subjects count more**: **⌀ = Σ (weight × grade) / Σ (weight)**. The result stays on the
+  **1.0–6.0 grade scale** and the **lowest average wins.** (Σ(weight × grade) is only the
+  intermediate numerator; the raw sum must not be read on its own — a medium criterion
+  scored 6 would otherwise outweigh a high criterion scored 1. Normalising by Σ(weight)
+  removes that distortion and also keeps candidates comparable when the set of scored
+  criteria differs, e.g. K4 parked or an n/a.)
+- **No knock-out criteria are fixed up front.** A single 6 does **not** auto-fail a
+  candidate for now. Whether a 6 (or a specific criterion such as K6/K9) becomes a
+  knock-out is decided *after* seeing the results (deliberate, to avoid premature
+  hardening; may be hardened later).
 
-> Caveat (Goodhart / Devil's Advocate): a weighted sum can mask a failed criterion.
-> Because knock-outs are not pre-set, the final decision ADR must look at the
-> per-criterion grades, not only the total.
+> Caveat (Goodhart / Devil's Advocate): even a weighted average can mask a failed
+> criterion. Because knock-outs are not pre-set, the final decision ADR must look at the
+> per-criterion grades, not only the average.
 
 ## Criteria
 
@@ -94,25 +101,27 @@ Relations between requirements are covered on four axes, all using the **same pa
 
 > Living section. Each candidate from #14–#22 is scored against the grid above,
 > with verbatim evidence. K4 remains **parked** (un-park decision deferred until
-> more candidates are scored). Totals use Σ(weight × grade) over the scored
-> criteria; **lower is better** (scored-weights sum = 27 → best 27, worst 162).
-> The final format selection is a **separate, later ADR**; these scores inform it.
+> more candidates are scored). Scores use the **weighted grade average**
+> ⌀ = Σ(weight × grade) / Σ(weight) over the scored criteria, on the **1.0–6.0 scale**;
+> **lower is better**. The final format selection is a **separate, later ADR**; these
+> scores inform it.
 
 ### Scoreboard (fills up as candidates are analyzed)
 
-Grades per criterion; "–" = parked (K4); Σ = Σ(weight × grade) over scored criteria.
+Grades per criterion; "–" = parked (K4); **⌀ = weighted grade average** Σ(W×G)/Σ(W) on
+the 1.0–6.0 scale (school report, main subjects weigh more); lower is better.
 
-| Candidate (issue) | K1 | K2 | K3 | K4 | K5 | K6 | K7 | K9 | K10 | K11 | K12 | **Σ** | Verdict |
+| Candidate (issue) | K1 | K2 | K3 | K4 | K5 | K6 | K7 | K9 | K10 | K11 | K12 | **⌀** | Verdict |
 |-------------------|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:---:|:---:|:---:|:-----:|---------|
-| Catala (#15) | 1 | 4 | 5 | – | 4 | 1 | 6 | 2 | 6 | 2 | 1 | **87** | reference-only (format); optional executable upstream |
+| Catala (#15) | 1 | 4 | 5 | – | 4 | 1 | 6 | 2 | 6 | 2 | 1 | **3.22** | reference-only (format); optional executable upstream |
 | GEMARA (#16) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not an L2 rules format — see below); reference-only (format) + interop at the audit/evaluation boundary |
 | ComplyTime (#17) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not a format — an assessment-**execution** tool); documented in the tooling landscape (ADR-015), not here |
 | OECD Law-as-Code (#18) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not a format or tool — an international reference/positioning frame); the "why" of O4R → motivation / ADR-005 |
-| EuroSCAL / MEDINA / EMERALD (#19) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (EU ecosystem peer on L4 continuous certification, not a format); ally at the EU cascade level (EUCS/ENISA) → ADR-005 |
+| EuroSCAL / Clouditor (#19) | 3 | 2 | 2 | – | 2 | 1 | 4 | 2 | 6 | 5 | 4 | **3.07** | scored; not an L2 format but close (OSCAL-native); high value as an L4 assessment reference → #26/#27 |
 
 ### Scored candidates
 
-#### #15 Catala (INRIA) — Σ = 87 (K4 parked)
+#### #15 Catala (INRIA) — ⌀ = 3.22 (K4 parked)
 
 Source: `github.com/CatalaLang/catala` (README, repo metadata), issue #15.
 
@@ -148,6 +157,50 @@ dependency (consistent with the minimal/portable tech-stack principle and the
 "unstable research project" caveat).
 
 **Feeds:** #12 (interface / upstream) and #8 (Rules Layer spec — elicitation concept as a pattern).
+
+#### #19 EuroSCAL / Clouditor (MEDINA / EMERALD) — ⌀ = 3.07 (K4 parked)
+
+Source: Clouditor (`clouditor/clouditor`, Fraunhofer AISEC — README, metadata,
+`api/orchestrator/orchestrator.proto`, `api/assessment/metric.proto`, `policies/rego.go`,
+`.gitmodules`); EMERALD (emerald-he.eu; CORDIS 101120688); MEDINA (CORDIS 952633);
+NIST OSCAL workshops; issue #19.
+
+**Scored (close enough to the grid):** unlike GEMARA/ComplyTime, Clouditor (the engine
+behind MEDINA → EMERALD) has enough **format substance** to score — it follows the OSCAL
+catalog/control model and uses a declarative metric format. Its real home is **L4
+assessment**, so the grid measures "fitness as an L2 rules format"; the per-criterion
+profile (not only the average) carries the message.
+
+| K | Criterion | W | Grade | W×G | Rationale (evidence) |
+|---|-----------|:-:|:-----:|:---:|----------------------|
+| K1 | Decision-logic power | 3 | 3 | 9 | Typed thresholds strong: `MetricConfiguration.operator` ∈ `^(<\|>\|<=\|>=\|==\|isIn\|allIn)$` + typed `target_value`; `range`/`allowedValues`. But nested logic/exceptions live in external **Rego**, not in the declarative format; no native exception construct. |
+| K2 | Verbatim separation | 3 | 2 | 6 | Clean structural separation Control (OSCAL) / Metric (declarative) / Rego (logic) — three artifacts; the logic never overwrites the control text. (Quality of the Rego language itself judged under K7/K12, not here.) |
+| K3 | OSCAL attachment | 3 | 2 | 6 | OSCAL-native catalog/control model (verbatim: "a Control in a certification catalog. It follows the **OSCAL model**", "OPS-01, as used in OSCAL"); no NIST fork. Weaker only on the lateral mapping-collection axis (mapping is control→metric). |
+| K4 | Schema validatability (CI) | 3 | *parked* | – | Un-park decision deferred. |
+| K5 | Stable, semantic IDs | 3 | 2 | 6 | Semantic IDs/paths (`AdminMFAEnabled`, `metrics/<Category>/<Name>/`, OSCAL `OPS-01`); lifecycle via file/Git versioning (not ideal, no native predecessor/successor). uuid `id` field is a weak point but not dominant. |
+| K6 | Openness / license | 2 | 1 | 2 | **Apache-2.0** (OSI-approved, `gh` + README badge); open/published (godoc, OpenSSF Best Practices). Same license as O4R. |
+| K7 | Agent / machine evaluability | 2 | 4 | 8 | Declarative metric is YAML/JSON (good), but the decision logic is **Rego (OPA)** — a foreign policy language, engine-bound, not the OSCAL model. Better than Catala (compiler) because the "what" (metric) is OSCAL/YAML-near; penalty for the Rego "how". |
+| K9 | Stewardship & long-term health | 3 | 2 | 6 | **Fraunhofer AISEC** (not a one-person fork), active (87★, OpenSSF Best Practices, v2 in progress), adopted in EU certification projects (MEDINA→EMERALD), "Friend of OSCAL". Caveat: v2 in flux / no fixed stable date; EU-project-bound; not a standards steward. |
+| K10 | Cascade compatibility | 3 | 6 | 18 | No vertical cascade model (no versioned parent/child, no `deviates-from`); catalogs sit side by side (C5/CCM/EUCS), no derivation hierarchy. Own language (Rego) + external toolset would need the cascade built entirely outside. |
+| K11 | Norm conflict | 2 | 5 | 10 | No conflict-as-data model; competing requirements are evaluated in isolation (parallel per-metric results). Does not silently resolve, but does not surface the conflict as a relation either. |
+| K12 | Determinism & auditability | 3 | 4 | 12 | Technically deterministic (Rego/OPA, no LLM) + OSCAL-auditable output, **but not inherently transparent**: explainability/verifiability is bound to a second language (Rego) + external engine, not readable from the artifact itself nor by the owner without Rego knowledge (MHC limitation). |
+
+**Profile:** mirror image of Catala — **strong on OSCAL integration** (K2/K3/K5 = 2) via
+the shared OSCAL catalog/control foundation; **weak on cascade** (K10 = 6) and on the
+**foreign, non-inherently-transparent logic language** (K7 = 4, K12 = 4, Rego). ⌀ = 3.07,
+just ahead of Catala (3.22).
+
+**Verdict:** **scored; not adopted as an L2 rules format** (K10/K7/K12). **High value on
+the L4 assessment side:** an OSCAL-native **metric model** (declarative schema + typed
+operators + evaluation scales), the `applicable`/`compliant` split (independently
+mirrors O4R's L2-applicability vs. L4-assessment line), and **format + policies in a
+separate governance repo** (`Cybersecurity-Certification-Hub/security-metrics` as a
+submodule, SSOT, separate from the engine). **Reference / reuse candidate for #26/#27
+(Railway Assessment Profile).** EU ecosystem peer + collaboration (Friends of OSCAL;
+parallel cloud scope): **register / engage**, explore shared tooling and structures,
+without adopting the cloud-specific scope. **Differences:** Rego as a non-inherently-
+transparent logic language (MHC caveat); uuid IDs. **Feeds:** ADR-005 addendum (EU
+cascade) and #26/#27 (L4 assessment reference).
 
 ### Assessed but not scored (different problem class)
 
@@ -254,35 +307,6 @@ reference frame and vocabulary (Law as Code vs. Rules as Code) that underpins O4
 (Law-as-Code relationship / positioning) — anchor the terminology there.
 **Non-goal:** nothing to adopt as an artifact or tool.
 *(Follow-up: reflect the OECD reference in `motivation.md`.)*
-
-#### #19 EuroSCAL (MEDINA / EMERALD) — assessed, not scored (EU ecosystem peer)
-
-Source: EMERALD (emerald-he.eu; CORDIS 101120688), MEDINA (CORDIS 952633),
-NIST OSCAL workshops (nist.gov/csrc), issue #19.
-
-**Why not scored against K1–K12:** EuroSCAL (the MEDINA → EMERALD line of EU projects)
-is not an L2 rules format; it is an **EU-funded peer on the L4 assessment / continuous
-certification side**, cloud-security focused. The K-grid does not apply.
-
-- **Scope:** continuous certification of cloud services; EMERALD (verbatim): a
-  "**Compliance-as-a-Service (CaaS)** … continuous certification processes in alignment
-  with harmonized European cybersecurity schemes, such as the **EU Cybersecurity
-  Certification Scheme for Cloud Services (EUCS)**." MEDINA = predecessor; EMERALD since
-  Nov 2023.
-- **Layer / role:** **L4 Assessment** (continuous audit/certification). Issue note
-  (verbatim): "**no railway profile / no Rules/Change layer**."
-- **OSCAL interaction:** builds on / bridges OSCAL — "EU Friends of OSCAL"; demonstrated
-  at NIST OSCAL workshops ("Paving the Road Towards Continuous Certification: OSCAL and
-  the EUCS"; Bosch MEDINA-OSCAL).
-- **Stewardship:** EU Horizon-funded research consortia (MEDINA complete; EMERALD
-  active); consortium governance, not a foundation steward; no single artifact to adopt.
-
-**Verdict:** **reference-only / peer.** **EU ecosystem peer** on L4 (continuous
-certification, cloud/EUCS) and a "Friend of OSCAL". **Value for O4R:** an **ally and
-reference at the EU cascade level** (ENISA/EUCS) — shows OSCAL-based continuous
-certification in EU practice; no railway profile, no rules/change layer. **Feeds:**
-ADR-005 addendum (already referenced) and the EU cascade level. **Non-goal:** nothing to
-adopt as an artifact.
 
 ## Open points (to settle as analyses proceed)
 
