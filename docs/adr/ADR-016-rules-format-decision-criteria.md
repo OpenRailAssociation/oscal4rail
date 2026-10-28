@@ -107,6 +107,7 @@ Grades per criterion; "–" = parked (K4); Σ = Σ(weight × grade) over scored 
 | Catala (#15) | 1 | 4 | 5 | – | 4 | 1 | 6 | 2 | 6 | 2 | 1 | **87** | reference-only (format); optional executable upstream |
 | GEMARA (#16) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not an L2 rules format — see below); reference-only (format) + interop at the audit/evaluation boundary |
 | ComplyTime (#17) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not a format — an assessment-**execution** tool); documented in the tooling landscape (ADR-015), not here |
+| OECD Law-as-Code (#18) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not a format or tool — an international reference/positioning frame); the "why" of O4R → motivation / ADR-005 |
 
 ### Scored candidates
 
@@ -221,6 +222,37 @@ NIST-OSCAL-native tools, OpenSCAP/OPA/AMPEL), i.e. [ADR-015](./ADR-015-oscal-age
 L4 assessment runtime/backend for the GovernanceAgent (Project 3); **documented in the
 tooling landscape (ADR-015)**, feeds #26/#27 and Project 3. **Non-goal:** O4R builds
 neither the scan runtime nor the result processing. Full tool entry belongs in ADR-015 (PR #47).
+
+#### #18 OECD Law-as-Code (reference framework) — assessed, not scored (positioning, the "why")
+
+Source: OECD consultation 2026 "Towards a shared reference framework for law as code"
+(oecd.org); OECD-OPSI "Cracking the Code" / Rules as Code (oecd-opsi.org); issue #18.
+
+**Why not scored against K1–K12:** OECD Law-as-Code is neither a format nor a tool — it
+is an **international reference and positioning frame** / terminology. The K-grid does not
+apply. Recorded for traceability.
+
+- **Scope:** OECD (2026, verbatim): "**Law as Code** refines the broader practice of
+  **Rules as Code** … the **state-authorised provision of authoritative law in force,
+  transformed into machine-executable representations and made available as shared public
+  digital infrastructure**." OECD-OPSI (verbatim): an "**official, machine-consumable
+  version** of some types of government rules, **to exist alongside the existing natural
+  language counterpart**."
+- **Stewardship:** OECD (intergovernmental); public consultation 2026. Highest
+  institutional legitimacy, but **no software artifact / no license** to adopt.
+- **Relationship to O4R:** O4R **fits inside this frame** — it is a **sectoral (railway)
+  instantiation** of the OECD vision. It is the **"why we build O4R at all"**, not the
+  "how". O4R is **not** Law-as-Code itself (it does not produce state-authorised law); it
+  is sectoral governance that **consumes** Law-as-Code upstreams. The OECD "alongside the
+  natural-language counterpart" principle independently validates O4R's code-first +
+  verbatim approach. Links to Rulemapping (#14) / SPRIND via OECD-OPSI.
+
+**Verdict:** **reference-only (positioning / the "why").** Provides the international
+reference frame and vocabulary (Law as Code vs. Rules as Code) that underpins O4R's
+**motivation and existence**. **Feeds:** `docs/motivation.md` (the why) and ADR-005
+(Law-as-Code relationship / positioning) — anchor the terminology there.
+**Non-goal:** nothing to adopt as an artifact or tool.
+*(Follow-up: reflect the OECD reference in `motivation.md`.)*
 
 ## Open points (to settle as analyses proceed)
 
