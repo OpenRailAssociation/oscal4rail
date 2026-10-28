@@ -106,6 +106,7 @@ Grades per criterion; "–" = parked (K4); Σ = Σ(weight × grade) over scored 
 |-------------------|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:---:|:---:|:---:|:-----:|---------|
 | Catala (#15) | 1 | 4 | 5 | – | 4 | 1 | 6 | 2 | 6 | 2 | 1 | **87** | reference-only (format); optional executable upstream |
 | GEMARA (#16) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not an L2 rules format — see below); reference-only (format) + interop at the audit/evaluation boundary |
+| ComplyTime (#17) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not a format — an assessment-**execution** tool); documented in the tooling landscape (ADR-015), not here |
 
 ### Scored candidates
 
@@ -189,6 +190,37 @@ boundary, marking auditability as a shared interop gain rather than an O4R scope
 OSCAL** (consume O4R/OSCAL catalogs downstream). The only known connector,
 `gemara2oscal`, is **archived and one-directional (GEMARA→OSCAL)**; OSCAL→GEMARA
 readability is **not yet verified** and is an open point for the #26 interop exploration.
+
+#### #17 ComplyTime (complyctl) — assessed, not scored (tooling, not a format)
+
+Source: `complytime/complyctl` (README, metadata), `complytime.dev`, issue #17.
+
+**Why not scored against K1–K12:** like GEMARA, ComplyTime is not an L2 rules format.
+It is an **assessment-*execution* tool** — a "lightweight compliance runtime that pulls
+Gemara policies from an OCI registry and executes scans via providers, producing
+compliance reports in multiple formats (EvaluationLog, **OSCAL**, SARIF, Markdown)"
+(complyctl README). It belongs to the **tooling landscape** (same class as the
+NIST-OSCAL-native tools, OpenSCAP/OPA/AMPEL), i.e. [ADR-015](./ADR-015-oscal-agent-tooling-landscape.md),
+**not** this rules-format grid. Recorded here only so the evaluation is traceable.
+
+- **Scope & format:** OSCAL-**native** runtime; `complyctl` (Go CLI), evaluator plugins
+  via gRPC (OpenSCAP/OPA/AMPEL), OCI policy distribution; produces **OSCAL
+  assessment-results**. Apache-2.0; Red Hat origin; OpenSSF Best Practices + Scorecard; active.
+- **Layer / role:** **L4 assessment *execution*** (not L4 *specification* — that is O4R's
+  Railway Assessment Profile #26). It is the OSCAL-native tool a **GovernanceAgent
+  (Project 3)** would invoke and whose deterministic result it receives back (MCP/tool
+  pattern: pre-condition = which policy applies, action = scan, post-condition = OSCAL
+  evidence; the human derives/decides — MHC preserved).
+- **Needs at both ends:** input = an applicability decision ("which rule/policy") = O4R
+  **L2 (#8)**, which ComplyTime does **not** make itself (it makes the O4R L2 need
+  explicit); output processing (issue / report / quality-gate) = Project 3 / operations.
+- **Makes the GEMARA↔OSCAL bridge real:** ComplyTime pulls Gemara policies and emits
+  OSCAL assessment-results — a live path for the #16 interop condition.
+
+**Verdict:** **not a format — an assessment-execution tool.** **Adopt-candidate** as the
+L4 assessment runtime/backend for the GovernanceAgent (Project 3); **documented in the
+tooling landscape (ADR-015)**, feeds #26/#27 and Project 3. **Non-goal:** O4R builds
+neither the scan runtime nor the result processing. Full tool entry belongs in ADR-015 (PR #47).
 
 ## Open points (to settle as analyses proceed)
 
