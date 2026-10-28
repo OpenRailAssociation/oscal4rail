@@ -108,6 +108,7 @@ Grades per criterion; "–" = parked (K4); Σ = Σ(weight × grade) over scored 
 | GEMARA (#16) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not an L2 rules format — see below); reference-only (format) + interop at the audit/evaluation boundary |
 | ComplyTime (#17) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not a format — an assessment-**execution** tool); documented in the tooling landscape (ADR-015), not here |
 | OECD Law-as-Code (#18) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not a format or tool — an international reference/positioning frame); the "why" of O4R → motivation / ADR-005 |
+| EuroSCAL / MEDINA / EMERALD (#19) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (EU ecosystem peer on L4 continuous certification, not a format); ally at the EU cascade level (EUCS/ENISA) → ADR-005 |
 
 ### Scored candidates
 
@@ -253,6 +254,35 @@ reference frame and vocabulary (Law as Code vs. Rules as Code) that underpins O4
 (Law-as-Code relationship / positioning) — anchor the terminology there.
 **Non-goal:** nothing to adopt as an artifact or tool.
 *(Follow-up: reflect the OECD reference in `motivation.md`.)*
+
+#### #19 EuroSCAL (MEDINA / EMERALD) — assessed, not scored (EU ecosystem peer)
+
+Source: EMERALD (emerald-he.eu; CORDIS 101120688), MEDINA (CORDIS 952633),
+NIST OSCAL workshops (nist.gov/csrc), issue #19.
+
+**Why not scored against K1–K12:** EuroSCAL (the MEDINA → EMERALD line of EU projects)
+is not an L2 rules format; it is an **EU-funded peer on the L4 assessment / continuous
+certification side**, cloud-security focused. The K-grid does not apply.
+
+- **Scope:** continuous certification of cloud services; EMERALD (verbatim): a
+  "**Compliance-as-a-Service (CaaS)** … continuous certification processes in alignment
+  with harmonized European cybersecurity schemes, such as the **EU Cybersecurity
+  Certification Scheme for Cloud Services (EUCS)**." MEDINA = predecessor; EMERALD since
+  Nov 2023.
+- **Layer / role:** **L4 Assessment** (continuous audit/certification). Issue note
+  (verbatim): "**no railway profile / no Rules/Change layer**."
+- **OSCAL interaction:** builds on / bridges OSCAL — "EU Friends of OSCAL"; demonstrated
+  at NIST OSCAL workshops ("Paving the Road Towards Continuous Certification: OSCAL and
+  the EUCS"; Bosch MEDINA-OSCAL).
+- **Stewardship:** EU Horizon-funded research consortia (MEDINA complete; EMERALD
+  active); consortium governance, not a foundation steward; no single artifact to adopt.
+
+**Verdict:** **reference-only / peer.** **EU ecosystem peer** on L4 (continuous
+certification, cloud/EUCS) and a "Friend of OSCAL". **Value for O4R:** an **ally and
+reference at the EU cascade level** (ENISA/EUCS) — shows OSCAL-based continuous
+certification in EU practice; no railway profile, no rules/change layer. **Feeds:**
+ADR-005 addendum (already referenced) and the EU cascade level. **Non-goal:** nothing to
+adopt as an artifact.
 
 ## Open points (to settle as analyses proceed)
 
