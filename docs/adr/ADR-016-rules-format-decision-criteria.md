@@ -118,6 +118,7 @@ the 1.0–6.0 scale (school report, main subjects weigh more); lower is better.
 |-------------------|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:---:|:---:|:---:|:-----:|---------|
 | EuroSCAL / Clouditor (#19) | 3 | 2 | 2 | – | 2 | 1 | 4 | 2 | 6 | 5 | 4 | **3.07** | scored; not an L2 format but close (OSCAL-native); high value as an L4 assessment reference → #26/#27 |
 | Catala (#15) | 1 | 4 | 5 | – | 4 | 1 | 6 | 2 | 6 | 2 | 1 | **3.22** | reference-only (format); optional executable upstream |
+| OpenFisca (#21) | 1 | 4 | 5 | – | 3 | 2 | 5 | 1 | 6 | 5 | 3 | **3.44** | scored; **not adopted** — RaC hybrid (date-versioned parameter YAML + Python logic); best stewardship (K9), AGPL caveat; parameter/temporal-value reference for L2 |
 | Blawx (#20) | 1 | 4 | 5 | – | 4 | 1 | 6 | 6 | 6 | 2 | 2 | **3.78** | scored; **not adopted** — Catala-class RaC logic but foreign engine (s(CASP)) + single-person fork (K9); owner-friendly authoring + explainability reference |
 | Rulemapping / RUML (#14) | 2 | 6 | 4 | – | 6 | 6 | 4 | 4 | 6 | 5 | 5 | **4.78** | scored; **not adopted** — proprietary, commercialised single-vendor SaaS (ToU §6; Product Update 2026-10-23); process-level handover (ADR-006) stays valid |
 | GEMARA (#16) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not an L2 rules format — see below); reference-only (format) + interop at the audit/evaluation boundary |
@@ -305,6 +306,55 @@ lesson), which alone rules out a dependency. **Value retained:** a reference for
 (b) **explainable reasoning** (s(CASP) justification trees), under the Meaningful Human
 Control guardrail. **Feeds:** #8 (rules spec — as an authoring/elicitation pattern, like
 Catala), **not** a dependency.
+
+#### #21 OpenFisca (digital common; FR-government origin) — ⌀ = 3.44 (K4 parked)
+
+Source: `github.com/openfisca/openfisca-core` (gh API: license **AGPL-3.0**, 249★, created
+2013-12, **last push 2026-10-23** — active; Python); country packages active
+(`openfisca-france` 2026-10-27, `openfisca-tunisia` 2026-10-28); openfisca.org/doc
+(parameters / legislation evolutions); OECD-OPSI; issue #21.
+
+OpenFisca is an "open-source engine to write rules as code" for tax/benefit microsimulation
+(initiated by the French government in 2011; used in FR, NZ, AU, CA, …). Two artifact types:
+**parameters** = **YAML files with date-stamped values** + legislative references (tree
+structure, `values:` date→value, `metadata.reference`, `unit`, `brackets`/`scales`); and
+**variables/formulas** = **Python code** (`def formula(person, period, parameters)`) that
+consumes the parameters.
+
+| K | Criterion | W | Grade | W×G | Rationale (evidence) |
+|---|-----------|:-:|:-----:|:---:|----------------------|
+| K1 | Decision-logic power | 3 | 1 | 3 | Logic in **Python** → fully general (nesting, AND/OR, negation, exceptions, reforms); thresholds as typed parameters (`brackets`/`scales` with `threshold`/`rate`/`unit`). Covers all K1 constructs; on par with Catala/Blawx. Its massive strength. |
+| K2 | Verbatim separation | 3 | 4 | 12 | Clean structural split parameters (YAML) / logic (Python); logic never overwrites rule text. But **no verbatim model** — parameter YAML carries `metadata.reference` (a URL to the norm), **not the verbatim text**; inverted SSOT. Same as Catala/Blawx; no ToU/ownership issue (AGPL/self-hosted). |
+| K3 | OSCAL attachment | 3 | 5 | 15 | No native OSCAL binding; the parameter YAML would be referenceable, but the **logic is Python, engine-bound** (OpenFisca-Core runtime) — the decision part is not a portable `link`/`back-matter` artifact. Referencing only the parameter YAML is insufficient (values, not logic). Same as Catala/Blawx (5). |
+| K5 | Stable, semantic IDs | 3 | 3 | 9 | Semantic tree paths (`tax_on_salary.public_sector.rate`) + **native date-stamped values with legislative references** (`values: 1993-01-01 … 2010-01-01 …`) — a real data-borne temporal value history, unique among candidates → **above Catala/Blawx (4)**. But it is value-over-time, **not** the rule-identity lifecycle K5 demands (no predecessor/successor, no retired status) → not 2. |
+| K6 | Openness / license | 2 | 2 | 4 | **AGPL-3.0** (OSI-approved, gh API); "digital common", horizontal RFC governance, public. Open — but **AGPL copyleft** is a real reuse caveat vs. O4R's permissive Apache-2.0 (applies on code/asset adoption, not format reference). Consistent with the RUML reasoning (license practicality counted): a notch below the permissive Apache/MIT candidates (1), far above RUML (6). |
+| K7 | Agent / machine evaluability | 2 | 5 | 10 | Decision logic is **Python in an engine runtime** — not the OSCAL model, not canonical YAML, not evaluable without the engine (direction of Catala/Blawx 6). **Mitigated to 5** by the engine-free, traversable **parameter YAML** (a substantial declarative part is accessible without the engine, unlike Catala's pure compiler dependency). |
+| K9 | Stewardship & long-term health | 3 | 1 | 3 | **Strongest stewardship of all candidates:** org-backed (`openfisca`, many active repos — not a one-person fork), continuously active since **2011** (core push 2026-10), broad multi-jurisdictional productive adoption (FR/NZ/AU/CA), explicit democratic "digital common" governance (RFCs). Above Catala/EuroSCAL (2). Caveat: a community/government ecosystem, not a formal standards steward. |
+| K10 | Cascade compatibility | 3 | 6 | 18 | No cascade model — no versioned parent/child between norm levels, no `deviates-from`. Reforms are scenario variants; country packages sit side by side, no derivation hierarchy with conformance. Same as all candidates (6). |
+| K11 | Norm conflict | 2 | 5 | 10 | No conflict-as-data model and no conflict-surfacing concept — reforms resolve alternative states in code, not as a versioned relation between competing norms. Does not silently resolve (no conflict concept at all), but does not surface it either. Same as EuroSCAL/RUML (5); below Catala/Blawx (2). |
+| K12 | Determinism & auditability | 3 | 3 | 9 | Deterministic, reproducible, no LLM; strong YAML-test mechanism; **parameter side highly auditable** (date-stamped values + legislative references → what value held when and from where — strong diff/sign-off basis over time, best after Catala). **But the Python logic lacks inherent explainability** (no justification tree like Blawx/s(CASP), no formal semantics like Catala) — "which branch fired" is only via code reading. Above EuroSCAL (4)/RUML (5); below Blawx (2)/Catala (1). |
+| K4 | Schema validatability (CI) | 3 | *parked* | – | Un-park decision deferred. For the record: parameter YAML has documented conventions + YAML tests; Python formulas are not schema-validatable. |
+
+**Profile:** the **hybrid with the best stewardship** — massive logic power (K1 = 1), the
+**strongest stewardship of all candidates** (K9 = 1), and uniquely a **native date-versioned
+parameter YAML** (K5 = 3, above Catala/Blawx). Fails the O4R-defining axes like every RaC
+candidate — no cascade (K10 = 6), engine/Python-bound logic (K7 = 5), handover-only (K3 = 5),
+no conflict-as-data (K11 = 5), no verbatim (K2 = 4). AGPL copyleft (K6 = 2) as a reuse caveat.
+⌀ = 3.44 — ahead of Blawx (3.78), behind Catala (3.22) and EuroSCAL (3.07).
+
+**Verdict:** **scored; not adopted as the L2 rules format** (K3/K10 = 5/6; logic engine-bound).
+A hybrid of a declarative, **date-versioned parameter YAML** (strong, legislation-referenced —
+the K5 differentiator) and **Python decision logic** (powerful but engine-bound, not OSCAL/YAML).
+**Best stewardship of all candidates** (K9 = 1: org-backed `openfisca`, active since 2011,
+multi-jurisdictional digital common). Fails the O4R-defining axes like every RaC candidate — no
+cascade (K10), no OSCAL binding (K3), no conflict-as-data (K11), no verbatim model (K2).
+**License caveat:** AGPL-3.0 is OSI-approved and open (K6 = 2), but its copyleft is
+**incompatible with O4R's Apache-2.0 on code/asset adoption** — relevant only if code were
+adopted, not for format/concept reference. **Value retained:** the **date-versioned parameter
+model** (`values` per date + `metadata.reference`) is a concrete reference for
+**parameter/threshold handling and temporal value history in L2**, and the YAML-test pattern
+for determinism. **Feeds:** #8 (parameter handling + temporal values), **not** a dependency
+(AGPL + engine-bound logic).
 
 ### Assessed but not scored (different problem class)
 
