@@ -118,6 +118,7 @@ the 1.0–6.0 scale (school report, main subjects weigh more); lower is better.
 |-------------------|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:---:|:---:|:---:|:-----:|---------|
 | EuroSCAL / Clouditor (#19) | 3 | 2 | 2 | – | 2 | 1 | 4 | 2 | 6 | 5 | 4 | **3.07** | scored; not an L2 format but close (OSCAL-native); high value as an L4 assessment reference → #26/#27 |
 | Catala (#15) | 1 | 4 | 5 | – | 4 | 1 | 6 | 2 | 6 | 2 | 1 | **3.22** | reference-only (format); optional executable upstream |
+| Blawx (#20) | 1 | 4 | 5 | – | 4 | 1 | 6 | 6 | 6 | 2 | 2 | **3.78** | scored; **not adopted** — Catala-class RaC logic but foreign engine (s(CASP)) + single-person fork (K9); owner-friendly authoring + explainability reference |
 | Rulemapping / RUML (#14) | 2 | 6 | 4 | – | 6 | 6 | 4 | 4 | 6 | 5 | 5 | **4.78** | scored; **not adopted** — proprietary, commercialised single-vendor SaaS (ToU §6; Product Update 2026-10-23); process-level handover (ADR-006) stays valid |
 | GEMARA (#16) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not an L2 rules format — see below); reference-only (format) + interop at the audit/evaluation boundary |
 | ComplyTime (#17) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not a format — an assessment-**execution** tool); documented in the tooling landscape (ADR-015), not here |
@@ -256,6 +257,54 @@ remains valid as a *process-level* point of contact, **not** a data-format adopt
 open standard, re-score K6 (and the dependent K4/K9) — the grades reflect the present facts,
 which do not support a better grade today. **Feeds:** the ADR-006 amendment note and #8
 (rules spec — as a structural pattern only, not a dependency).
+
+#### #20 Blawx (Lexpedite / Jason Morris) — ⌀ = 3.78 (K4 parked)
+
+Source: `github.com/Lexpedite/blawx` (gh API: license **MIT**, 158★, created 2020-01,
+**last push 2024-11-01**, not archived; languages HTML/JS/Python); `Lexpedite/blawx_mcp`
+(**archived**, MIT); CEUR "Building Blawx"; MIT Computational Law Report; OECD-OPSI;
+pubpub demonstration paper (CC-BY-4.0); issue #20.
+
+Blawx is an "open source, user-friendly, web-based declarative logic knowledge
+representation tool … for encoding, testing and using rules" (GitHub) by Lexpedite Legal
+Technology Ltd. (Jason Morris), partly under a 2022–2023 Interchange Agreement with the
+Government of Canada. Visual programming via **Blockly**; the reasoning engine is
+**s(CASP)** (constraint answer set programming — symbolic AI, explainable reasoning). It is
+primarily an **authoring tool + reasoner**, not a published, tool-independent exchange
+*format*.
+
+| K | Criterion | W | Grade | W×G | Rationale (evidence) |
+|---|-----------|:-:|:-----:|:---:|----------------------|
+| K1 | Decision-logic power | 3 | 1 | 3 | s(CASP) = constraint answer set programming: nesting, negation (NAF + explicit), defaults/exceptions (defeasible reasoning), typed constraints — built for legal reasoning. Covers all K1 constructs natively; on par with Catala. |
+| K2 | Verbatim separation | 3 | 4 | 12 | Encoding is a standalone logic representation (s(CASP) predicates in Blockly); the norm text is *encoded*, not carried as a verbatim field; no ADR-014 structural separation; inverted-SSOT tendency like Catala. Above RUML (6): MIT + self-hosting keeps owner ownership of the encoding (no ToU rights grant). Logic power counted under K1, not here. |
+| K3 | OSCAL attachment | 3 | 5 | 15 | No native OSCAL binding; engine/language-bound like Catala — the encoding lives in the tool + s(CASP) reasoner, not a portable `link`/`back-matter` file. Below RUML (4, standalone XML); far below EuroSCAL (2, OSCAL-native). |
+| K5 | Stable, semantic IDs | 3 | 4 | 12 | IDs = predicate/category/attribute names (semantic-near, unlike RUML's auto-increment), but **no format-native version/lifecycle construct** (no predecessor/successor, no retired); versioning only via Git/tool. Same as Catala. |
+| K6 | Openness / license | 2 | 1 | 2 | **MIT** (OSI-approved, gh API verified); code public + self-hostable (Docker in repo); demonstration paper CC-BY-4.0; s(CASP) is an open academic system. Fully open — far above RUML (6). |
+| K7 | Agent / machine evaluability | 2 | 6 | 12 | Logic runs via the **s(CASP) engine** — a foreign logic language, engine-bound; not the OSCAL model, not canonical YAML. The raw artifact is not evaluable without the engine. Same as Catala (compiler-bound, 6). (The "not actively maintained" fact is weighed under K9, not here.) |
+| K9 | Stewardship & long-term health | 3 | 6 | 18 | **Single-person fork** (Lexpedite / Jason Morris), no foundation/standards steward; **last push 2024-11-01** (~1 year quiet), `blawx_mcp` **archived** (2026-06); Canada adoption only a time-boxed Interchange Agreement (2022–2023). This is the ADR-015 lesson in full (archived / one-person fork) → effectively dormant. Worse than RUML (4, at least active). Mitigating only: main repo not archived; MIT + self-hosting permits continuation by others (no lock-in). |
+| K10 | Cascade compatibility | 3 | 6 | 18 | No cascade model — no versioned parent/child between norm levels, no `deviates-from`. Module/encoding structure is technical composition, not governance specialization. Same as Catala/EuroSCAL/RUML (6). |
+| K11 | Norm conflict | 2 | 2 | 4 | s(CASP) handles defeasibility and competing rules natively — detects/surfaces inconsistencies (does not silently resolve); on par with Catala (2). Caveat (as Catala): resolution at reasoning/authoring time, not as a versioned data relation for the L4 MHC decision point. Above EuroSCAL/RUML (5). |
+| K12 | Determinism & auditability | 3 | 2 | 6 | Strong: s(CASP) is deterministic, no LLM in the path, and **explainable by design** — natural-language **justification trees** (why a result holds), inherently more transparent than Rego. Not quite Catala (1, formal semantics + partial compiler certification); dragged by missing versioning (no diff/re-verification over time) and engine-bound auditability (K7). Above EuroSCAL (4) and RUML (5). |
+| K4 | Schema validatability (CI) | 3 | *parked* | – | Un-park decision deferred. For the record: no published tool-independent exchange schema; s(CASP) is a language, not a JSON Schema/XSD. |
+
+**Profile:** the **Catala-class** pattern — excellent logic substance (K1 = 1),
+explainability/determinism (K12 = 2), conflict handling (K11 = 2), open MIT license
+(K6 = 1); fails on the same structural points as Catala — foreign engine language instead
+of OSCAL/YAML (K7 = 6), no cascade (K10 = 6), handover-only attachment (K3 = 5), no
+verbatim/lifecycle (K2/K5 = 4). **Decisive differentiator vs. Catala: stewardship**
+(K9 = 6 vs. Catala's 2) — single-person fork, ~1 year inactive, MCP archived. ⌀ = 3.78,
+behind Catala (3.22) and EuroSCAL (3.07), ahead of RUML (4.78).
+
+**Verdict:** **scored; not adopted as the L2 rules format** (K7/K9/K10 = 6). Same
+Catala-class profile — strong Rules-as-Code logic, explainable reasoning, open license —
+but a **foreign engine language (s(CASP))** instead of OSCAL/YAML (K7), no cascade (K10),
+handover-only attachment (K3). **Decisive differentiator vs. Catala: stewardship (K9 = 6)**
+— a single-person fork (Lexpedite), last push 2024-11, `blawx_mcp` archived (the ADR-015
+lesson), which alone rules out a dependency. **Value retained:** a reference for
+(a) **owner-friendly authoring** (Blockly visual programming for non-programmers) and
+(b) **explainable reasoning** (s(CASP) justification trees), under the Meaningful Human
+Control guardrail. **Feeds:** #8 (rules spec — as an authoring/elicitation pattern, like
+Catala), **not** a dependency.
 
 ### Assessed but not scored (different problem class)
 
