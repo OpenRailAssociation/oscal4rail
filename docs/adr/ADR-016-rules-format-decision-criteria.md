@@ -1,17 +1,18 @@
 # ADR-016: Decision Criteria and Scoring Method for the Rules-Layer Format Selection
 
-**Status:** Proposed (work in progress)
+**Status:** Accepted (grid + candidate analyses complete, 2026-10-29)
 
-**Date:** 2026-10-27
+**Date:** 2026-10-27 (grid) · 2026-10-29 (analyses complete, K4 un-parked)
 
 **Deciders:** Jens Grote
 
-> **Living document.** This ADR is intentionally **not** Accepted. It defines the
-> **evaluation grid and scoring method** used to analyze candidate rules-layer
-> formats. It is the **template** against which each candidate analysis issue
-> (#14–#22) is scored. The final format decision will be a **separate** ADR, taken
-> after the analyses are complete. Criteria may still be sharpened as analyses reveal
-> gaps (agreed: approximate now, refine later).
+> **Scope of this ADR.** It defines the **evaluation grid and scoring method** and records
+> the **completed analyses** of candidate rules-layer formats (#14–#22). It is now
+> **Accepted**: the grid is fixed, all nine candidates are assessed, K4 is un-parked, and the
+> **review outcome** is recorded below (see *Review outcome*). It remains **not** the final
+> format decision — per the separation agreed with the owner, the **format selection and the
+> own-format specification are a separate, later ADR** (rules-layer spec, #8). This ADR is the
+> traceable evidence base that decision will cite.
 
 ## Context
 
@@ -97,9 +98,9 @@ Relations between requirements are covered on four axes, all using the **same pa
 | horizontal (conflicting) | competing requirements | K11 (surface only; resolution in L4) |
 | lateral (non-conflicting) | equivalent-to / subset-of / depends-on / complements | NIST Mapping Collection, via K3 |
 
-## Candidate scores (work in progress)
+## Candidate scores (complete — 9/9)
 
-> Living section. Each candidate from #14–#22 is scored against the grid above,
+> All nine candidates (#14–#22) are scored/assessed against the grid above,
 > with verbatim evidence. K4 remains **parked** (un-park decision deferred until
 > more candidates are scored). Scores use the **weighted grade average**
 > ⌀ = Σ(weight × grade) / Σ(weight) over the scored criteria, on the **1.0–6.0 scale**;
@@ -507,19 +508,81 @@ Catala elicitation pattern, under the MHC guardrail. **Feeds:** **#10** (AMC/Alt
 in L2/L4), **#8** (rules spec — obligation typing) and **#26** (Railway Assessment Profile —
 presumption/AltMoC paths). **Non-goal:** nothing to adopt as a format or tool.
 
-## Open points (to settle as analyses proceed)
+## Review outcome (#13 — synthesis over all nine analyses)
 
-- Un-park **K4** after the tool evaluation.
-- Decide whether **K6/K9** (or a grade of 6) act as knock-outs, after seeing results.
-- Sharpen K10/K11 relation semantics if the candidate analyses expose gaps.
+**Bottom line: build the L2 rules format, do not adopt one — but reuse named parts of
+several candidates for specific layers.** No candidate is adoptable *as the L2 rules
+format*: all five scored candidates land between **3.07 and 4.78**, and every Rules-as-Code
+tool fails the same O4R-defining axes — **K10 cascade = 6 across the board**, weak OSCAL
+attachment (K3), no verbatim model. This is a pattern, not noise: **no existing format
+carries the Regulatory Cascade + OSCAL-verbatim combination**, which is precisely the O4R
+USP. Therefore O4R **specifies its own OSCAL-native, YAML-canonical, cascade-capable L2
+format** and draws **concepts/parts** from the candidates.
+
+**But "not the L2 format" ≠ "not relevant".** The framework is MECE-decomposed into layers,
+and the analyses show the right building block per part:
+
+### Explicit verdict per candidate (adopt / reuse-partial / reference-only / reject)
+
+| Candidate | ⌀ | As L2 format | Concretely for which part/layer | Verdict |
+|-----------|:--:|--------------|----------------------------------|---------|
+| EuroSCAL / Clouditor (#19) | 3.07 | no | **L4 Assessment**: OSCAL-native metric model, `applicable`/`compliant` split, `security-metrics` governance-repo pattern | **reuse-partial (L4)** → #26/#27 |
+| Catala (#15) | 3.22 | no | **L2 concept**: default logic + elicitation pattern (interpretable→deterministic); optional executable **upstream** | **reference-only (concept)** + optional upstream → #8/#12 |
+| OpenFisca (#21) | 3.44 | no | **L2 parameter handling**: date-versioned parameter YAML + `metadata.reference` + temporal value history | **reuse-partial (concept)** → #8 |
+| Blawx (#20) | 3.78 | no | **Enablement/authoring**: Blockly owner-friendly authoring; s(CASP) justification-tree explainability | **reference-only (concept)** → #8 |
+| Rulemapping / RUML (#14) | 4.78 | no | only the legislator→compliance **process handover** (ADR-006); format proprietary/incompatible | **reject (as format)**; process-handover only |
+| GEMARA (#16) | n/a | n/a | **interop** at the audit/evaluation boundary (consume O4R/OSCAL downstream) | reference / interop → #26 |
+| ComplyTime (#17) | n/a | n/a | **L4 assessment-execution backend** for the GovernanceAgent (P3) | backend (other layer) → ADR-015 |
+| OECD Law-as-Code (#18) | n/a | n/a | **positioning / the "why"** (Law-as-Code vs. Rules-as-Code vocabulary) | reference (positioning) → motivation.md / ADR-005 |
+| EASA AMC / AltMoC (#22) | n/a | n/a | **L4 Assessment semantics (primary) + L2 obligation:** AMC = the regulator-issued solution that makes you **compliant by default** (presumption of compliance); AltMoC = self-chosen path, presumption lost, **demonstrate + prior approval**; plus binding/non-binding obligation typing | **adopt-semantics** → #26/#10/#8 |
+
+### Consequences fed back into layer stories
+- **#8 (Rules Layer spec):** own OSCAL-native L2 format; reuse OpenFisca's date-versioned
+  parameter pattern; Catala/Blawx as elicitation + explainability patterns; adopt EASA
+  obligation typing (binding/non-binding).
+- **#26/#27 (Railway Assessment Profile):** EuroSCAL metric model + `applicable`/`compliant`
+  split; **EASA AMC/AltMoC as the core L4 compliance model** — taking the regulator's AMC
+  solution yields a **compliant-by-default** result (presumption of compliance), while an
+  AltMoC requires an explicit demonstration + competent-authority approval (the MHC decision
+  point); GEMARA audit/eval interop; ComplyTime as execution backend.
+- **ADR-005 / motivation.md:** OECD Law-as-Code positioning.
+- **ADR-006:** amend with the RUML equal-footing re-evaluation result (format not adopted;
+  process handover stays valid).
+
+### K4 un-parked (decision 2026-10-29)
+With nine candidates assessed, K4 (schema validatability, CI) is **un-parked**. It was never
+decisive for any scored candidate relative to the dominant axes (K10 cascade, K3 OSCAL,
+K2 verbatim), so un-parking **does not change the ranking**. The **separate format-selection
+ADR** scores K4 for the own-format proposal against the published OSCAL4Rail constraints
+schema (CI-validatable by design) — i.e. the own format is expected to score K4 well, which
+further supports *build over adopt*. No pre-set knock-outs are introduced retroactively; the
+format ADR reads per-criterion grades, not only averages (Goodhart mitigation).
+
+### Next step (separate ADR, not this one)
+The **format-selection + own-L2-format specification** is a separate, later ADR (rules-layer
+spec, #8), plus `docs/reference/ecosystem-positioning.md` (the comparison matrix as a
+standalone reference). This ADR is their traceable evidence base.
+
+## Open points (resolved on completion, 2026-10-29)
+
+- **K4 un-parked** — done (see *Review outcome* → K4 un-parked). Carried into the format ADR.
+- **K6/K9 as knock-outs** — decided **no** retroactive knock-outs; the format ADR reads
+  per-criterion grades, not only averages (Goodhart mitigation). The individual 6s (e.g.
+  RUML K2/K5/K6/K10) already dominate their averages without a hard gate.
+- **K10/K11 relation semantics** — no sharpening needed; the analyses applied them
+  consistently (K10 = 6 for every RaC candidate confirmed the cascade gap is real, not a
+  grid artifact).
 
 ## Decision
 
 Adopt the **scoring method** (school grades 1–6, lower is better; weights 3/2;
-total = Σ(weight × grade); no pre-set knock-outs) and the **criteria K1–K12** above
-(K4 parked, K8 dropped) as the common grid for the rules-format candidate analyses
-(#14–#22). The grid is a **living template**; the format selection itself is a
-separate, later ADR.
+⌀ = Σ(weight × grade) / Σ(weight); no pre-set knock-outs) and the **criteria K1–K12** above
+(K4 un-parked 2026-10-29, K8 dropped) as the grid for the rules-format candidate analyses
+(#14–#22). **All nine candidates are assessed and the review outcome is recorded** (see
+*Review outcome*): **no candidate is adopted as the L2 format (build, not adopt); named parts
+of EuroSCAL, OpenFisca, EASA, Catala and Blawx are reused per layer.** The **format selection
+and own-format specification remain a separate, later ADR** (#8) for which this ADR is the
+evidence base.
 
 ## Consequences
 
