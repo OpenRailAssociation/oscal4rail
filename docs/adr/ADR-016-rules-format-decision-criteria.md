@@ -111,13 +111,17 @@ Relations between requirements are covered on four axes, all using the **same pa
 Grades per criterion; "–" = parked (K4); **⌀ = weighted grade average** Σ(W×G)/Σ(W) on
 the 1.0–6.0 scale (school report, main subjects weigh more); lower is better.
 
+**Rows sorted by ⌀ (ascending; lower is better); assessed-but-not-scored candidates
+(n/a) listed last.**
+
 | Candidate (issue) | K1 | K2 | K3 | K4 | K5 | K6 | K7 | K9 | K10 | K11 | K12 | **⌀** | Verdict |
 |-------------------|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:---:|:---:|:---:|:-----:|---------|
+| EuroSCAL / Clouditor (#19) | 3 | 2 | 2 | – | 2 | 1 | 4 | 2 | 6 | 5 | 4 | **3.07** | scored; not an L2 format but close (OSCAL-native); high value as an L4 assessment reference → #26/#27 |
 | Catala (#15) | 1 | 4 | 5 | – | 4 | 1 | 6 | 2 | 6 | 2 | 1 | **3.22** | reference-only (format); optional executable upstream |
+| Rulemapping / RUML (#14) | 2 | 6 | 4 | – | 6 | 6 | 4 | 4 | 6 | 5 | 5 | **4.78** | scored; **not adopted** — proprietary, commercialised single-vendor SaaS (ToU §6; Product Update 2026-10-23); process-level handover (ADR-006) stays valid |
 | GEMARA (#16) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not an L2 rules format — see below); reference-only (format) + interop at the audit/evaluation boundary |
 | ComplyTime (#17) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not a format — an assessment-**execution** tool); documented in the tooling landscape (ADR-015), not here |
 | OECD Law-as-Code (#18) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not a format or tool — an international reference/positioning frame); the "why" of O4R → motivation / ADR-005 |
-| EuroSCAL / Clouditor (#19) | 3 | 2 | 2 | – | 2 | 1 | 4 | 2 | 6 | 5 | 4 | **3.07** | scored; not an L2 format but close (OSCAL-native); high value as an L4 assessment reference → #26/#27 |
 
 ### Scored candidates
 
@@ -201,6 +205,57 @@ parallel cloud scope): **register / engage**, explore shared tooling and structu
 without adopting the cloud-specific scope. **Differences:** Rego as a non-inherently-
 transparent logic language (MHC caveat); uuid IDs. **Feeds:** ADR-005 addendum (EU
 cascade) and #26/#27 (L4 assessment reference).
+
+#### #14 Rulemapping / RUML (Rulemapping Solutions GmbH) — ⌀ = 4.78 (K4 parked)
+
+Source: ADR-006 and the BS-KI 2.1 Builder pilot (2026-06-25, `docs/experiments/rulemapping/`,
+verbatim XML export analysis); rulemapping.org (retrieved 2026-10-29); SPRIND Law-as-Code;
+OECD-OPSI; `gh search` (no Rulemapping-Group OSS repo / no published schema found); the
+provider's **Terms of Use (version 11/2025, valid until 2026-11-12)** and the **Product
+Update e-mail of 2026-10-23** (Rulemapping Solutions GmbH), issue #14.
+
+> **Why scored despite ADR-006.** ADR-006 provisionally *adopted* Rulemapping as the
+> rules format. [ADR-014](./ADR-014-rules-layer-placement.md) made that adoption no longer
+> untouchable, so Rulemapping is re-evaluated **on equal footing** against the K-grid —
+> otherwise the evaluation would be a confirmation bias (Devil's Advocate). Two owner-provided
+> facts materially changed the picture since the June pilot: the format is **not** the open
+> standard ADR-006 anticipated.
+
+| K | Criterion | W | Grade | W×G | Rationale (evidence) |
+|---|-----------|:-:|:-----:|:---:|----------------------|
+| K1 | Decision-logic power | 3 | 2 | 6 | Full boolean operator set `or/and/xor/nand/nor/n-xor` + negation (`invertlogic`) + arbitrary tree nesting; exceptions ("kann verzichtet werden") representable via `invertlogic` (pilot). But **thresholds only as free text** in the node `title`, not a typed value. Better than EuroSCAL (3, Rego-external logic); below Catala (1, native default logic). |
+| K2 | Verbatim separation | 3 | 6 | 18 | **No verbatim model** — rule text only as optional free-text `alttext`; no ADR-014 structural separation; inverted SSOT (Builder file leading). **Compounded by ToU §6** (verbatim): the user grants the provider usage rights over user-generated content ("ein einfaches, nicht übertragbares Nutzungsrecht … analysieren, auszuwerten und zu verwenden") → owner ownership of the verbatim source is contractually broken, not just unmodelled. Full non-fulfilment. |
+| K3 | OSCAL attachment | 3 | 4 | 12 | Not OSCAL-native, but the lightweight **XML** export is directly referenceable from a control via `link rel="decision-logic"` / `back-matter` without forking NIST (pilot demonstrated). XML = standardised, machine-readable carrier (not a proprietary blob). No lateral mapping-collection axis. Better than Catala (5, needs a translation step); below EuroSCAL (2, OSCAL-native). |
+| K5 | Stable, semantic IDs | 3 | 6 | 18 | IDs are **numeric auto-increment, not semantic** (pilot verbatim); **no version/lifecycle construct** in the format (no predecessor/successor, no retired). Violates the stable-ID invariant (chapter-based, never counter-based). Both K5 sub-criteria fail; below Catala (4, at least semantic names). |
+| K6 | Openness / license | 2 | 6 | 12 | RUML spec **not published** (announced only, future tense: "open and *will be* published"). **ToU §6** (verbatim): "Alle Rechte an der Plattform und ihren Bestandteilen stehen ausschließlich dem Anbieter …"; prohibits "Reverse Engineering … Förderung konkurrierender Produkte … Vervielfältigung oder Veröffentlichung von Plattformbestandteilen ohne … Freigabe". No OSI-approved license; actively OSS- and competitor-hostile. Opposite end from Catala/EuroSCAL (1). **Reevaluation possible in future** (see verdict) — but the essential facts for a better grade are not given today. |
+| K7 | Agent / machine evaluability | 2 | 4 | 8 | XML boolean tree is programmatically **traversable without a compiler** (pilot ✅), but **not the OSCAL model, not canonical YAML**; part of the semantics is UI-derived and **not persisted** (green derivation), and thresholds live only in free text. Analogous to EuroSCAL (4, Rego): traversable but not in the standard model; better than Catala (6, compiler-bound). |
+| K9 | Stewardship & long-term health | 3 | 4 | 12 | Active development (Workspace launch 2026-11-13), productive PoCs (BMF tax law, building permits), SPRIND-funded (€12M, 2025), named management — **not a one-person fork**. But steward = **commercial Rulemapping Solutions GmbH** (single vendor), **no neutral standards steward**; the documented **move to a purely commercial model** (Product Update 2026-10-23: paid plans, usage-rights grant over uploaded rulemaps, entrepreneurs-only §14 BGB) plus the ToU §6/§3 discontinuation reservation ("jederzeit zu ändern, einzuschränken oder einzustellen"; "kein Anspruch … auf bestimmte Funktionen") weigh against longevity/neutrality. Below Catala/EuroSCAL (2, public non-commercial institutions). Mitigating: ToU §12 guarantees machine-readable data export. |
+| K10 | Cascade compatibility | 3 | 6 | 18 | **No cascade model** — no parent/child between norm levels, no versioned `deviates-from`. RUML models one single-case decision tree (ADR-006: "interactive single-case decision tree"); tree nesting is case logic, not vertical governance specialization. Same as Catala/EuroSCAL (6). The 4Rail USP is wholly absent. |
+| K11 | Norm conflict | 2 | 5 | 10 | **No conflict-as-data model** and no versioned relations between competing norms; a single-case tree evaluates in isolation. Does not silently resolve (there is simply no concept of competing norms), but does not surface the conflict as a relation either. Same as EuroSCAL (5); below Catala (2, detects/flags conflicts). |
+| K12 | Determinism & auditability | 3 | 5 | 15 | The boolean tree is locally deterministic and explainable (which branch fires), no LLM in the path. But the audit purpose — sign-off, **diff, stability, re-verification over time** — is substantially undermined because its prerequisites already fail: **no stable/semantic IDs and no versioning (K5 = 6)** and **no verbatim/owner-owned source link (K2 = 6)**; part of the semantics is UI-derived, not persisted. Below EuroSCAL (4, at least OSCAL-auditable output + metric values); far below Catala (1, formal semantics). |
+| K4 | Schema validatability (CI) | 3 | *parked* | – | Un-park decision deferred. For the record: no published schema; XML is proprietary (ToU §6), the announced RUML-JSON spec is unpublished. |
+
+**Profile:** strong only on raw decision-logic structure (K1 = 2) and solid traversability
+(K3 = 4, K7 = 4); **fails on exactly what makes O4R** — verbatim/owner ownership (K2 = 6),
+stable IDs/lifecycle (K5 = 6), openness/license (K6 = 6), cascade (K10 = 6). Four 6s, three
+of them in high-weight criteria. ⌀ = 4.78 — clearly the weakest scored candidate
+(EuroSCAL 3.07, Catala 3.22).
+
+**Verdict:** **scored; not adopted as the L2 rules format** (K2/K5/K6/K10 = 6). Despite
+ADR-006 having provisionally adopted Rulemapping, the equal-footing re-evaluation does
+**not** confirm it as the format: as of today it is a **proprietary, commercialised
+single-vendor SaaS** (Terms of Use §6, version 11/2025; Product Update 2026-10-23) — no
+OSI license, RUML spec unpublished, reverse engineering and "promotion of competing
+products" contractually prohibited, provider-claimed usage rights over user content —
+**incompatible with the OpenRail OSI-license requirement and with O4R's verbatim /
+owner-ownership principle** (SSOT, Meaningful Human Control). **Value retained:**
+(a) a conceptual reference for decision-logic *structure* (boolean tree, exceptions) at
+the authoring boundary; (b) the legislator → compliance **handover interface** (ADR-006)
+remains valid as a *process-level* point of contact, **not** a data-format adoption.
+**Reevaluation trigger:** if RUML is published under an OSI-approved license as a genuinely
+open standard, re-score K6 (and the dependent K4/K9) — the grades reflect the present facts,
+which do not support a better grade today. **Feeds:** the ADR-006 amendment note and #8
+(rules spec — as a structural pattern only, not a dependency).
 
 ### Assessed but not scored (different problem class)
 
