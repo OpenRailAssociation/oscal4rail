@@ -124,6 +124,7 @@ the 1.0–6.0 scale (school report, main subjects weigh more); lower is better.
 | GEMARA (#16) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not an L2 rules format — see below); reference-only (format) + interop at the audit/evaluation boundary |
 | ComplyTime (#17) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not a format — an assessment-**execution** tool); documented in the tooling landscape (ADR-015), not here |
 | OECD Law-as-Code (#18) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (not a format or tool — an international reference/positioning frame); the "why" of O4R → motivation / ADR-005 |
+| EASA AMC / AltMoC (#22) | — | — | — | — | — | — | — | — | — | — | — | **n/a** | assessed, **not scored** (a regulatory means-of-compliance construct, not an L2 format); **adopt the semantics** for L2 obligation + L4 presumption/AltMoC → #10/#8/#26 |
 
 ### Scored candidates
 
@@ -461,6 +462,50 @@ reference frame and vocabulary (Law as Code vs. Rules as Code) that underpins O4
 (Law-as-Code relationship / positioning) — anchor the terminology there.
 **Non-goal:** nothing to adopt as an artifact or tool.
 *(Follow-up: reflect the OECD reference in `motivation.md`.)*
+
+#### #22 EASA AMC / AltMoC (means-of-compliance construct) — assessed, not scored
+
+Source: EASA "Acceptable Means of Compliance (AMC) and Alternative Means of Compliance
+(AltMoC)" (document library); EASA FAQ 19117 (status of IR / AMC / CS / AltMoC / GM);
+Easy Access Rules (e.g. Airworthiness, Reg. (EU) 748/2012); issue #22.
+
+**Why not scored against K1–K12:** AMC/AltMoC is **neither a format nor a tool** — it is a
+**regulatory means-of-compliance construct / legal semantics** of the EASA regulatory system.
+The K-grid measures fitness as an L2 rules *format*; forcing a legal construct through it
+would yield a misleading total (Goodhart / false precision). Same class as OECD (#18) and
+GEMARA (#16): assessed qualitatively. Recorded for traceability.
+
+- **Scope & construct (verbatim):** AMC = regulator-issued, **non-binding** standards that
+  carry a **presumption of compliance** — "The AMC illustrate a means, **but not the only
+  means**, by which a requirement of an implementing rule can be met." AltMoC = an
+  alternative chosen by the regulated person; the presumption is **lost** and compliance must
+  be "demonstrate[d] to competent authorities" with **prior approval**. GM = non-binding
+  guidance material.
+- **EASA regulatory cascade:** Basic Regulation → **Implementing Rules** (binding) →
+  **CS / AMC / GM** (soft law). Published as **Easy Access Rules** (consolidated, structured
+  IR → AMC → GM).
+- **Affected O4R layers (where the semantics land):**
+  - **L2 Rules** — the **binding vs. non-binding obligation** distinction (IR binding; AMC
+    soft law) maps onto O4R's obligation typing (verbindlich/empfohlen), already present in
+    the applicability model.
+  - **L4 Assessment** — **AMC = presumption of compliance** (a deterministic default pass
+    path); **AltMoC = presumption lost + explicit prior approval** (a distinct evidence path
+    with a named competent-authority decision — a natural **Meaningful Human Control**
+    decision point).
+  - **Cascade** — soft law sitting *below* the binding rule, a concrete cascade level.
+- **License & governance:** EASA = official EU agency; highest institutional legitimacy;
+  material public (Easy Access Rules). No software artifact / no OSS license to adopt; reuse
+  terms are EASA-specific for the text material.
+
+**Verdict:** **assessed, not scored — adopt the *semantics*, not an artifact.** AMC/AltMoC
+provides the **established regulatory vocabulary** O4R should reuse rather than invent
+(issue #22: "model means-of-compliance using the established regulatory semantics instead of
+inventing our own"): binding/non-binding obligation (L2), presumption-of-compliance and the
+AltMoC demonstration + prior-approval path (L4), soft-law-below-binding (cascade). This
+mirrors the existing AMC concept in the DB-internal work (`KONZEPT-RULEMAPPING.md`) and the
+Catala elicitation pattern, under the MHC guardrail. **Feeds:** **#10** (AMC/AltMoC semantics
+in L2/L4), **#8** (rules spec — obligation typing) and **#26** (Railway Assessment Profile —
+presumption/AltMoC paths). **Non-goal:** nothing to adopt as a format or tool.
 
 ## Open points (to settle as analyses proceed)
 
