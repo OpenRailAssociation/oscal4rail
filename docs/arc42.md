@@ -1,8 +1,13 @@
 # OSCAL4Rail – Architecture Documentation (arc42)
 
-> **Version:** 0.1.0 (Hack4Rail 2026 – initial draft)
+> **Version:** 0.2.0 (2026-11-02 – synced with ADR-001…ADR-016)
 > **License:** CC0 1.0 Universal (public domain)
 > **Inspired by:** Arpad Vasarhelyi
+>
+> **Maintenance note:** Chapter 9 is the master list of all architecture decisions.
+> Every new or accepted ADR under [`docs/adr/`](adr/) MUST be entered in the table in
+> §9. A CI check (`tools/check_arc42_adr_sync.py`) enforces that every `ADR-*.md` is
+> referenced here, so this document stays current by construction.
 
 ---
 
@@ -104,11 +109,13 @@ Layers 2 (Rules) and 3 (Change Impact) are generic and reusable for other sector
 
 | ID | Constraint | Rationale |
 |----|-----------|-----------|
-| TC-1 | Output must be valid NIST OSCAL (JSON Schema v1.2.1) | Interoperability with existing OSCAL tooling |
+| TC-1 | Output must be valid NIST OSCAL, pinned to a single version via `schemas/nist/manifest.json` (currently **v1.2.3**) | Interoperability with existing OSCAL tooling; version drift structurally excluded ([ADR-008](adr/ADR-008-reproducible-schema-acquisition.md)) |
 | TC-2 | Rule text must be verbatim from source document | Auditability, no paraphrasing |
-| TC-3 | Rule IDs derived from chapter numbers, not page numbers | Stability across document versions |
-| TC-4 | No LLM required for extraction pipeline | Deterministic, reproducible results |
+| TC-3 | Rule IDs derived from chapter numbers, not page numbers | Stability across document versions ([ADR-003](#adr-003-chapter-number-as-stable-identifier)) |
+| TC-4 | No LLM required for extraction pipeline | Deterministic, reproducible results ([ADR-002](#adr-002-deterministic-extraction-without-llm)) |
 | TC-5 | Source files (PDF, Excel) remain canonical | OSCAL4Rail is derived, not authoritative |
+| TC-6 | NIST base schemas fetched reproducibly as release assets + SHA256, never hand-copied | Reproducible, exactly versioned, no drift ([ADR-008](adr/ADR-008-reproducible-schema-acquisition.md)) |
+| TC-7 | YAML is the canonical serialization; JSON/XML are generated via official OSCAL tools, never hand-maintained | Single Source of Truth, owner/diff readability ([ADR-012](adr/ADR-012-canonical-serialization.md)) |
 
 ### 2.2 Organisational Constraints
 
@@ -173,7 +180,10 @@ Cross-border: A train operating DE↔CH↔AT must comply with all three national
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| Base standard | NIST OSCAL v1.2.1 (all 3 layers) | Mature, public domain, existing tooling ecosystem |
+| Base standard | NIST OSCAL, pinned to one version via manifest (currently v1.2.3, all 3 layers) | Mature, public domain, existing tooling; no drift ([ADR-008](adr/ADR-008-reproducible-schema-acquisition.md)) |
+| Schema acquisition | Fetch official release assets + SHA256 verify (`tools/fetch_oscal_schemas.py`); `make schemas` as audit fallback | Minimal, portable, reproducible ([ADR-008](adr/ADR-008-reproducible-schema-acquisition.md)) |
+| Canonical serialization | YAML leading; JSON/XML generated via official OSCAL tools | SSOT, owner/diff readability ([ADR-012](adr/ADR-012-canonical-serialization.md)) |
+| Validation | One consolidated two-pass validator (`tools/validate.py`): NIST base + auto-mapped O4R constraints, report beside the file (MD+JSON) | Single CI pass/fail, coverage gaps observable ([ADR-013](adr/ADR-013-validator-consolidation.md)) |
 | Tooling foundation | compliance-trestle + oscal-deep-diff | Profile Resolution, Validation, Diff out-of-the-box ([ADR-007](adr/ADR-007-tooling-foundation.md)) |
 | Agent interface | compliance-trestle-mcp (MCP Server) | AI agents can invoke all OSCAL operations via standardized protocol |
 | Cascade model | OSCAL Profile chain (not custom schema) | Each cascade level = one Profile selecting from upstream Catalog |
@@ -183,6 +193,12 @@ Cross-border: A train operating DE↔CH↔AT must comply with all three national
 | Extraction method | Deterministic (markitdown + openpyxl) | Reproducible, auditable, no LLM required |
 | Rule identifier | Chapter number (e.g. `bs-ki-2.1`) | Stable across document versions |
 | Applicability model | OSCAL `props` with `class` attribute | Schema-compliant, extensible |
+| Rules Layer placement | Separate linked logic artifact (`link rel="decision-logic"`), not inline | Catalog stays pure NIST OSCAL; logic format swappable ([ADR-014](adr/ADR-014-rules-layer-placement.md)) |
+| Rules/catalog version coupling | Reuse NIST `metadata.version`; related artifacts MUST share the same value; equality enforced by the validator | Deterministic, auditable; no new schema construct ([ADR-014](adr/ADR-014-rules-layer-placement.md)) |
+| Rules format selection | Weighted school-grade grid over 9 candidates (format vs. hosted tool kept separate); format decision deferred to a later ADR | Traceable evidence base, no premature lock-in ([ADR-016](adr/ADR-016-rules-format-decision-criteria.md)) |
+| Metadata model | One adaptive schema, 4 orthogonal dimensions (theme, cascade, applicability, lifecycle) | One schema for the whole sector, adaptable per country/company ([ADR-009](adr/ADR-009-adaptive-metadata-model.md)) |
+| Authority model | Configurable authority meta-model: parallel streams, typed many-to-many relations, expresses overlap/conflict | Reflects real rail authority; framework prescribes no structure ([ADR-010](adr/ADR-010-configurable-authority-meta-model.md)) |
+| Corpus index | Single generated `index.json` (heads only, no controls), derived from catalog metadata | Assessment over the whole corpus without opening every catalog ([ADR-011](adr/ADR-011-generated-catalog-index.md)) |
 | Version strategy | One file per regulation, Git history for diffs | Leverages existing tooling |
 
 ### 4.2 Quality Approach
@@ -251,9 +267,17 @@ Cross-border: A train operating DE↔CH↔AT must comply with all three national
 | `oscal-deep-diff` | Structural diff between OSCAL documents | Node.js (GitHub) | ✅ Evaluated |
 | `trestle-mcp` | MCP Server for AI agent integration | Python | 🔜 To evaluate |
 | `trestle-oscal4rail` | Railway-specific plugin (cascade, semantic diff, assessment) | Python | 🔜 To build |
-| `parse_matrix` | Parse Excel Bewertungsmatrix → applicability per rule | openpyxl | ✅ Exists |
-| `extract_pdf` | Extract verbatim text per chapter from regulation PDF | markitdown / pdfplumber | ✅ Exists |
-| `build_catalog` | Merge matrix + PDF texts into OSCAL Catalog YAML | PyYAML | ✅ Exists |
+| `tools/fetch_oscal_schemas.py` | Fetch pinned NIST schemas as release assets + SHA256 verify ([ADR-008](adr/ADR-008-reproducible-schema-acquisition.md)) | Python | ✅ Exists |
+| `tools/validate.py` | Consolidated two-pass validator: NIST base + auto-mapped O4R constraints, report beside file (MD+JSON) ([ADR-013](adr/ADR-013-validator-consolidation.md)) | Python (`jsonschema`) | ✅ Exists |
+| `tools/generate_doc.py` | Round-trip generator: OSCAL YAML → human-readable document for owner verification | Python | ✅ Exists |
+| `parse_matrix` | Parse Excel Bewertungsmatrix → applicability per rule | openpyxl | ✅ Exists (extraction) |
+| `extract_pdf` | Extract verbatim text per chapter from regulation PDF | markitdown / pdfplumber | ✅ Exists (extraction) |
+| `build_catalog` | Merge matrix + PDF texts into OSCAL Catalog YAML | PyYAML | ✅ Exists (extraction) |
+
+> **Note.** The PoC extraction scripts (`parse_matrix`, `extract_pdf`, `build_catalog`)
+> live in the DB-internal PoC repository; the framework repo ships the version-controlled
+> tooling above. A standalone `oscal4rail` CLI (`validate|diff|assess|rules`) is the
+> consolidation target for v1.0.0.
 
 ### 5.3 Level 2 – Agentic Assessment Flow
 
@@ -297,9 +321,9 @@ catalog:
 
 ```
 1. Download new PDF + XLSX from standards body
-2. run: python3 extract.py --pdf BS-KI_DE.pdf --matrix Matrix_BS-KI_DE.xlsx
-3. Output: catalogs/bs-ki/de/bs-ki-de.yaml
-4. run: trestle validate -a  →  ✅ VALID
+2. run extraction (PoC scripts) → verbatim catalog YAML
+3. Output: catalogs/bs-ki/de/bs-ki-de.yaml  (YAML is canonical, ADR-012)
+4. run: python3 tools/validate.py <file>  →  two-pass (NIST + O4R), report beside file (ADR-013)
 5. git diff  →  shows changed rules at control level
 6. run: oscal-deep-diff --config diff-config.yaml  →  structured change notification
 7. git commit -m "feat(bs-ki): update to v2.0"
@@ -385,23 +409,33 @@ Developer machine
 ### 7.2 Target (OSS project)
 
 ```
-GitHub (OpenRail-Playground/OSCAL4Rail)
+GitHub (OpenRailAssociation/oscal4rail)   ← migrated from OpenRail-Playground/A38
 ├── .github/workflows/
-│   └── validate.yml        (CI: validate all catalogs on every PR)
+│   └── validate.yml        (CI: validate all catalogs on every PR — planned, #14)
 ├── catalogs/
 │   ├── bs-ki/de/           (CH passenger info standard)
 │   ├── bs-ki/fr/
 │   ├── tsi-tat/            (EU TSI Telematics)
 │   └── ...
-├── schema/
-│   └── oscal-catalog.json  (NIST schema, pinned version)
+├── examples/
+│   ├── profiles/          (cascade profile examples, ADR cascade spec)
+│   ├── mappings/          (cross-framework Control Mapping examples)
+│   └── multilingual/      (multilingual model examples, ADR-017)
+├── schemas/
+│   ├── nist/               (fetched NIST schemas, pinned v1.2.3 + manifest, ADR-008)
+│   └── oscal4rail/         (additive O4R constraint schemas, Framework ≠ Content)
 ├── tools/
-│   ├── extract.py
-│   ├── validate.py
-│   └── diff.py
+│   ├── fetch_oscal_schemas.py   (ADR-008)
+│   ├── validate.py              (consolidated two-pass, ADR-013)
+│   └── generate_doc.py          (round-trip generator)
 └── docs/
     └── arc42.md            (this document)
 ```
+
+> The repository has been migrated to the standalone **`OpenRailAssociation/oscal4rail`**
+> (OpenRail Incubation). The CI validation workflow is planned ([ADR-013](adr/ADR-013-validator-consolidation.md),
+> issue #14); a separate docs-consistency check (`tools/check_arc42_adr_sync.py`) keeps this
+> document in sync with the ADR set.
 
 ---
 
@@ -445,10 +479,90 @@ Transport modes: `bahn`, `bus-tram-metro`, `schiff`, `seilbahn`
 - Old versions archived in `history/` before update
 - Git diff shows changes at control level
 - Tags: `<regulation>/<version>` (e.g. `bs-ki/v1.0`)
+- **Version coupling across layers:** related artifacts (catalog, rules, assessment)
+  MUST carry the same NIST `metadata.version` value. Equality is enforced by the
+  validator as an error, not a schema construct, so the layers can never drift apart
+  ([ADR-014](adr/ADR-014-rules-layer-placement.md)).
+
+### 8.5 Serialization (YAML canonical)
+
+YAML is the single canonical serialization for all OSCAL4Rail instance artifacts; it is
+the SSOT and the only form edited or reviewed by hand. JSON and XML are **generated** on
+demand from the YAML via official OSCAL tools (`oscal-cli convert`, `compliance-trestle`),
+never hand-maintained. One JSON Schema validates all three serializations because they
+share the same model ([ADR-012](adr/ADR-012-canonical-serialization.md)).
+
+### 8.6 Reproducible Schemas (no drift)
+
+NIST base schemas are fetched as official release assets and verified against stored
+SHA256 checksums, pinned to one release tag in `schemas/nist/manifest.json` (SSOT). A
+version bump is a conscious, traceable commit. NIST base (`schemas/nist/`) and additive
+O4R constraints (`schemas/oscal4rail/`) are kept strictly separate (Framework ≠ Content)
+([ADR-008](adr/ADR-008-reproducible-schema-acquisition.md)).
+
+### 8.7 Adaptive Metadata and Configurable Authority
+
+The metadata head decomposes into four orthogonal dimensions — theme, cascade level,
+applicability, lifecycle/provenance — so one schema serves the whole sector yet adapts
+per country, company, and vehicle series without forking
+([ADR-009](adr/ADR-009-adaptive-metadata-model.md)). Authority is modeled not as one
+ladder but as **parallel streams** (statutory, normative, sectoral, corporate, vendor)
+with typed many-to-many relations that can express overlap, redundancy, and conflict —
+the framework prescribes no fixed structure ("Framework ≠ Usage")
+([ADR-010](adr/ADR-010-configurable-authority-meta-model.md)).
+
+### 8.8 Catalog Index
+
+A single generated `index.json` lists one entry per catalog (heads only, no control
+bodies), derived from the catalogs' `metadata`. It lets the Assessment Layer operate over
+a large corpus without opening every catalog and is never hand-maintained
+([ADR-011](adr/ADR-011-generated-catalog-index.md)).
+
+### 8.9 Multilingual Model
+
+Multiple language versions are the **same** requirement expressed in different languages,
+never an additional rule: identity lives in the stable, chapter-based control ID, not in
+the text. The framework never translates and never judges equivalence — that is the
+owner's editorial act (Meaningful Human Control). When versions can diverge, the owner may
+mark which language governs with an optional `reference-language` prop (a single ISO 639
+code, or `all` when every version is equally authoritative, e.g. an EU act). Structural
+patterns are specified in `docs/reference/catalog-format.md` §8; worked examples live under
+`examples/multilingual/` ([ADR-017](adr/ADR-017-multilingual-reference-language.md), [ADR-004](#adr-004-one-catalog-file-per-regulation-per-language)).
 
 ---
 
 ## 9. Architecture Decisions
+
+All architecture decisions are recorded as ADRs under [`docs/adr/`](adr/). **This table
+is the master list** — every ADR file MUST appear here, enforced by
+`tools/check_arc42_adr_sync.py` (CI). The embedded summaries below (ADR-001…004, 007)
+are kept for readability; the authoritative text is the linked ADR file.
+
+| ADR | Title | Status | Date |
+|-----|-------|--------|------|
+| ADR-001 | Use NIST OSCAL as base standard | Accepted | — (embedded below) |
+| ADR-002 | Deterministic extraction without LLM | Accepted | — (embedded below) |
+| ADR-003 | Chapter number as stable identifier | Accepted | — (embedded below) |
+| ADR-004 | One catalog file per regulation per language | Accepted | — (embedded below) |
+| [ADR-005](adr/ADR-005-law-as-code-relationship.md) | Relationship to Law-as-Code Initiatives (SPRIND/Rulemapping/OpenCode) | Accepted | 2026-06-25 |
+| [ADR-006](adr/ADR-006-oscal4rail-vs-rulemapping.md) | OSCAL4Rail and Rulemapping — Complementarity or Competition? | Accepted (amended by ADR-014) | 2026-06-25 |
+| [ADR-007](adr/ADR-007-tooling-foundation.md) | compliance-trestle + oscal-deep-diff as tooling foundation (Framework ≠ Content) | Proposed | 2026-08-03 |
+| [ADR-008](adr/ADR-008-reproducible-schema-acquisition.md) | Reproducible Schema Acquisition and OSCAL Version Policy (pinned v1.2.3) | Accepted | 2026-09-29 |
+| [ADR-009](adr/ADR-009-adaptive-metadata-model.md) | Adaptive Metadata Model (one schema, 4 orthogonal dimensions) | Proposed (Draft) | 2026-10-01 |
+| [ADR-010](adr/ADR-010-configurable-authority-meta-model.md) | Configurable Authority Meta-Model (parallel streams, many-to-many) | Proposed (Draft) | 2026-10-01 |
+| [ADR-011](adr/ADR-011-generated-catalog-index.md) | Generated Catalog Index (`index.json`) | Proposed (Draft) | 2026-10-01 |
+| [ADR-012](adr/ADR-012-canonical-serialization.md) | Canonical Serialization — YAML leading, JSON/XML generated | Accepted | 2026-10-16 |
+| [ADR-013](adr/ADR-013-validator-consolidation.md) | Consolidated Validator (two-pass, auto-mapped O4R constraints, report beside file) | Accepted | 2026-10-20 |
+| [ADR-014](adr/ADR-014-rules-layer-placement.md) | Rules-Layer Placement — separate linked logic artifact, version-coupled via `metadata.version` | Accepted | 2026-10-27 |
+| [ADR-015](adr/ADR-015-oscal-agent-tooling-landscape.md) | OSCAL AI-Agent Tooling Landscape — Adopt vs. Reference | Proposed | 2026-10-27 |
+| [ADR-016](adr/ADR-016-rules-format-decision-criteria.md) | Decision Criteria and Scoring Method for the Rules-Layer Format Selection | Accepted (format decision deferred to a later ADR) | 2026-10-27 / 2026-10-29 |
+| [ADR-017](adr/ADR-017-multilingual-reference-language.md) | Multilingual Model: same rule across languages, optional `reference-language` marker | Accepted | 2026-10-27 |
+
+> **Note.** The format decision for the Rules Layer (Layer 2) is still open: ADR-016
+> fixes the evaluation grid and completed analyses, but the format selection and the
+> own-format specification are a separate, later ADR (Rules-Layer spec, issue #8).
+
+### Embedded summaries
 
 ### ADR-001: Use NIST OSCAL as base standard
 
@@ -533,10 +647,15 @@ Full ADR: [docs/adr/ADR-007-tooling-foundation.md](adr/ADR-007-tooling-foundatio
 |----|------|------------|--------|------------|
 | R-1 | Standards bodies renumber chapters | Low | High | Monitor chapter structure on each update |
 | R-2 | PDF formatting breaks extraction | Medium | Medium | Manual review of extracted text |
-| R-3 | OSCAL schema version update breaks validation | Low | Medium | Pin schema version, migrate on major OSCAL releases |
+| R-3 | OSCAL schema version update breaks validation | Low | Medium | Pinned via `schemas/nist/manifest.json` (v1.2.3), conscious bump + checksum update ([ADR-008](adr/ADR-008-reproducible-schema-acquisition.md)) |
 | R-4 | Adoption without standards body buy-in | Medium | High | OpenRail Association as sponsor, demonstrate value first |
 | TD-1 | No automated cross-language consistency | – | Medium | Future: OSCAL Control Mapping |
-| TD-2 | No CI/CD pipeline yet | – | Low | Add GitHub Actions workflow |
+| TD-2 | No artifact-validation CI pipeline yet | – | Low | Planned GitHub Actions workflow (issue #14); consolidated validator ready ([ADR-013](adr/ADR-013-validator-consolidation.md)) |
+| TD-3 | `oscal-cli convert` YAML↔JSON↔XML roundtrip not yet verified end-to-end in this repo | – | Low | Verify and wire into CI ([ADR-012](adr/ADR-012-canonical-serialization.md), #5/#14) |
+| TD-4 | Hard `oscal-version` enforcement deferred; currently reported, not enforced | – | Low | BS-KI (`1.1.3`) to be revised against final Catalog Railway Profile, then enforce ([ADR-013](adr/ADR-013-validator-consolidation.md)) |
+| TD-5 | Version-equality check across layers not yet implemented in the validator | – | Medium | Implement in `oscal4rail validate`, enforce in CI as hard failure ([ADR-014](adr/ADR-014-rules-layer-placement.md), #5/#14) |
+| TD-6 | Rules-Layer format not yet selected | – | Medium | Decision grid complete; format decision in a later ADR ([ADR-016](adr/ADR-016-rules-format-decision-criteria.md), #8) |
+| TD-7 | ADR-009/010/011 still in Draft (Proposed) | – | Low | Elaborate and move to Accepted as the metadata/authority/index work matures |
 
 ---
 
@@ -559,3 +678,13 @@ Full ADR: [docs/adr/ADR-007-tooling-foundation.md](adr/ADR-007-tooling-foundatio
 | ERA | European Union Agency for Railways |
 | AB | Ausführungsbestimmung (implementing regulation) |
 | Control Mapping | OSCAL model for cross-referencing between catalogs |
+| Canonical serialization | The single leading, hand-edited form (YAML); JSON/XML are generated ([ADR-012](adr/ADR-012-canonical-serialization.md)) |
+| Decision logic | Applicability conditions (AND/OR, thresholds) in a separate linked artifact, not inline ([ADR-014](adr/ADR-014-rules-layer-placement.md)) |
+| `metadata.version` | NIST version field reused to couple catalog/rules/assessment to the same version ([ADR-014](adr/ADR-014-rules-layer-placement.md)) |
+| Authority stream | A parallel line of regulatory authority (statutory, normative, sectoral, corporate, vendor) ([ADR-010](adr/ADR-010-configurable-authority-meta-model.md)) |
+| `index.json` | Generated corpus index (catalog heads only) for the Assessment Layer ([ADR-011](adr/ADR-011-generated-catalog-index.md)) |
+| Two-pass validation | NIST base schema pass + additive O4R constraints pass in one validator run ([ADR-013](adr/ADR-013-validator-consolidation.md)) |
+
+---
+
+> 🤖 Dieses Dokument wurde mit Unterstützung von KI erstellt (Art. 50 Abs. 4 KI-VO).
