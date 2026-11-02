@@ -1,172 +1,202 @@
-# ADR-006: OSCAL4Rail und Rulemapping – Komplementarität oder Konkurrenz?
+# ADR-006: OSCAL4Rail and Rulemapping — Complementarity or Competition?
 
-**Status:** Accepted
+**Status:** Accepted (amended — see note below)
 **Date:** 2026-06-25
 **Deciders:** Jens Grote
-**Technical Story:** Evaluation des Rulemapping-Builder-Exports (Pilot BS-KI 2.1, 2026-06-25)
+**Technical Story:** Evaluation of the Rulemapping Builder export (pilot BS-KI 2.1, 2026-06-25)
+
+> **Amendment (2026-10-27, [ADR-014](./ADR-014-rules-layer-placement.md)).** This ADR
+> argued for the placement of decision logic (an external rulemap, referenced via
+> `link rel="decision-logic"`, rather than mixing data and logic in the catalog).
+> ADR-014 **confirms** that direction and makes the **placement and version-coupling
+> mechanism binding** (separate linked logic artifact; version coupling via the NIST
+> `metadata.version` field, enforced by the validation tool). In **exactly this
+> aspect**, ADR-006 is refined/superseded by ADR-014. The broader positioning
+> (Rulemapping and OSCAL4Rail solve different problems for different audiences) remains
+> unchanged. The choice of the concrete rules **format** is still open and will be
+> decided after the analysis phase (AP0, issues #13–#22) in a separate ADR.
 
 ---
 
-## Kontext und Problemstellung
+## Context and Problem Statement
 
-Im Rahmen der SPRIND-Initiative „Law as Code" hat sich Rulemapping als zentrale Methodik für maschinenlesbare Gesetzgebung etabliert. OSCAL4Rail verfolgt mit NIST OSCAL einen anderen Ansatz für dasselbe Grundproblem: Regulatorik maschinenlesbar machen.
+Within the SPRIND "Law as Code" initiative, Rulemapping has established itself as a
+central methodology for machine-readable legislation. OSCAL4Rail pursues a different
+approach to the same underlying problem using NIST OSCAL: making regulation
+machine-readable.
 
-**Die zentrale Frage:** Sind OSCAL4Rail und Rulemapping konkurrierende Ansätze – oder ergänzende Werkzeuge, die durch Integration ihre jeweiligen Stärken ausspielen?
+**The central question:** Are OSCAL4Rail and Rulemapping competing approaches, or
+complementary tools that play to their respective strengths through integration?
 
-### Auslöser
+### Trigger
 
-- SPRIND-Initiative „Law as Code" mit Rulemapping als Kernmethodik
-- Pilot-Test des Rulemapping Builders mit BS-KI 2.1 (erfolgreich, 2026-06-25)
-- Bahnen unterliegen einer tiefen Regulierungskaskade (EU → National → Branche → Konzern → Tochtergesellschaft)
-- Bedarf an Klarheit für die OpenRail-Incubation und Stakeholder-Kommunikation
+- SPRIND "Law as Code" initiative with Rulemapping as its core methodology
+- Pilot test of the Rulemapping Builder with BS-KI 2.1 (successful, 2026-06-25)
+- Railways are subject to a deep regulatory cascade (EU → national → industry → group → subsidiary)
+- Need for clarity for the OpenRail incubation and stakeholder communication
 
-### Die Regulierungskaskade
+### The regulatory cascade
 
-Eisenbahnregulierung ist kein flaches Regelwerk, sondern eine Vererbungshierarchie mit konformer Spezialisierung:
+Railway regulation is not a flat rulebook but an inheritance hierarchy with conformant
+specialization:
 
 ```
-EU-Richtlinie / TSI (abstrakt)
-  "Systeme müssen gegen bekannte Schwachstellen geschützt werden"
+EU directive / TSI (abstract)
+  "Systems must be protected against known vulnerabilities"
     │
-    ▼ nationale Umsetzung
+    ▼ national implementation
 BSI IT-Grundschutz / BSKG / EBO
-  "Patches müssen nach Risikobewertung eingespielt werden"
+  "Patches must be applied following a risk assessment"
     │
-    ▼ Konzernregel
-DB Richtlinie
-  "Du musst nach BSI Grundschutz patchen"
+    ▼ group rule
+DB guideline
+  "You must patch according to BSI Grundschutz"
     │
     ├─▼ DB Systel                          ├─▼ DB InfraGO
-    │  "CVSS Score bestimmt Frist:         │  "Nur KRITIS-Systeme,
-    │   Critical ≤72h, High ≤7d..."        │   nach Methode XYZ"
+    │  "CVSS score sets the deadline:      │  "Only KRITIS systems,
+    │   Critical ≤72h, High ≤7d..."        │   per method XYZ"
     │                                       │
-    └── beide KONFORM zur DB-Richtlinie ───┘
+    └── both CONFORMANT to the DB guideline ┘
 ```
 
-Jede Ebene **spezialisiert** die darüber liegende – sie darf konkretisieren, aber nicht widersprechen. Unterschiedliche Tochtergesellschaften dürfen die gleiche Oberregel unterschiedlich, aber jeweils konform umsetzen.
+Each level **specializes** the one above, it may concretize but not contradict.
+Different subsidiaries may implement the same parent rule differently, each in a
+conformant way.
 
 ---
 
-## Entscheidungstreiber (Decision Drivers)
+## Decision Drivers
 
-1. **Regelinhalt** – Was steht in der Regel? Verbatim, auditierbar.
-2. **Anwendbarkeit** – Für wen gilt es? (Kanal, Verkehrsträger, Obligation)
-3. **Entscheidungslogik** – Unter welchen Bedingungen gilt es? (Schwellenwerte, Ausnahmen)
-4. **Change Tracking** – Was hat sich geändert? Neu, weggefallen, verschärft, gelockert, ersetzt?
-5. **Konsistenz & Redundanz** – Gibt es Doppelungen, Widersprüche, Ergänzungen über Regelwerke und Ebenen hinweg?
-6. **Kaskade & Vererbung** – Kann die Hierarchie EU → National → Konzern → Tochter abgebildet werden?
-7. **Konformitätsprüfung** – Ist eine Spezialisierung noch konform zur Oberregel?
-8. **Schema-Validierbarkeit** – CI-fähige Validierung gegen ein formales Schema?
-9. **Stabile Identifikatoren** – Für Versionsdiff und systemübergreifende Referenzierung?
-10. **Offenheit** – Kein Vendor-Lock-in, Open Source, offene Standards?
-11. **Unabhängigkeit** – Jeder Ansatz funktioniert auch allein?
+1. **Rule content**: What does the rule say? Verbatim, auditable.
+2. **Applicability**: Whom does it apply to? (channel, transport mode, obligation)
+3. **Decision logic**: Under which conditions does it apply? (thresholds, exceptions)
+4. **Change tracking**: What has changed? New, removed, tightened, relaxed, replaced?
+5. **Consistency & redundancy**: Are there duplications, contradictions, additions across rulebooks and levels?
+6. **Cascade & inheritance**: Can the hierarchy EU → national → group → subsidiary be represented?
+7. **Conformance checking**: Is a specialization still conformant to the parent rule?
+8. **Schema validatability**: CI-capable validation against a formal schema?
+9. **Stable identifiers**: For version diff and cross-system referencing?
+10. **Openness**: No vendor lock-in, open source, open standards?
+11. **Independence**: Does each approach also work on its own?
 
 ---
 
-## Analyse: Stärken und Schwächen
+## Analysis: Strengths and Weaknesses
 
 ### OSCAL4Rail
 
-| Dimension | Stärke | Schwäche |
-|-----------|--------|----------|
-| Regelinhalt | Verbatim-Zitate, auditierbar, keine Interpretation | – |
-| Anwendbarkeit | Matrix-Modell (Kanal × Verkehrsträger → Obligation) | Statisch, keine Bedingungslogik |
-| Entscheidungslogik | – | Nicht modellierbar. Schwellenwerte nur als Freitext |
-| Change Tracking | Semantischer Diff auf Control-Ebene: neu, geändert, entfallen | – |
-| Konsistenz & Redundanz | Vergleich zwischen Katalogen (Diff/Alignment) | Widerspruchserkennung noch nicht implementiert |
-| Kaskade & Vererbung | ✅ OSCAL-Schichtenmodell: Catalog → Profile → Component Definition | – |
-| Konformitätsprüfung | Architektonisch möglich (Profile-Vererbung), noch nicht gebaut | – |
-| Schema-Validierung | ✅ NIST JSON Schema, CI-fähig | – |
-| Stabile IDs | ✅ Kapitel-basiert, semantisch | – |
-| Offenheit | ✅ Apache 2.0, OSCAL selbst CC0, bestehendes Tooling-Ökosystem | – |
+| Dimension | Strength | Weakness |
+|-----------|----------|----------|
+| Rule content | Verbatim quotes, auditable, no interpretation | – |
+| Applicability | Matrix model (channel × transport mode → obligation) | Static, no conditional logic |
+| Decision logic | – | Not modelable. Thresholds only as free text |
+| Change tracking | Semantic diff at control level: new, changed, removed | – |
+| Consistency & redundancy | Comparison across catalogs (diff/alignment) | Contradiction detection not yet implemented |
+| Cascade & inheritance | ✅ OSCAL layer model: Catalog → Profile → Component Definition | – |
+| Conformance checking | Architecturally possible (profile inheritance), not yet built | – |
+| Schema validation | ✅ NIST JSON Schema, CI-capable | – |
+| Stable IDs | ✅ Chapter-based, semantic | – |
+| Openness | ✅ Apache 2.0, OSCAL itself CC0, existing tooling ecosystem | – |
 
 ### Rulemapping
 
-| Dimension | Stärke | Schwäche |
-|-----------|--------|----------|
-| Regelinhalt | – | Kein Verbatim-Modell. Regeltext nur als Freitext in `alttext` |
-| Anwendbarkeit | – | Kein Applicability-Modell |
-| Entscheidungslogik | ✅ Boolesche Operatoren (OR, AND, XOR, NAND, NOR), Negation, Baumstruktur | Schwellenwerte nur als Freitext im Knotentitel |
-| Change Tracking | – | Keine Versionierung im Format, kein Diff-Tooling |
-| Konsistenz & Redundanz | – | Kein Vergleich zwischen Rulemaps vorgesehen |
-| Kaskade & Vererbung | – | Kein Schichtenmodell, keine Hierarchie zwischen Regelebenen |
-| Konformitätsprüfung | – | Nicht vorgesehen |
-| Schema-Validierung | – | Kein publiziertes Schema (XSD/JSON Schema) |
-| Stabile IDs | – | Numerisch (auto-increment), nicht semantisch |
-| Offenheit | RUML als offener Standard angekündigt. Builder kostenlos nutzbar | Stand heute: proprietäres Format, nicht schema-validierbar |
+| Dimension | Strength | Weakness |
+|-----------|----------|----------|
+| Rule content | – | No verbatim model. Rule text only as free text in `alttext` |
+| Applicability | – | No applicability model |
+| Decision logic | ✅ Boolean operators (OR, AND, XOR, NAND, NOR), negation, tree structure | Thresholds only as free text in the node title |
+| Change tracking | – | No versioning in the format, no diff tooling |
+| Consistency & redundancy | – | No comparison between rulemaps foreseen |
+| Cascade & inheritance | – | No layer model, no hierarchy between rule levels |
+| Conformance checking | – | Not foreseen |
+| Schema validation | – | No published schema (XSD/JSON Schema) |
+| Stable IDs | – | Numeric (auto-increment), not semantic |
+| Openness | RUML announced as an open standard. Builder free to use | As of today: proprietary format, not schema-validatable |
 
 ---
 
-## Kernbefund
+## Core Finding
 
-**OSCAL4Rail und Rulemapping lösen fundamental verschiedene Probleme.**
+**OSCAL4Rail and Rulemapping solve fundamentally different problems.**
 
-### Unterschiedliche Einsatzzwecke
+### Different purposes
 
 | Dimension | Rulemapping | OSCAL4Rail |
 |-----------|-------------|------------|
-| **Zielgruppe** | Bürger, Sachbearbeiter, Juristen, Gesetzgeber | IT-Architekten, Compliance-Teams, Normungsgremien |
-| **Kernfrage** | „Trifft diese Regel auf *meinen Einzelfall* zu?" | „Wie verwalte ich *10.000 Regeln* über 5 Ebenen mit Änderungsverfolgung?" |
-| **Interaktion** | Mensch geht interaktiv durch Entscheidungsbaum | Maschine prüft automatisiert gegen Katalog |
-| **Ergebnis** | Ein Ja/Nein für einen konkreten Fall | Compliance-Report über alle Systeme und Regeln |
-| **Skala** | Ein Gesetz, ein Fall | Hunderte Regelwerke, tausende Controls, über Jahre |
-| **Analogie** | Berater am Schalter / Self-Service-Webseite | Wirtschaftsprüfer mit Checkliste |
+| **Audience** | Citizens, case workers, lawyers, legislators | IT architects, compliance teams, standardization bodies |
+| **Core question** | "Does this rule apply to *my individual case*?" | "How do I manage *10,000 rules* across 5 levels with change tracking?" |
+| **Interaction** | A human walks interactively through a decision tree | A machine checks automatically against a catalog |
+| **Result** | A yes/no for one concrete case | A compliance report across all systems and rules |
+| **Scale** | One law, one case | Hundreds of rulebooks, thousands of controls, over years |
+| **Analogy** | Advisor at the counter / self-service website | Auditor with a checklist |
 
-### Rulemapping: Bürger-Staat-Dialog
+### Rulemapping: citizen–state dialogue
 
-Typische Rulemapping-Use-Cases:
-- „Brauche ich für meinen Anbau eine Baugenehmigung?" → Grundfläche? Höhe? Bebauungsplan? → Ja/Nein
-- „Brauche ich ein Visum für Thailand?" → Aufenthaltsdauer? Zweck? Nationalität? → Ja, Typ X / Nein
-- „Welche Steuerformulare muss ich ausfüllen?" → Selbständig? Kinder? Einkommen? → Anlage N + KAP
+Typical Rulemapping use cases:
+- "Do I need a building permit for my extension?" → Floor area? Height? Zoning plan? → Yes/No
+- "Do I need a visa for Thailand?" → Length of stay? Purpose? Nationality? → Yes, type X / No
+- "Which tax forms must I fill in?" → Self-employed? Children? Income? → Annex N + KAP
 
-Das ist ein **interaktiver Einzelfall-Entscheidungsbaum** – ein Mensch geht den Baum durch und bekommt eine Antwort.
+This is an **interactive single-case decision tree**, a human walks the tree and gets
+an answer.
 
-### OSCAL4Rail: Regulierungs-Management über Ebenen und Zeit
+### OSCAL4Rail: regulation management across levels and time
 
-Typische OSCAL4Rail-Use-Cases:
-- „Wir betreiben 4.700 Haltestellen und 12 IT-Systeme. Welche 42 Regeln gelten jeweils?"
-- „Was hat sich seit letztem Jahr geändert? Welche Regeln sind verschärft, gelockert, neu, weggefallen?"
-- „Ist unsere Umsetzung (DB Systel: CVSS-basiert) noch konform zur Oberregel (DB Richtlinie: BSI Grundschutz)?"
-- „Die TSI wurde aktualisiert – welche unserer Systeme sind betroffen?"
+Typical OSCAL4Rail use cases:
+- "We operate 4,700 stops and 12 IT systems. Which 42 rules apply to each?"
+- "What has changed since last year? Which rules are tightened, relaxed, new, removed?"
+- "Is our implementation (DB Systel: CVSS-based) still conformant to the parent rule (DB guideline: BSI Grundschutz)?"
+- "The TSI was updated, which of our systems are affected?"
 
-Das ist **automatisierte Massenprüfung mit Versionsverwaltung** – kein Mensch geht interaktiv durch einen Baum.
+This is **automated mass checking with version management**, no human walks a tree
+interactively.
 
-### Keine Konkurrenz – verschiedene Welten
+### No competition, different worlds
 
-Die beiden Ansätze *können* sich an einer Schnittstelle berühren: Wenn ein Gesetzgeber per Rulemapping ein Gesetz modelliert, *könnte* das Ergebnis als Input in einen OSCAL-Katalog einfließen. Aber das ist eine **Übergabe**, keine Integration im Sinne von „beide arbeiten am selben Artefakt".
+The two approaches *can* touch at one interface: when a legislator models a law via
+Rulemapping, the result *could* feed as input into an OSCAL catalog. But that is a
+**handover**, not integration in the sense of "both work on the same artifact".
 
-| | Rulemapping-Welt | Übergabe | OSCAL4Rail-Welt |
+| | Rulemapping world | Handover | OSCAL4Rail world |
 |---|-----------------|----------|-----------------|
-| Akteur | Gesetzgeber/Jurist | → publiziert → | Compliance-Team/IT-Architekt |
-| Artefakt | Entscheidungsbaum (Rulemap) | → wird zu → | Control im Katalog (OSCAL) |
-| Zweck | „So entscheidest du" | | „Das musst du einhalten" |
+| Actor | Legislator/lawyer | → publishes → | Compliance team/IT architect |
+| Artifact | Decision tree (rulemap) | → becomes → | Control in the catalog (OSCAL) |
+| Purpose | "This is how you decide" | | "This is what you must comply with" |
 
-### Nicht jede Regel braucht einen Entscheidungsbaum
+### Not every rule needs a decision tree
 
-Viele Regeln sind einfache, binäre Aussagen ohne jede Entscheidungslogik:
-- „Code muss in Git öffentlich lesbar abgelegt werden."
-- „Architekturentscheidungen müssen dokumentiert und veröffentlicht sein."
-- „Systeme müssen gepatcht werden."
+Many rules are simple, binary statements without any decision logic:
+- "Code must be stored publicly readable in Git."
+- "Architecture decisions must be documented and published."
+- "Systems must be patched."
 
-Hier gibt es nichts zu „entscheiden" – es gilt, Punkt. Kein Schwellenwert, keine Ausnahme, kein Baum. Das ist die Mehrheit aller Regeln.
+There is nothing to "decide" here, it simply applies, full stop. No threshold, no
+exception, no tree. This is the majority of all rules.
 
-Der BS-KI 2.1 Pilot-Test (mit Schwellenwert ≥800 Fahrgäste und mehrdimensionaler Applicability) ist ein *ungewöhnlich komplexer* Fall – kein Regelfall.
+The BS-KI 2.1 pilot test (with a threshold of ≥800 passengers and multi-dimensional
+applicability) is an *unusually complex* case, not the normal case.
 
 ---
 
-## Entscheidung
+## Decision
 
-**OSCAL4Rail und Rulemapping lösen verschiedene Probleme für verschiedene Zielgruppen. Sie sind weder Konkurrenten noch zwingend zu integrieren.**
+**OSCAL4Rail and Rulemapping solve different problems for different audiences. They are
+neither competitors nor necessarily to be integrated.**
 
-- **OSCAL4Rail** ist das Werkzeug für **Regulierungs-Management**: Kataloge verwalten, Versionen tracken, Kaskaden abbilden, Compliance maschinell prüfen.
-- **Rulemapping** ist das Werkzeug für **Einzelfall-Entscheidungen**: Bürger-Self-Service, Sachbearbeiter-Unterstützung, interaktive Prüfung.
+- **OSCAL4Rail** is the tool for **regulation management**: managing catalogs, tracking
+  versions, representing cascades, checking compliance by machine.
+- **Rulemapping** is the tool for **single-case decisions**: citizen self-service, case
+  worker support, interactive checking.
 
-### Möglicher Berührungspunkt
+### Possible point of contact
 
-Dort wo ein Regelwerk tatsächlich komplexe Bedingungslogik enthält (Schwellenwerte, Ausnahmen, kontextabhängige Anwendbarkeit), *könnte* ein Rulemapping-Entscheidungsbaum als ergänzendes Artefakt neben dem OSCAL4Rail-Control existieren. Das ist aber die Ausnahme, nicht die Regel.
+Where a rulebook actually contains complex conditional logic (thresholds, exceptions,
+context-dependent applicability), a Rulemapping decision tree *could* exist as a
+complementary artifact alongside the OSCAL4Rail control. But that is the exception, not
+the rule.
 
 ```yaml
-# Nur bei komplexer Bedingungslogik – nicht der Standard
+# Only for complex conditional logic, not the default
 controls:
   - id: bs-ki-2.1
     title: "Aktuelle Uhrzeit"
@@ -179,137 +209,139 @@ controls:
         text: "Entscheidungsbaum: Anwendbarkeitsbedingungen"
 ```
 
-### Was OSCAL4Rail NICHT von Rulemapping übernimmt
+### What OSCAL4Rail does NOT adopt from Rulemapping
 
-- Kein interaktiver Bürger-Dialog
-- Kein Einzelfall-Entscheidungsbaum als Kernkonzept
-- Keine Übernahme des Rulemapping-Formats als primäres Datenmodell
+- No interactive citizen dialogue
+- No single-case decision tree as a core concept
+- No adoption of the Rulemapping format as the primary data model
 
-### Was OSCAL4Rail allein leistet (und Rulemapping nicht kann)
+### What OSCAL4Rail delivers alone (and Rulemapping cannot)
 
-- Regulierungskaskade (EU → National → Konzern → Tochter)
-- Semantischer Diff über Versionen
-- Konformitätsprüfung zwischen Ebenen
-- Schema-validierte Kataloge mit stabilen Identifikatoren
-- Change Tracking: was ist neu, weggefallen, verschärft, gelockert
+- Regulatory cascade (EU → national → group → subsidiary)
+- Semantic diff across versions
+- Conformance checking between levels
+- Schema-validated catalogs with stable identifiers
+- Change tracking: what is new, removed, tightened, relaxed
 
 ---
 
-### Ergänzung auf Prozessebene – nicht auf Datenebene
+### Complementarity at the process level, not the data level
 
-Die Ergänzung von Rulemapping und OSCAL4Rail liegt nicht darin, beide Formate zusammenzuschalten, sondern darin, dass sie **verschiedene Phasen im Lebenszyklus einer Regel** bedienen:
+The complementarity of Rulemapping and OSCAL4Rail lies not in wiring both formats
+together, but in the fact that they serve **different phases in the life cycle of a
+rule**:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  PHASE 1: Regel erstellen (Regelschreiber)                   │
+│  PHASE 1: Author the rule (rule writer)                      │
 │                                                              │
-│  Gesetzgeber / Normungsgremium / Fachexperte                 │
-│  ├── schreibt Gesetz/Vorschrift                              │
-│  └── modelliert Entscheidungslogik im Rulemap Builder        │
-│       → „Wann gilt was? Welche Bedingungen? Ausnahmen?"      │
+│  Legislator / standardization body / domain expert           │
+│  ├── writes the law/regulation                               │
+│  └── models the decision logic in the Rulemap Builder        │
+│       → "When does what apply? Which conditions? Exceptions?" │
 │                                                              │
-│  Werkzeug: Rulemapping                                       │
-│  Artefakt: Entscheidungsbaum (Rulemap)                       │
+│  Tool: Rulemapping                                           │
+│  Artifact: decision tree (rulemap)                           │
 └──────────────────────────────┬──────────────────────────────┘
-                               │ publiziert Regeltext
+                               │ publishes rule text
                                ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  PHASE 2: Regel verwalten (Compliance-Team)                  │
+│  PHASE 2: Manage the rule (compliance team)                  │
 │                                                              │
-│  OSCAL4Rail liest den publizierten Regeltext                 │
-│  ├── extrahiert verbatim Controls                            │
-│  ├── ordnet Applicability zu                                 │
-│  ├── bildet Kaskade ab (EU → National → Konzern → Tochter)  │
-│  └── trackt Änderungen über Versionen                        │
+│  OSCAL4Rail reads the published rule text                    │
+│  ├── extracts verbatim controls                              │
+│  ├── assigns applicability                                   │
+│  ├── represents the cascade (EU → national → group → subs.)  │
+│  └── tracks changes across versions                          │
 │                                                              │
-│  Werkzeug: OSCAL4Rail                                        │
-│  Artefakt: Katalog mit Controls                              │
+│  Tool: OSCAL4Rail                                            │
+│  Artifact: catalog with controls                             │
 └──────────────────────────────┬──────────────────────────────┘
-                               │ Katalog bereitgestellt
+                               │ catalog provided
                                ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  PHASE 3: Regel prüfen (IT-Architekten / AI-Agents)          │
+│  PHASE 3: Check the rule (IT architects / AI agents)         │
 │                                                              │
-│  Automatisierte Compliance-Prüfung:                          │
-│  ├── Welche Controls gelten für mein System?                 │
-│  ├── Ist meine Umsetzung konform?                            │
-│  └── Was hat sich seit letzter Prüfung geändert?             │
+│  Automated compliance checking:                              │
+│  ├── Which controls apply to my system?                      │
+│  ├── Is my implementation conformant?                        │
+│  └── What has changed since the last check?                  │
 │                                                              │
-│  Werkzeug: MCP-Agents / Compliance-Tooling                   │
-│  Artefakt: Compliance-Report                                 │
+│  Tool: MCP agents / compliance tooling                       │
+│  Artifact: compliance report                                 │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Zwei Werkzeuge, zwei Phasen:**
-- Rulemapping hilft dem **Ersteller** der Regel, sie präzise und widerspruchsfrei zu formulieren
-- OSCAL4Rail hilft dem **Anwender** der Regel, sie maschinell zu verwalten und zu prüfen
+**Two tools, two phases:**
+- Rulemapping helps the **author** of the rule to formulate it precisely and without contradiction
+- OSCAL4Rail helps the **user** of the rule to manage and check it by machine
 
 ---
 
-## Konsequenzen
+## Consequences
 
-### Positiv
+### Positive
 
-- Klare Positionierung: OSCAL4Rail muss sich nicht an Rulemapping messen lassen – anderer Zweck
-- OSCAL4Rail bleibt schlank und fokussiert auf Regulierungs-Management
-- Kein Druck, Rulemapping-Integration als Feature zu bauen
-- Gegenüber SPRIND/OpenRail klar kommunizierbar: „Verschiedene Werkzeuge, verschiedene Probleme, möglicher Berührungspunkt an der Schnittstelle Gesetzgeber → Compliance-Team"
-- Die Regulierungskaskade und Change Tracking sind USPs von OSCAL4Rail, die Rulemapping nicht adressiert
+- Clear positioning: OSCAL4Rail need not be measured against Rulemapping, different purpose
+- OSCAL4Rail stays lean and focused on regulation management
+- No pressure to build Rulemapping integration as a feature
+- Clearly communicable toward SPRIND/OpenRail: "Different tools, different problems, possible point of contact at the legislator → compliance-team interface"
+- The regulatory cascade and change tracking are OSCAL4Rail USPs that Rulemapping does not address
 
-### Negativ / Risiken
+### Negative / Risks
 
-- Rulemapping könnte fälschlicherweise als Konkurrent wahrgenommen werden → Mitigation: dieser ADR als klare Kommunikationsgrundlage
-- Bei SPRIND-Kontaktaufnahme muss die Differenzierung sauber erklärt werden, um nicht in einen „wer ist besser"-Vergleich zu geraten
+- Rulemapping could be mistakenly perceived as a competitor → mitigation: this ADR as a clear communication basis
+- When contacting SPRIND, the differentiation must be explained cleanly to avoid slipping into a "who is better" comparison
 
-### Offen / noch zu klären
+### Open / to be clarified
 
-- Ist eine Übergabe-Schnittstelle (Rulemapping → OSCAL4Rail) in der Praxis relevant oder rein theoretisch?
-- Wird RUML als offener Standard publiziert? (Monitoring, aber keine Abhängigkeit)
-- Gibt es Regelwerke mit so viel Bedingungslogik, dass eine systematische Verknüpfung sinnvoll wird?
+- Is a handover interface (Rulemapping → OSCAL4Rail) relevant in practice or purely theoretical?
+- Will RUML be published as an open standard? (monitoring, but no dependency)
+- Are there rulebooks with so much conditional logic that a systematic link becomes worthwhile?
 
 ---
 
-## Betrachtete Alternativen
+## Considered Alternatives
 
-### Alternative 1: Nur OSCAL4Rail (kein Rulemapping)
+### Alternative 1: OSCAL4Rail only (no Rulemapping)
 
-- (+) Einfacher, keine externe Abhängigkeit
-- (-) Entscheidungslogik und Bedingungen nicht modellierbar
-- (-) Agent muss Freitext interpretieren für „Gilt diese Regel für mich?"
-- **Bewertung:** Für die Mehrheit der Regeln ausreichend. Für komplexe Regeln fehlt die Logik-Schicht.
+- (+) Simpler, no external dependency
+- (-) Decision logic and conditions not modelable
+- (-) Agent must interpret free text for "does this rule apply to me?"
+- **Assessment:** Sufficient for the majority of rules. For complex rules the logic layer is missing.
 
-### Alternative 2: Entscheidungslogik direkt in OSCAL4Rail modellieren
+### Alternative 2: Model decision logic directly in OSCAL4Rail
 
-- (+) Alles in einem Format
-- (-) NIST OSCAL Catalog hat kein Logik-Modell (erfordert Custom-Extensions)
-- (-) Breaking Change zum OSCAL-Standard
-- (-) Vermischung von Daten und Logik (verletzt IOSP-Prinzip)
-- **Verworfen:** Widerspricht der OSCAL-Philosophie und dem Prinzip der Verantwortungstrennung.
+- (+) Everything in one format
+- (-) The NIST OSCAL Catalog has no logic model (requires custom extensions)
+- (-) Breaking change relative to the OSCAL standard
+- (-) Mixing of data and logic (violates the IOSP principle)
+- **Rejected:** Contradicts the OSCAL philosophy and the principle of separation of concerns.
 
 ### Alternative 3: DMN (Decision Model and Notation, OMG/ISO 19510)
 
-- (+) Offener Standard, etabliertes Tooling (Camunda, Drools)
-- (+) Formale Entscheidungstabellen mit Datentypen
-- (-) Komplex, schwergewichtig
-- (-) Kein Bezug zu Law-as-Code/SPRIND-Ökosystem
-- **Vorgemerkt als Fallback** falls Rulemapping-Format dauerhaft proprietär bleibt.
+- (+) Open standard, established tooling (Camunda, Drools)
+- (+) Formal decision tables with data types
+- (-) Complex, heavyweight
+- (-) No connection to the Law-as-Code/SPRIND ecosystem
+- **Noted as a fallback** should the Rulemapping format remain proprietary permanently.
 
-### Alternative 4: Catala (funktionale Rechtssprache, INRIA)
+### Alternative 4: Catala (functional legal language, INRIA)
 
-- (+) Open Source, akademisch fundiert, formale Semantik
-- (-) Programmiersprache → Juristen/Fachexperten können nicht damit arbeiten
-- (-) Andere Zielgruppe, kein SPRIND-Bezug
-- **Vorgemerkt als technische Alternative** für Zukunft.
+- (+) Open source, academically grounded, formal semantics
+- (-) A programming language → lawyers/domain experts cannot work with it
+- (-) Different audience, no SPRIND connection
+- **Noted as a technical alternative** for the future.
 
 ---
 
-## Validierung
+## Validation
 
-Pilot-Test durchgeführt am 2026-06-25:
-- BS-KI 2.1 „Aktuelle Uhrzeit" als Rulemap modelliert (komplexer Fall mit Schwellenwert)
-- Import/Export im Builder erfolgreich
-- Boolesche Logik (OR/AND) + Negation (`invertlogic`) funktional
-- Ergebnisse dokumentiert in `docs/experiments/rulemapping/`
+Pilot test conducted on 2026-06-25:
+- BS-KI 2.1 "Aktuelle Uhrzeit" modeled as a rulemap (complex case with threshold)
+- Import/export in the Builder successful
+- Boolean logic (OR/AND) + negation (`invertlogic`) functional
+- Results documented in `docs/experiments/rulemapping/`
 
 ---
 
@@ -317,7 +349,9 @@ Pilot-Test durchgeführt am 2026-06-25:
 
 - [ADR-005: Relationship to Law-as-Code Initiatives](ADR-005-law-as-code-relationship.md)
 - [Experiment: Rulemapping Builder Pilot](../experiments/rulemapping-pilot.md)
-- [Experiment: Export-Analyse](../experiments/rulemapping/README.md)
+- [Experiment: Export analysis](../experiments/rulemapping/README.md)
 - [SPRIND Law-as-Code](https://sprind.org/en/actions/strategic-projects/law-as-code)
 - [Rulemapping Builder](https://builder.rulemapping.org)
 - [NIST OSCAL](https://pages.nist.gov/OSCAL/)
+
+> 🤖 Dieses Dokument wurde mit Unterstützung von KI erstellt (Art. 50 Abs. 4 KI-VO).
