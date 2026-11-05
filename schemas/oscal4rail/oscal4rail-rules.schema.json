@@ -1,0 +1,424 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/OpenRailAssociation/oscal4rail/schemas/oscal4rail/oscal4rail-rules.schema.json",
+  "title": "OSCAL4Rail Rules Layer (Layer 2) — decision logic artifact",
+  "description": "Standalone schema for an OSCAL4Rail Rules Layer artifact (a 'rule-set'), the separate linked decision-logic artifact per ADR-014, realized OSCAL-native per ADR-018. A rule-set is bound to its catalog by the control via link rel='decision-logic' and version-coupled via metadata.version (tool check, not schema). The decision logic uses the NIST-native parameter/constraint/test/expression slot with a deterministic Metapath 'Subset v1'; lateral relations use the NIST Control Mapping Model (separate artifact). This schema deliberately does NOT $ref the NIST schema; it validates the rule-set's own additive structure. Vocabularies for modality/status/enforcement are owner-declared and bound to a fixed semantics axis the agent reads (ADR-018 point 8). See docs/reference/rules-layer.md and ADR-018.",
+  "type": "object",
+  "required": [
+    "rule-set"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "rule-set": {
+      "type": "object",
+      "required": [
+        "metadata",
+        "catalog-ref",
+        "vocabularies",
+        "rules"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "metadata": {
+          "type": "object",
+          "description": "NIST-style metadata. 'version' MUST equal the bound catalog's version (enforced by the validation tool, not this schema — ADR-014).",
+          "required": [
+            "title",
+            "version",
+            "oscal-version",
+            "last-modified"
+          ],
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "oscal-version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "last-modified": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "remarks": {
+              "type": "string"
+            }
+          }
+        },
+        "catalog-ref": {
+          "type": "object",
+          "description": "Which catalog this rule-set serves: identity (catalog-uuid) + resolution (href). The catalog's owner/publisher and regulation live in the catalog's own metadata (SSOT), not here. Belonging is established here + the control's link rel='decision-logic' (ADR-014/ADR-018).",
+          "required": [
+            "catalog-uuid",
+            "href"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "catalog-uuid": {
+              "type": "string",
+              "description": "Stable identity of the served catalog (the catalog's uuid); location-independent SSOT anchor.",
+              "minLength": 1
+            },
+            "href": {
+              "type": "string",
+              "description": "Where the tool resolves the catalog file (path or URL). A resolution hint, not the identity.",
+              "minLength": 1
+            }
+          }
+        },
+        "vocabularies": {
+          "type": "object",
+          "description": "Owner-declared vocabularies, each bound to a fixed semantics axis the agent reads (ADR-018 point 8). The agent never reads the label semantically — only the bound axis.",
+          "required": [
+            "modality"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "modality": {
+              "type": "object",
+              "description": "Obligation STRENGTH. Each declared label maps to a fixed axis: binding (bool) + rank (int, lower = stronger).",
+              "minProperties": 1,
+              "additionalProperties": {
+                "$ref": "#/$defs/modality-binding"
+              }
+            },
+            "status": {
+              "type": "object",
+              "description": "Lifecycle. Each declared label maps to: active (bool).",
+              "minProperties": 1,
+              "additionalProperties": {
+                "$ref": "#/$defs/status-binding"
+              }
+            },
+            "enforcement": {
+              "type": "object",
+              "description": "How the rule is meant to be enforced. Each declared label maps to a fixed kind (MHC-relevant). Declaration only; evaluation is L4 (ADR-018 point 9).",
+              "minProperties": 1,
+              "additionalProperties": {
+                "$ref": "#/$defs/enforcement-binding"
+              }
+            },
+            "ordinal-scales": {
+              "type": "object",
+              "description": "Named ordered vocabularies for ordinal comparison in applies-when (e.g. schutzbedarf: [normal, hoch, sehr-hoch]). Order is the array order; ordinal comparison is undefined without a declared scale (ADR-018 Subset v1).",
+              "additionalProperties": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "parameters": {
+          "type": "array",
+          "description": "Calibratable parameters referenced by applies-when via param('<id>'). Values MAY be dated (temporal values, ADR-018 point 6).",
+          "items": {
+            "$ref": "#/$defs/parameter"
+          }
+        },
+        "rule-groups": {
+          "type": "array",
+          "description": "Obligation RELATION between rules (alternative/choice). choice is fixed framework semantics (ADR-018 point 8).",
+          "items": {
+            "$ref": "#/$defs/rule-group"
+          }
+        },
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/rule"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "o4r-id": {
+      "description": "Chapter-based ID: <regulation>-<chapter>[.<section>][.<subsection>...][-<context>]. Never page-based. See catalog-format.md §2.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-[0-9]+(\\.[0-9]+)*(-[a-z0-9-]+)?$"
+    },
+    "modality-binding": {
+      "type": "object",
+      "description": "Fixed semantics axis for an obligation-strength label (ADR-018 point 8). 'polarity' distinguishes an obligation (required) from a prohibition (forbidden); a 'MUSS' and a 'DARF NICHT' are both binding but opposite in polarity.",
+      "required": [
+        "binding",
+        "rank",
+        "polarity"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "binding": {
+          "type": "boolean"
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "polarity": {
+          "type": "string",
+          "description": "Fixed framework semantics: whether the rule mandates or prohibits.",
+          "enum": [
+            "required",
+            "forbidden"
+          ]
+        },
+        "remarks": {
+          "type": "string"
+        }
+      }
+    },
+    "status-binding": {
+      "type": "object",
+      "required": [
+        "active"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "active": {
+          "type": "boolean"
+        },
+        "remarks": {
+          "type": "string"
+        },
+        "lifecycle": {
+          "type": "string",
+          "description": "Fixed framework lifecycle axis for a status label. 'active' = in force; 'draft' = not yet in force; 'deprecated' = still binding for existing (legacy) systems but not for new ones; 'superseded' = replaced by another rule (see superseded-by); 'withdrawn' = retired without replacement.",
+          "enum": [
+            "draft",
+            "active",
+            "deprecated",
+            "superseded",
+            "withdrawn"
+          ]
+        },
+        "superseded-by": {
+          "type": "string",
+          "description": "When lifecycle is 'superseded': the rule-id of the rule that replaces this one."
+        }
+      }
+    },
+    "enforcement-binding": {
+      "type": "object",
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "Fixed MHC-relevant kind. Only these three values are framework-defined.",
+          "enum": [
+            "deterministic",
+            "decision-model",
+            "agentic"
+          ]
+        },
+        "remarks": {
+          "type": "string"
+        }
+      }
+    },
+    "parameter": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "unit": {
+          "type": "string"
+        },
+        "value": {
+          "type": [
+            "string",
+            "number",
+            "boolean"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "description": "Dated value history (temporal values, ADR-018 point 6). Most recent applicable entry wins.",
+          "items": {
+            "type": "object",
+            "required": [
+              "from",
+              "value"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "from": {
+                "type": "string",
+                "format": "date"
+              },
+              "value": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            }
+          }
+        },
+        "remarks": {
+          "type": "string"
+        }
+      }
+    },
+    "rule-group": {
+      "type": "object",
+      "required": [
+        "id",
+        "choice",
+        "members"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/o4r-id"
+        },
+        "choice": {
+          "type": "string",
+          "description": "Fixed framework semantics, mapped onto NIST parameter-selection/@how-many (ADR-018 point 8).",
+          "enum": [
+            "all",
+            "one-of",
+            "one-or-more"
+          ]
+        },
+        "members": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/o4r-id"
+          }
+        },
+        "remarks": {
+          "type": "string"
+        }
+      }
+    },
+    "rule": {
+      "type": "object",
+      "description": "One rule: the decision logic + obligation for a control (ADR-018 point 8).",
+      "required": [
+        "rule-id",
+        "control-id",
+        "modality",
+        "status"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "rule-id": {
+          "$ref": "#/$defs/o4r-id"
+        },
+        "control-id": {
+          "$ref": "#/$defs/o4r-id"
+        },
+        "modality": {
+          "type": "string",
+          "description": "A label declared in vocabularies.modality (not a free value)."
+        },
+        "status": {
+          "type": "string",
+          "description": "A label declared in vocabularies.status."
+        },
+        "applies-when": {
+          "$ref": "#/$defs/applies-when"
+        },
+        "enforcement": {
+          "type": "array",
+          "description": "Labels declared in vocabularies.enforcement. A rule may be enforced in several ways at once (e.g. deterministic gate AND human sign-off). Declaration only; evaluation is L4 (ADR-018 point 9).",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "source-ref": {
+          "type": "object",
+          "description": "SSOT pointer; no verbatim duplication of statement text.",
+          "required": [
+            "href"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "href": {
+              "type": "string",
+              "minLength": 1
+            },
+            "section": {
+              "type": "string"
+            }
+          }
+        },
+        "deviations": {
+          "type": "array",
+          "description": "Conflict-as-data (K11). Declaration only; status/approval is L4 (ADR-018 point 9).",
+          "items": {
+            "type": "object",
+            "required": [
+              "requirement",
+              "deviation",
+              "rationale"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "requirement": {
+                "type": "string",
+                "minLength": 1
+              },
+              "deviation": {
+                "type": "string",
+                "minLength": 1
+              },
+              "rationale": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "remarks": {
+          "type": "string",
+          "description": "Owner prose, always allowed; never read by the agent for semantics (ADR-018)."
+        }
+      }
+    },
+    "applies-when": {
+      "type": "object",
+      "description": "Decision logic as an OSCAL-native constraint test. 'expression' is a Metapath Subset v1 string (ADR-018 point 2); 'description' is the human-readable gloss. The expression is what the agent evaluates deterministically.",
+      "required": [
+        "expression"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "expression": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Metapath Subset v1. Allowed: and/or/not, comparison/threshold (=,!=,<,<=,>,>=), ordinal comparison over a declared scale, context('<dimension>'), param('<id>'), set membership x=('a','b'), literals. Forbidden: arbitrary axis navigation, non-deterministic/environment functions, recursion, reading the verbatim statement. See ADR-018."
+        },
+        "description": {
+          "type": "string"
+        },
+        "remarks": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
