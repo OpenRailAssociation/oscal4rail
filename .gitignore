@@ -47,3 +47,10 @@ examples/upstream/**/_fetched/
 # Company-specific renderer: the real file is user-owned and must survive
 # framework updates. Only the template (custom_renderer.example.py) is versioned.
 tools/custom_renderer.py
+
+# Organization-internal experiments must never land in this public repo.
+# The versioned experiments (rulemapping-pilot.md, rulemapping/) are the public
+# framework material; internal working notes are kept in the respective internal
+# repository instead. Block known internal files and an explicit internal marker.
+docs/experiments/applicability-and-or-is-kl.md
+*.internal.*
