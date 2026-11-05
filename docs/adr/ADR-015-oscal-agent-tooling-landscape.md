@@ -70,7 +70,7 @@ ground and leave the same gaps:
 | OSCAL4Rail Layer | Covered by existing agent tooling? | Consequence |
 |---|---|---|
 | L1 Catalog | Yes (NIST-native: query/list controls, groups, schema) | Do not re-build. Our value = Railway Profile / Constraints on top. |
-| L2 Rules (Applicability) | **No** | **Differentiator holds** (Rulemapping adoption, ADR-006). |
+| L2 Rules (Applicability) | **No** | **Differentiator holds** (own L2 format per ADR-016; not Rulemapping adoption). |
 | L3 Change Impact | **No** | **Differentiator holds** (structured diff / cascade propagation). |
 | L4 Assessment | Yes (NIST-native: Assessment Plan/Results/POA&M) | Do not re-build. Our value = Railway evaluation scales + MHC. |
 | Regulatory Cascade | Only flat cross-framework `Mapping Collection`; **no cascade semantics** (specializes/concretizes/propagation) | **Differentiator holds.** |
@@ -147,6 +147,6 @@ ground and leave the same gaps:
 - `compliance-trestle-mcp` — https://github.com/oscal-compass/compliance-trestle-mcp
 - `agentic-agile-authoring` — https://github.com/oscal-compass/agentic-agile-authoring
 - OpenAPM (`apm-cli`) — https://github.com/microsoft/apm
-- ADR-006 (Rulemapping as Layer 2), ADR-007 (Tooling Foundation / Framework ≠ Content)
+- ADR-006 (OSCAL4Rail vs. Rulemapping — complementarity), ADR-016 (rules-format decision: build own L2 format, RUML not adopted), ADR-007 (Tooling Foundation / Framework ≠ Content)
 
 > 🤖 Dieses Dokument wurde mit Unterstützung von KI erstellt (Art. 50 Abs. 4 KI-VO).

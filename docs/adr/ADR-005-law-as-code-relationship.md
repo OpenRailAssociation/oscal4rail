@@ -89,7 +89,7 @@ ETSI TR 103 305-4 serializes the "Critical Security Controls" as OSCAL.
 |--------|-------|--------------------------|
 | NIST OSCAL | Format/metaschema standard | Base (L1/L4) |
 | SPRIND Law-as-Code | Political initiative, format, repository | Institutional framework (upstream) |
-| Rulemapping | Decision logic | L2 format (adopted, ADR-006) |
+| Rulemapping | Decision logic | Process handover only; **not** adopted as the L2 format (ADR-016) |
 | **EUROSCAL (MEDINA/EMERALD)** | **EU community, OSCAL for EU cloud security** | **Ecosystem peer / consumer** |
 | OSCAL4Rail | Sectoral governance layer Railway | 4-layer + Cascade (sectoral) |
 
@@ -103,3 +103,28 @@ alliance partner** for the EU level of the Regulatory Cascade and for the OpenRa
 
 5. Evaluate EUROSCAL/MEDINA/EMERALD as EU ecosystem contact (alliance for EU level of cascade,
    OpenRail incubation visibility).
+
+---
+
+## Amendment (2026-11-05, [ADR-016](./ADR-016-rules-format-decision-criteria.md))
+
+The original mapping tables above listed Rulemapping as the *adopted* L2 format
+(citing ADR-006). That is **superseded**: after the equal-footing re-evaluation of all
+candidate formats (issues #13–#22), [ADR-016](./ADR-016-rules-format-decision-criteria.md)
+(Accepted) concludes **build the own L2 format, do not adopt** an existing one. Rulemapping
+(RUML) scored ⌀ 4.78 and is **not adopted as the L2 format** (open-standard status,
+stable/semantic IDs, cascade modelling, and OSCAL-native verbatim handling are not met).
+
+What of the SPRIND/Rulemapping relationship remains valid:
+
+- The **complementarity positioning** of ADR-005/ADR-006 is unchanged — the two solve
+  different problems for different audiences.
+- The **process handover** (legislator authoring → compliance management: a Rulemap *could*
+  feed as input into an OSCAL catalog) remains a valid ecosystem contact point.
+- The cascade still allows an **optional executable upstream** (e.g. a rules-as-code engine
+  such as Catala at the top of the cascade) as a *reference-only* concept, without adopting
+  any of these as the L2 data model. This is the residual thought migrated from the closed
+  issue #12.
+
+Re-evaluation trigger (per ADR-016): should RUML be published as an OSI-licensed open
+standard, the relevant criteria are re-scored.

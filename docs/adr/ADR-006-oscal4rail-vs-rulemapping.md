@@ -16,6 +16,16 @@
 > unchanged. The choice of the concrete rules **format** is still open and will be
 > decided after the analysis phase (AP0, issues #13–#22) in a separate ADR.
 
+> **Amendment (2026-11-05, [ADR-016](./ADR-016-rules-format-decision-criteria.md)).** The
+> format question left open above is now **answered**. ADR-016 (Accepted) re-evaluated
+> Rulemapping/RUML on an **equal footing** with all other candidates (so ADR-006 would not
+> act as a confirmation bias) and scored it ⌀ 4.78. Outcome: **build the own L2 format, do
+> not adopt** an existing one; **RUML is not adopted as the L2 format**. What remains valid
+> from this ADR is the **positioning** (different problems for different audiences) and the
+> **process handover** (a Rulemap *could* feed as input into an OSCAL catalog). The
+> placement/version-coupling mechanism stays as fixed by ADR-014. Re-evaluation trigger: if
+> RUML is published as an OSI-licensed open standard, the relevant criteria are re-scored.
+
 ---
 
 ## Context and Problem Statement
