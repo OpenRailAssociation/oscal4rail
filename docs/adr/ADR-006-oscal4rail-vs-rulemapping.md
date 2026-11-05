@@ -363,5 +363,3 @@ Pilot test conducted on 2026-06-25:
 - [SPRIND Law-as-Code](https://sprind.org/en/actions/strategic-projects/law-as-code)
 - [Rulemapping Builder](https://builder.rulemapping.org)
 - [NIST OSCAL](https://pages.nist.gov/OSCAL/)
-
-> 🤖 Dieses Dokument wurde mit Unterstützung von KI erstellt (Art. 50 Abs. 4 KI-VO).

@@ -544,5 +544,3 @@ Honest status, so the spec does not overstate precision:
 [ADR-007]: ../adr/ADR-007-tooling-foundation.md
 [ADR-008]: ../adr/ADR-008-reproducible-schema-acquisition.md
 [#3]: https://github.com/OpenRailAssociation/oscal4rail/issues/3
-
-> 🤖 Dieses Dokument wurde mit Unterstützung von KI erstellt (Art. 50 Abs. 4 KI-VO).

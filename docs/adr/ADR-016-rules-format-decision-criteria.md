@@ -610,5 +610,3 @@ evidence base.
 - [cascade-as-profiles.md](../reference/cascade-as-profiles.md) §6 (mapping collection)
 - OpenRail open-sourcing practice (OSI-approved license requirement)
 - Candidate analysis issues: #14–#22; Rules Layer spec issue #8
-
-> 🤖 Dieses Dokument wurde mit Unterstützung von KI erstellt (Art. 50 Abs. 4 KI-VO).

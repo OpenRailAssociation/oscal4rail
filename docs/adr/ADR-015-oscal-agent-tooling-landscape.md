@@ -148,5 +148,3 @@ ground and leave the same gaps:
 - `agentic-agile-authoring` — https://github.com/oscal-compass/agentic-agile-authoring
 - OpenAPM (`apm-cli`) — https://github.com/microsoft/apm
 - ADR-006 (OSCAL4Rail vs. Rulemapping — complementarity), ADR-016 (rules-format decision: build own L2 format, RUML not adopted), ADR-007 (Tooling Foundation / Framework ≠ Content)
-
-> 🤖 Dieses Dokument wurde mit Unterstützung von KI erstellt (Art. 50 Abs. 4 KI-VO).

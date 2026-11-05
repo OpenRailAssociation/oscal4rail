@@ -131,5 +131,3 @@ YAML leads on the two criteria that *are* the project's USP (readability, diff).
 - Verify `oscal-cli convert` YAML→JSON→XML→YAML roundtrip on BS-KI (identity check),
   then record the exact command in `docs/` and wire it into CI (#5 → #14).
 - State the serialization/conversion rule in `CONTRIBUTING.md` and `README.md`.
-
-> 🤖 Dieses Dokument wurde mit Unterstützung von KI erstellt (Art. 50 Abs. 4 KI-VO).

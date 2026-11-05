@@ -162,5 +162,3 @@ language governs; that remains the owner's declaration.
   [ADR-012](./ADR-012-canonical-serialization.md) (serialization / prop portability).
 
 [ISO 639]: https://www.iso.org/iso-639-language-code
-
-> 🤖 Dieses Dokument wurde mit Unterstützung von KI erstellt (Art. 50 Abs. 4 KI-VO).
