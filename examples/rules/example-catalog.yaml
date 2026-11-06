@@ -1,0 +1,55 @@
+catalog:
+  uuid: 27f245eb-a31a-59b7-a954-6065fff1bda1
+  metadata:
+    title: OSCAL4Rail rules example — illustrative catalog
+    version: '1.0'
+    oscal-version: 1.2.3
+    last-modified: '2026-11-05T12:00:00Z'
+    props:
+    - name: country
+      value: XX
+    - name: language
+      value: en
+    - name: source-document
+      value: illustrative — not a real regulation
+    remarks: Illustrative, self-contained example catalog for the Rules Layer (L2).
+      Framework uses OSCAL 1.2.3 (ADR-008). BS-KI 1.1.3 was only an initial-verification
+      idea source, not a framework test artifact.
+  groups:
+  - id: ex-1
+    title: Accessibility (illustrative)
+    controls:
+    - id: ex-1.1
+      title: Passenger information display
+      parts:
+      - name: statement
+        prose: Real-time passenger information must be displayed at stops.
+      props:
+      - name: source-chapter
+        value: '1'
+      - name: applicability
+        value: binding
+        class: stop.rail
+    - id: ex-1.2
+      title: Vehicle interior display
+      parts:
+      - name: statement
+        prose: Interior displays must show the next stop.
+      props:
+      - name: source-chapter
+        value: '1'
+      - name: applicability
+        value: binding
+        class: vehicle-interior.rail
+    - id: ex-1.3
+      title: Legacy interface authentication
+      parts:
+      - name: statement
+        prose: Systems commissioned before the cutover date use the legacy authentication
+          scheme.
+      props:
+      - name: source-chapter
+        value: '1.3'
+      - name: applicability
+        value: binding
+        class: stop.rail

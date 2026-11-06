@@ -56,7 +56,12 @@ NIST_SCHEMA_MAP = {
 O4R_SCHEMA_MAP = {
     "catalog": "oscal4rail-catalog-constraints.schema.json",
     "profile": "oscal4rail-profile-cascade-constraints.schema.json",
+    "rule-set": "oscal4rail-rules.schema.json",
 }
+
+# OSCAL4Rail-native roots that have NO NIST base schema (NIST pass 1 is skipped
+# for them; they are validated by the O4R schema alone). ADR-014/ADR-018.
+O4R_NATIVE_ROOTS = {"rule-set"}
 
 
 def _safe_pattern(validator, patrn, instance, schema):
@@ -80,6 +85,21 @@ def detect_model(data: dict) -> str | None:
     for key in NIST_SCHEMA_MAP:
         if key in data:
             return key
+    for key in O4R_NATIVE_ROOTS:
+        if key in data:
+            return key
+    return None
+
+
+def separation_violation(data: dict) -> str | None:
+    """ADR-018 §10: a document must not mix a catalog/profile and a rule-set."""
+    nist_roots = [k for k in NIST_SCHEMA_MAP if k in data]
+    native_roots = [k for k in O4R_NATIVE_ROOTS if k in data]
+    if nist_roots and native_roots:
+        return (
+            f"document mixes NIST root(s) {nist_roots} with O4R-native root(s) "
+            f"{native_roots}; catalog and rule-set MUST be separate files (ADR-018 §10)"
+        )
     return None
 
 
@@ -98,6 +118,92 @@ def artifact_oscal_version(data: dict, model: str) -> str | None:
             v = meta.get("oscal-version")
             return str(v) if v is not None else None
     return None
+
+
+def _load_catalog_controls(catalog_path: Path) -> tuple[set[str], str | None, str | None]:
+    """Return (set of control ids, catalog version, catalog uuid) for referential checks."""
+    data = load_data(catalog_path)
+    cat = data.get("catalog", {})
+    version = (cat.get("metadata") or {}).get("version")
+    cat_uuid = cat.get("uuid")
+    ids: set[str] = set()
+
+    def _walk(groups):
+        for g in groups or []:
+            for c in g.get("controls", []) or []:
+                _walk_control(c)
+            _walk(g.get("groups"))
+
+    def _walk_control(c):
+        if "id" in c:
+            ids.add(c["id"])
+        for sub in c.get("controls", []) or []:
+            _walk_control(sub)
+
+    _walk(cat.get("groups"))
+    for c in cat.get("controls", []) or []:
+        _walk_control(c)
+    return ids, (str(version) if version is not None else None), (str(cat_uuid) if cat_uuid is not None else None)
+
+
+def ruleset_consistency(data: dict, rule_set_path: Path) -> list[str]:
+    """ADR-018 §10 cross-artifact contract, enforced as errors."""
+    errs: list[str] = []
+    rs = data.get("rule-set", {})
+    meta = rs.get("metadata", {}) or {}
+    voc = rs.get("vocabularies", {}) or {}
+    mod, st = set(voc.get("modality", {})), set(voc.get("status", {}))
+    enf = set(voc.get("enforcement", {}))
+    rule_ids = {r.get("rule-id") for r in rs.get("rules", []) or []}
+
+    # vocab + group-member referential integrity (within the rule-set)
+    for r in rs.get("rules", []) or []:
+        rid = r.get("rule-id", "?")
+        if r.get("modality") not in mod:
+            errs.append(f"rule {rid}: modality '{r.get('modality')}' not declared in vocabularies.modality")
+        if r.get("status") not in st:
+            errs.append(f"rule {rid}: status '{r.get('status')}' not declared in vocabularies.status")
+        for e in r.get("enforcement", []) or []:
+            if e not in enf:
+                errs.append(f"rule {rid}: enforcement '{e}' not declared in vocabularies.enforcement")
+    for g in rs.get("rule-groups", []) or []:
+        for m in g.get("members", []) or []:
+            if m not in rule_ids:
+                errs.append(f"rule-group {g.get('id','?')}: member '{m}' is not a rule-id")
+
+    # cross-artifact: resolve catalog-ref, identity, control-id integrity, version equality
+    cref = rs.get("catalog-ref", {}) or {}
+    href = cref.get("href")
+    if not href:
+        errs.append("catalog-ref.href missing; cannot verify control-id integrity or version equality")
+        return errs
+    cat_path = (rule_set_path.parent / href).resolve()
+    if not cat_path.exists():
+        errs.append(f"catalog-ref.href does not resolve to a file: {href}")
+        return errs
+    try:
+        control_ids, cat_version, cat_uuid = _load_catalog_controls(cat_path)
+    except Exception as exc:  # noqa: BLE001 - report, do not crash
+        errs.append(f"cannot read catalog '{href}': {exc}")
+        return errs
+    # identity: catalog-ref.catalog-uuid must match the catalog's own uuid
+    ref_uuid = cref.get("catalog-uuid")
+    if ref_uuid and cat_uuid and str(ref_uuid) != str(cat_uuid):
+        errs.append(
+            f"catalog-ref.catalog-uuid '{ref_uuid}' != catalog uuid '{cat_uuid}' "
+            "(identity mismatch — the rule-set points at a different catalog than it resolves)"
+        )
+    for r in rs.get("rules", []) or []:
+        cid = r.get("control-id")
+        if cid not in control_ids:
+            errs.append(f"rule {r.get('rule-id','?')}: control-id '{cid}' not found in catalog '{href}'")
+    rs_version = meta.get("version")
+    if cat_version is not None and str(rs_version) != str(cat_version):
+        errs.append(
+            f"version mismatch: rule-set {rs_version} != catalog {cat_version} "
+            "(must be equal — ADR-014/ADR-018 §10)"
+        )
+    return errs
 
 
 def _run_schema(schema_path: Path, data: dict) -> list[str]:
@@ -122,6 +228,14 @@ def validate_file(path: Path, strict: bool) -> dict:
     }
 
     data = load_data(path)
+
+    # ADR-018 §10: a document must not mix a catalog/profile and a rule-set.
+    sep = separation_violation(data)
+    if sep is not None:
+        result["nist_pass"]["status"] = "error"
+        result["nist_pass"]["errors"] = [sep]
+        return result
+
     model = detect_model(data)
     result["model"] = model
 
@@ -130,16 +244,21 @@ def validate_file(path: Path, strict: bool) -> dict:
         result["nist_pass"]["errors"] = [f"cannot detect OSCAL model (root keys: {list(data.keys())[:5]})"]
         return result
 
-    # --- Pass 1: NIST ---
-    nist_schema = NIST_DIR / NIST_SCHEMA_MAP[model]
-    result["nist_pass"]["schema"] = NIST_SCHEMA_MAP[model]
-    if not nist_schema.exists():
-        result["nist_pass"]["status"] = "error"
-        result["nist_pass"]["errors"] = [f"NIST schema not found: {nist_schema}"]
-        return result
-    nist_errors = _run_schema(nist_schema, data)
-    result["nist_pass"]["status"] = "pass" if not nist_errors else "fail"
-    result["nist_pass"]["errors"] = nist_errors
+    # --- Pass 1: NIST (skipped for O4R-native roots that have no NIST schema) ---
+    if model in O4R_NATIVE_ROOTS:
+        result["nist_pass"]["status"] = "skipped"
+        result["nist_pass"]["schema"] = None
+        result["nist_pass"]["reason"] = f"'{model}' is OSCAL4Rail-native; no NIST base schema (ADR-018)"
+    else:
+        nist_schema = NIST_DIR / NIST_SCHEMA_MAP[model]
+        result["nist_pass"]["schema"] = NIST_SCHEMA_MAP[model]
+        if not nist_schema.exists():
+            result["nist_pass"]["status"] = "error"
+            result["nist_pass"]["errors"] = [f"NIST schema not found: {nist_schema}"]
+            return result
+        nist_errors = _run_schema(nist_schema, data)
+        result["nist_pass"]["status"] = "pass" if not nist_errors else "fail"
+        result["nist_pass"]["errors"] = nist_errors
 
     # --- oscal-version (report-only, ADR-013) ---
     av = artifact_oscal_version(data, model)
@@ -172,12 +291,20 @@ def validate_file(path: Path, strict: bool) -> dict:
             result["o4r_pass"]["reason"] = f"O4R schema file missing: {o4r_schema}"
         else:
             o4r_errors = _run_schema(o4r_schema, data)
+            # rule-set: add the ADR-018 §10 cross-artifact consistency checks
+            if model == "rule-set":
+                o4r_errors = o4r_errors + ruleset_consistency(data, path)
             result["o4r_pass"]["status"] = "pass" if not o4r_errors else "fail"
             result["o4r_pass"]["errors"] = o4r_errors
 
-    # --- overall pass/fail (ADR-013): NIST must pass; O4R must pass only if it ran ---
-    ok = result["nist_pass"]["status"] == "pass"
+    # --- overall pass/fail ---
+    # NIST must pass when it ran; "skipped" (O4R-native root) is not a failure.
+    ok = result["nist_pass"]["status"] in ("pass", "skipped")
     if strict and result["o4r_pass"]["status"] == "fail":
+        ok = False
+    # An O4R-native root that was NOT validated against its O4R schema (no --strict)
+    # is inconclusive, not a pass: require --strict to assert a rule-set is valid.
+    if model in O4R_NATIVE_ROOTS and result["o4r_pass"]["status"] != "pass":
         ok = False
     result["ok"] = ok
     return result

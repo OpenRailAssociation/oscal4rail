@@ -1,0 +1,83 @@
+rule-set:
+  metadata:
+    title: OSCAL4Rail rules example — rule-set
+    version: '1.0'
+    oscal-version: 1.2.3
+    last-modified: '2026-11-05T12:00:00Z'
+    remarks: Self-contained worked example on OSCAL 1.2.3.
+  catalog-ref:
+    catalog-uuid: 27f245eb-a31a-59b7-a954-6065fff1bda1
+    href: example-catalog.yaml
+  vocabularies:
+    modality:
+      binding:
+        binding: true
+        rank: 1
+        polarity: required
+      recommended:
+        binding: false
+        rank: 2
+        polarity: required
+    status:
+      active:
+        active: true
+        lifecycle: active
+      retired:
+        active: false
+        lifecycle: withdrawn
+      legacy-only:
+        active: true
+        lifecycle: deprecated
+    enforcement:
+      check:
+        kind: deterministic
+      review:
+        kind: agentic
+    ordinal-scales:
+      protection:
+      - normal
+      - high
+      - very-high
+  parameters:
+  - id: fleet-threshold
+    unit: count
+    values:
+    - from: '2024-01-01'
+      value: 50
+    - from: '2026-01-01'
+      value: 30
+  rule-groups:
+  - id: ex-1.1
+    choice: one-or-more
+    members:
+    - ex-1.1
+    - ex-1.2
+    remarks: At least one context applies.
+  rules:
+  - rule-id: ex-1.1
+    control-id: ex-1.1
+    modality: binding
+    status: active
+    enforcement:
+    - check
+    applies-when: &id001
+      expression: context('location') = 'stop' and context('transport') = 'rail'
+      description: Applies at rail stops.
+  - rule-id: ex-1.2
+    control-id: ex-1.2
+    modality: recommended
+    status: active
+    enforcement:
+    - check
+    - review
+    applies-when:
+      expression: context('location') = 'vehicle-interior' and param('fleet-threshold')
+        <= 30
+      description: Illustrative threshold via a dated parameter.
+  - rule-id: ex-1.3
+    control-id: ex-1.3
+    modality: binding
+    status: legacy-only
+    enforcement:
+    - check
+    applies-when: *id001
