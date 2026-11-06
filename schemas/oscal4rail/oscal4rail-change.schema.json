@@ -1,0 +1,210 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/OpenRailAssociation/oscal4rail/schemas/oscal4rail/oscal4rail-change.schema.json",
+  "title": "OSCAL4Rail Change Impact Constraints (additive over the NIST OSCAL Mapping Model)",
+  "description": "Standalone constraint schema for an OSCAL4Rail Change Impact report. The report IS an OSCAL artifact: a NIST OSCAL 'mapping-collection' that maps a source catalog version to a target catalog version; this schema checks the railway/governance-specific conventions on top of (not instead of) the NIST OSCAL Mapping schema, run as a second validation pass. Rationale (ADR-019): the whole framework keeps governance machine- and agent-readable with Code as the single source of truth; the change must therefore stay an OSCAL artifact under the OSCAL4Rail schema (a Governance-as-Code object, i.e. the rule catalog), not a free report. One OSCAL mapping is both the human-readable report and the agent-readable diff, and it is the artifact L4 re-assessment consumes (the L1+L2 -> L3 -> L4 circle). The OSCAL4Rail change semantics ride on the native map/@relationship (qualified by an O4R namespace) plus O4R props; no foreign fields are invented (OSCAL-native, no fork, ADR-016/018). This schema deliberately does NOT $ref the NIST schema (Variant A, two-pass). See docs/reference/change-format.md and ADR-019.",
+  "type": "object",
+  "required": ["mapping-collection"],
+  "properties": {
+    "mapping-collection": {
+      "type": "object",
+      "required": ["uuid", "metadata", "mappings"],
+      "properties": {
+        "metadata": {
+          "type": "object",
+          "required": ["title", "version", "oscal-version"],
+          "properties": {
+            "version": {
+              "type": "string",
+              "description": "Version of this change report (a derived artifact; not the compared catalogs' versions, which are the mapping's source/target resources)."
+            },
+            "oscal-version": {
+              "type": "string",
+              "description": "The pinned OSCAL version the report is produced under (SSOT, ADR-008)."
+            }
+          }
+        },
+        "mappings": {
+          "type": "array",
+          "minItems": 1,
+          "description": "At least one mapping from a source catalog state to a target catalog state.",
+          "items": { "$ref": "#/$defs/o4r-change-mapping" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "o4r-change-mapping": {
+      "type": "object",
+      "description": "A NIST mapping between two versions of the same rule catalog. source-resource = old state, target-resource = new state (ADR-014 version coupling). Each 'map' is one control-level change.",
+      "required": ["uuid", "source-resource", "target-resource", "maps"],
+      "properties": {
+        "source-resource": {
+          "$ref": "#/$defs/versioned-resource",
+          "description": "The OLD catalog state (base)."
+        },
+        "target-resource": {
+          "$ref": "#/$defs/versioned-resource",
+          "description": "The NEW catalog state (head)."
+        },
+        "props": {
+          "type": "array",
+          "description": "Mapping-level O4R props. MUST declare the O4R change namespace marker so a consumer can recognise this as an OSCAL4Rail change report.",
+          "contains": { "$ref": "#/$defs/prop-o4r-change-marker" }
+        },
+        "maps": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/o4r-change-map" }
+        },
+        "source-gap-summary": {
+          "$ref": "#/$defs/existence-gap",
+          "description": "Controls present in the SOURCE (old) only: removed controls (ADR-019, NIST gap-summary). A removed control has no target, so it cannot be a map."
+        },
+        "target-gap-summary": {
+          "$ref": "#/$defs/existence-gap",
+          "description": "Controls present in the TARGET (new) only: added controls. An added control has no source, so it cannot be a map."
+        }
+      }
+    },
+    "existence-gap": {
+      "type": "object",
+      "description": "A NIST gap-summary listing controls that exist on only one side (added or removed). Keeps existence changes OSCAL-native and upgradeable, instead of an invalid one-sided map.",
+      "required": ["uuid", "unmapped-controls"],
+      "properties": {
+        "uuid": { "type": "string" },
+        "unmapped-controls": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["with-ids"],
+            "properties": {
+              "with-ids": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "versioned-resource": {
+      "type": "object",
+      "description": "A NIST mapping-resource-reference to a compared catalog state, carrying its version via an O4R prop so the version coupling (ADR-014) is explicit in the report.",
+      "required": ["type", "href", "props"],
+      "properties": {
+        "type": { "type": "string" },
+        "href": { "type": "string" },
+        "props": {
+          "type": "array",
+          "contains": { "$ref": "#/$defs/prop-catalog-version" }
+        }
+      }
+    },
+    "o4r-change-map": {
+      "type": "object",
+      "description": "One control-level change, expressed as a NIST 'map'. The change category rides on @relationship qualified by the O4R namespace; the old/new signal snapshot and the impact chain ride on O4R props.",
+      "required": ["uuid", "ns", "relationship", "sources", "targets"],
+      "properties": {
+        "ns": {
+          "type": "string",
+          "description": "MUST be the OSCAL4Rail change namespace, so @relationship is read as an O4R change category, not a generic NIST relationship.",
+          "const": "https://oscal4rail.openrail.org/ns/change"
+        },
+        "relationship": {
+          "type": "string",
+          "description": "The governance-primary change category for a two-sided change (change-format.md section 4.1). Existence changes (added/removed) are NOT relationships; they are expressed via the NIST source-/target-gap-summary, because a NIST map requires both sources and targets.",
+          "enum": [
+            "deprecated",
+            "superseded",
+            "withdrawn",
+            "tightened",
+            "relaxed",
+            "inverted",
+            "content-changed"
+          ]
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "description": "The control in the OLD state (mapping-item type=control, id-ref=control-id). A map always has both sides; one-sided existence changes use the gap-summary instead.",
+          "items": { "$ref": "#/$defs/control-item" }
+        },
+        "targets": {
+          "type": "array",
+          "minItems": 1,
+          "description": "The control in the NEW state. A map always has both sides; one-sided existence changes use the gap-summary instead.",
+          "items": { "$ref": "#/$defs/control-item" }
+        },
+        "props": {
+          "type": "array",
+          "description": "O4R change props: old/new signal snapshot, superseded-by, and the impact chain.",
+          "items": { "$ref": "#/$defs/o4r-change-prop" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "relationship": { "const": "superseded" } }
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "type": "array",
+                "contains": { "$ref": "#/$defs/prop-superseded-by" }
+              }
+            },
+            "required": ["props"]
+          }
+        }
+      ]
+    },
+    "control-item": {
+      "type": "object",
+      "description": "A NIST mapping-item referencing a control by its stable control-id.",
+      "required": ["type", "id-ref"],
+      "properties": {
+        "type": { "type": "string", "const": "control" },
+        "id-ref": { "type": "string" }
+      }
+    },
+    "o4r-change-prop": {
+      "type": "object",
+      "required": ["name", "value"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "O4R change prop names: dimension, old-modality, new-modality, old-rank, new-rank, old-polarity, new-polarity, old-lifecycle, new-lifecycle, superseded-by, affected-context, affected-cascade, required-action, secondary-category."
+        },
+        "ns": { "type": "string" },
+        "value": { "type": "string" },
+        "class": { "type": "string" }
+      }
+    },
+    "prop-o4r-change-marker": {
+      "type": "object",
+      "required": ["name", "value"],
+      "properties": {
+        "name": { "const": "o4r-artifact" },
+        "value": { "const": "change-report" }
+      }
+    },
+    "prop-catalog-version": {
+      "type": "object",
+      "required": ["name", "value"],
+      "properties": {
+        "name": { "const": "catalog-version" },
+        "value": { "type": "string", "minLength": 1 }
+      }
+    },
+    "prop-superseded-by": {
+      "type": "object",
+      "required": ["name", "value"],
+      "properties": {
+        "name": { "const": "superseded-by" },
+        "value": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

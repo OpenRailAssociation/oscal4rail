@@ -1,6 +1,6 @@
 # OSCAL4Rail – Architecture Documentation (arc42)
 
-> **Version:** 0.2.0 (2026-11-02 – synced with ADR-001…ADR-016)
+> **Version:** 0.3.0 (2026-11-05 – synced with ADR-001…ADR-019)
 > **License:** CC0 1.0 Universal (public domain)
 > **Inspired by:** Arpad Vasarhelyi
 >
@@ -148,8 +148,8 @@ Layers 2 (Rules) and 3 (Change Impact) are generic and reusable for other sector
 │  (EBA/BAV)   │       │    │            OSCAL4Rail Framework          │
 └──────────────┘       ▼    │                                         │
 ┌──────────────┐       ┌───▶│  Layer 1: Catalog (NIST OSCAL Profile)  │
-│  Industry    │──Std──┤    │  Layer 2: Rules (Rulemapping format)    │──▶ AI Agents
-│  (KKI)       │       │    │  Layer 3: Change Impact (diff/notify)   │──▶ Compliance Teams
+│  Industry    │──Std──┤    │  Layer 2: Rules (OSCAL-native, ADR-018) │──▶ AI Agents
+│  (KKI)       │       │    │  Layer 3: Change Impact (OSCAL Mapping)  │──▶ Compliance Teams
 └──────────────┘       │    │  Layer 4: Assessment (Plan/Results)      │──▶ IT Systems
 ┌──────────────┐       │    │                                         │
 │  Company     │──Ril──┘    │  Cascade: conformance ↓ / impact ↑      │──▶ Change Notifications
@@ -165,9 +165,9 @@ Cross-border: A train operating DE↔CH↔AT must comply with all three national
 |-----------|-----------|--------|-------------|
 | PDF regulations | Input | PDF | Source regulation documents (until upstream publishes machine-readable) |
 | Excel matrix | Input | XLSX | Applicability matrix (v/e/–) |
-| Rulemapping artifacts | Input | RUML/XML | Applicability rules (Layer 2) |
+| Rule-set (Layer 2) | Output | YAML | OSCAL-native decision logic, separate linked artifact (ADR-018) |
 | OSCAL Catalog | Output | YAML | Machine-readable regulation catalog |
-| Change Notification | Output | YAML | Structured diff between versions |
+| Change Notification | Output | YAML | OSCAL Mapping (mapping-collection) between versions (ADR-019) |
 | Assessment Results | Output | YAML | Compliance findings per system |
 | NIST JSON Schema | Validation | JSON Schema | Official OSCAL schema v1.2.1 + OSCAL4Rail constraints |
 | Git repository | Storage | Git | Version control, cascade hierarchy, diff |
@@ -188,14 +188,14 @@ Cross-border: A train operating DE↔CH↔AT must comply with all three national
 | Agent interface | compliance-trestle-mcp (MCP Server) | AI agents can invoke all OSCAL operations via standardized protocol |
 | Cascade model | OSCAL Profile chain (not custom schema) | Each cascade level = one Profile selecting from upstream Catalog |
 | Cross-framework linking | OSCAL Control Mapping (v1.2.0+) | Built-in coverage + gap-summary, solves multilingual |
-| Change detection | oscal-deep-diff + railway semantics | NIST tool for structural diff, own layer for tightened/relaxed classification |
+| Change detection | VCS-native (Git refs) + OSCAL Mapping output | L3 interprets a Git change; the report is an OSCAL `mapping-collection`, classification from the L2 semantics axis ([ADR-019](adr/ADR-019-change-layer-vcs-native.md)) |
 | Railway extensions | OSCAL props with `ns="https://github.com/OpenRailAssociation/oscal4rail/ns"` | Standard extension mechanism, no schema fork |
 | Extraction method | Deterministic (markitdown + openpyxl) | Reproducible, auditable, no LLM required |
 | Rule identifier | Chapter number (e.g. `bs-ki-2.1`) | Stable across document versions |
 | Applicability model | OSCAL `props` with `class` attribute | Schema-compliant, extensible |
 | Rules Layer placement | Separate linked logic artifact (`link rel="decision-logic"`), not inline | Catalog stays pure NIST OSCAL; logic format swappable ([ADR-014](adr/ADR-014-rules-layer-placement.md)) |
 | Rules/catalog version coupling | Reuse NIST `metadata.version`; related artifacts MUST share the same value; equality enforced by the validator | Deterministic, auditable; no new schema construct ([ADR-014](adr/ADR-014-rules-layer-placement.md)) |
-| Rules format selection | Weighted school-grade grid over 9 candidates (format vs. hosted tool kept separate); format decision deferred to a later ADR | Traceable evidence base, no premature lock-in ([ADR-016](adr/ADR-016-rules-format-decision-criteria.md)) |
+| Rules format selection | Weighted school-grade grid over 9 candidates (format vs. hosted tool kept separate); conclusion "build the own format"; specified OSCAL-native | Traceable evidence base; own format realized ([ADR-016](adr/ADR-016-rules-format-decision-criteria.md), [ADR-018](adr/ADR-018-rules-format-oscal-native.md)) |
 | Metadata model | One adaptive schema, 4 orthogonal dimensions (theme, cascade, applicability, lifecycle) | One schema for the whole sector, adaptable per country/company ([ADR-009](adr/ADR-009-adaptive-metadata-model.md)) |
 | Authority model | Configurable authority meta-model: parallel streams, typed many-to-many relations, expresses overlap/conflict | Reflects real rail authority; framework prescribes no structure ([ADR-010](adr/ADR-010-configurable-authority-meta-model.md)) |
 | Corpus index | Single generated `index.json` (heads only, no controls), derived from catalog metadata | Assessment over the whole corpus without opening every catalog ([ADR-011](adr/ADR-011-generated-catalog-index.md)) |
@@ -222,13 +222,13 @@ Cross-border: A train operating DE↔CH↔AT must comply with all three national
 │  Layer 1        │  Layer 2         │  Layer 3       │  Layer 4              │
 │  CATALOG        │  RULES           │  CHANGE IMPACT │  ASSESSMENT           │
 │                 │                  │                │                       │
-│  NIST OSCAL     │  Rulemapping     │  oscal-deep-   │  NIST OSCAL           │
-│  Catalog +      │  format          │  diff + railway│  Assessment Results   │
-│  Profile +      │  (not in NIST)   │  semantics     │  + Railway Profile    │
-│  Mapping        │                  │  (NIST + own)  │                       │
+│  NIST OSCAL     │  OSCAL-native    │  OSCAL Mapping │  NIST OSCAL           │
+│  Catalog +      │  param/constraint│  Model (NIST)  │  Assessment Results   │
+│  Profile +      │  /test (ADR-018) │  VCS-native    │  + Railway Profile    │
+│  Mapping        │  (not in NIST)   │  (ADR-019)     │                       │
 ├─────────────────┼──────────────────┼────────────────┼───────────────────────┤
-│  Catalog Model  │  Applicability   │  Structural    │  Assessment Plan      │
-│  Profile Model  │  Rules           │  Diff (NIST)   │  Assessment Results   │
+│  Catalog Model  │  Applicability   │  Git change →  │  Assessment Plan      │
+│  Profile Model  │  Rules           │  mapping-coll. │  Assessment Results   │
 │  Control Mapping│  Context Filters │  Semantic      │  POA&M                │
 │  Component Def. │  AMC Refs        │  Classification│  Component Definition │
 └─────────────────┴──────────────────┴────────────────┴───────────────────────┘
@@ -354,27 +354,24 @@ Human reviewer:
 ### 6.3 Change Impact Detection (Layer 3)
 
 ```
-Input: bs-ki-v1.yaml, bs-ki-v2.yaml
+Input: two states of the catalog (+ optional rule-set), via Git refs or files
 
-1. oscal-deep-diff produces structural diff:
-   {
-     "changes": [
-       {"change": "property_changed", "leftPointer": ".../prose", "leftElement": "800", "rightElement": "500"},
-       {"change": "property_changed", "leftPointer": ".../props/2/value", "leftElement": "empfohlen", "rightElement": "verbindlich"},
-       {"change": "array_changed", "rightOnly": [{"id": "bs-ki-2.99", ...}]}
-     ]
-   }
+1. tools/change reads source and target (git show <ref>:<path>, or --from/--to):
+   no diff is re-implemented — Git provides "what changed" (ADR-019 D1/D2).
 
-2. trestle-oscal4rail classifies each change:
-   - prose changed + threshold lowered → "tightened"
-   - applicability empfohlen → verbindlich → "tightened"
-   - new control → "added"
+2. Classify per control-id, from the L2 semantics axis (ADR-019 D3/§4.4):
+   - status.lifecycle active → deprecated          → "deprecated" (lifecycle)
+   - modality.rank decreased (weaker → stronger)   → "tightened"  (strength)
+   - control present in target only                → "added"      (existence)
+   precedence lifecycle > strength > existence; no L2 → only added/removed/content-changed.
 
-3. Impact propagation:
-   - Which Profiles reference this Catalog? → resolve downstream
-   - Which systems have Assessment Results against affected controls? → notify
+3. Emit an OSCAL mapping-collection (the change report):
+   each control-level change is one map; category on map/@relationship (O4R ns);
+   changed-field + old/new values as O4R props. Validates two-pass (NIST + O4R).
 
-4. Output: change-notification.yaml (Layer 3 format)
+4. Consume (consumer side, not the framework): a CI/merge pipeline step, a scheduled
+   job, or an agent reads the mapping and triggers a reaction under its own policy
+   (ADR-019 D4/D6). The report is both the human-readable report and the agent diff.
 ```
 
 ### 6.4 Profile Resolution (Cascade)
@@ -557,10 +554,15 @@ are kept for readability; the authoritative text is the linked ADR file.
 | [ADR-015](adr/ADR-015-oscal-agent-tooling-landscape.md) | OSCAL AI-Agent Tooling Landscape — Adopt vs. Reference | Proposed | 2026-10-27 |
 | [ADR-016](adr/ADR-016-rules-format-decision-criteria.md) | Decision Criteria and Scoring Method for the Rules-Layer Format Selection | Accepted (format decision deferred to a later ADR) | 2026-10-27 / 2026-10-29 |
 | [ADR-017](adr/ADR-017-multilingual-reference-language.md) | Multilingual Model: same rule across languages, optional `reference-language` marker | Accepted | 2026-10-27 |
+| [ADR-018](adr/ADR-018-rules-format-oscal-native.md) | Rules-Layer Format — OSCAL-native via `parameter/constraint/test` + Control Mapping; fields convention, Metapath Subset v1, status lifecycle axis | Accepted | 2026-11-05 |
+| [ADR-019](adr/ADR-019-change-layer-vcs-native.md) | Change Impact Layer (L3) — VCS-native interpretation; the report is an OSCAL artifact (NIST Mapping Model) under the OSCAL4Rail schema; tools validate form not content | Accepted | 2026-11-05 |
 
-> **Note.** The format decision for the Rules Layer (Layer 2) is still open: ADR-016
-> fixes the evaluation grid and completed analyses, but the format selection and the
-> own-format specification are a separate, later ADR (Rules-Layer spec, issue #8).
+> **Note.** The Rules-Layer (Layer 2) format decision is settled: [ADR-016](adr/ADR-016-rules-format-decision-criteria.md)
+> fixed the evaluation grid and concluded "build the own format, do not adopt";
+> [ADR-018](adr/ADR-018-rules-format-oscal-native.md) is the own-format specification
+> (OSCAL-native). The Change Impact Layer (Layer 3) is specified in
+> [ADR-019](adr/ADR-019-change-layer-vcs-native.md): a VCS-native interpretation whose
+> report is itself an OSCAL artifact (a NIST Mapping Model) under the OSCAL4Rail schema.
 
 ### Embedded summaries
 
@@ -654,7 +656,7 @@ Full ADR: [docs/adr/ADR-007-tooling-foundation.md](adr/ADR-007-tooling-foundatio
 | TD-3 | `oscal-cli convert` YAML↔JSON↔XML roundtrip not yet verified end-to-end in this repo | – | Low | Verify and wire into CI ([ADR-012](adr/ADR-012-canonical-serialization.md), #5/#14) |
 | TD-4 | Hard `oscal-version` enforcement deferred; currently reported, not enforced | – | Low | BS-KI (`1.1.3`) to be revised against final Catalog Railway Profile, then enforce ([ADR-013](adr/ADR-013-validator-consolidation.md)) |
 | TD-5 | Version-equality check across layers not yet implemented in the validator | – | Medium | Implement in `oscal4rail validate`, enforce in CI as hard failure ([ADR-014](adr/ADR-014-rules-layer-placement.md), #5/#14) |
-| TD-6 | Rules-Layer format not yet selected | – | Medium | Decision grid complete; format decision in a later ADR ([ADR-016](adr/ADR-016-rules-format-decision-criteria.md), #8) |
+| TD-6 | Rules-Layer format | – | Resolved | Format selected and specified OSCAL-native ([ADR-016](adr/ADR-016-rules-format-decision-criteria.md) grid, [ADR-018](adr/ADR-018-rules-format-oscal-native.md) spec) |
 | TD-7 | ADR-009/010/011 still in Draft (Proposed) | – | Low | Elaborate and move to Accepted as the metadata/authority/index work matures |
 
 ---

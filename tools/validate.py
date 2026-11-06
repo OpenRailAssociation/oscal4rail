@@ -57,6 +57,7 @@ O4R_SCHEMA_MAP = {
     "catalog": "oscal4rail-catalog-constraints.schema.json",
     "profile": "oscal4rail-profile-cascade-constraints.schema.json",
     "rule-set": "oscal4rail-rules.schema.json",
+    "mapping-collection": "oscal4rail-change.schema.json",
 }
 
 # OSCAL4Rail-native roots that have NO NIST base schema (NIST pass 1 is skipped
