@@ -256,6 +256,3 @@ an organizational `ns` (the NIST-sanctioned extension point).
   generalizes the cascade dimension of this ADR)
 
 ---
-
-> 🤖 This document was created with AI assistance (Art. 50(4) EU AI Act). Content is subject to
-> review and sign-off by a named maintainer before it changes status from Proposed to Accepted.

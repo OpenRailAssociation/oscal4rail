@@ -221,5 +221,3 @@ into the mechanism.
 - [cascade-as-profiles.md](../reference/cascade-as-profiles.md) §4 (pinned parent reference)
 - [rulemapping-pilot.md](../experiments/rulemapping-pilot.md) (`link rel="decision-logic"`)
 - Issue [#8](https://github.com/OpenRailAssociation/oscal4rail/issues/8) (Specify the Rules Layer)
-
-> 🤖 Dieses Dokument wurde mit Unterstützung von KI erstellt (Art. 50 Abs. 4 KI-VO).
