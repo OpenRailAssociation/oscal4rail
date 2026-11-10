@@ -34,6 +34,7 @@ import sys
 from pathlib import Path
 
 import jsonschema
+import yaml  # noqa: F401 - kept so this module merges cleanly with the YAML report writer (#89)
 from jsonschema import Draft7Validator
 
 from o4r_common import NIST_DIR, REPO_ROOT, iter_controls, pinned_oscal_version
