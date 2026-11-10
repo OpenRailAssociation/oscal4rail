@@ -48,7 +48,17 @@ git-ignored (generated, not versioned; same pattern as `_fetched/`).
 
 **Round-trip verification (`--verify`):** checks that every `prose` value from
 the YAML appears 1:1 in the generated Markdown. A mismatch is an error
-(non-zero exit). This is the Design-by-Contract guarantee: code equals intent.
+(non-zero exit).
+
+What a green `--verify` means, and what it does not:
+
+- It is a statement about **rendering fidelity**: the generated document shows
+  the prose that is in the YAML.
+- It is **not** a statement about intent. Whether the YAML says what the
+  governance owner means can only be confirmed by the owner, who reads the
+  generated document and signs it off (Meaningful Human Control). The tool
+  prepares that review; it does not replace it, and a passing check is not an
+  approval.
 
 ## What the output contains
 
@@ -257,7 +267,9 @@ prose in the YAML.** No paraphrasing, no summarizing, no reordering within a
 control. The governance owner reads the generated document and must recognize
 their own text word for word.
 
-`--verify` enforces this automatically. Run it in CI to catch regressions.
+`--verify` checks this automatically. Run it in CI to catch rendering
+regressions. It checks the rendering against the YAML, not the YAML against the
+owner's intent; that remains the owner's sign-off (see [Usage](#usage)).
 
 ## Related
 
