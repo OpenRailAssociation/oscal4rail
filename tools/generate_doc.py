@@ -14,8 +14,14 @@ which consumers produce their target format:
 
 The tool renders each control verbatim (prose taken 1:1 from the catalog),
 preserves source-chapter references and obligation levels, and supports a
-round-trip verification mode (--verify) that checks every prose value from
-the YAML appears in the generated output.
+verification mode (--verify) with two checks:
+
+  completeness  every element of the catalog is either rendered or reported by
+                name (nothing is dropped silently);
+  fidelity      each prose value, title and applicability row appears in the
+                section of the element it belongs to.
+
+--verify is a statement about the rendering, not about the owner's intent.
 
 See issue #6 and docs/how-to/generate-documents.md.
 """
@@ -32,6 +38,7 @@ See issue #6 and docs/how-to/generate-documents.md.
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
@@ -74,6 +81,76 @@ except Exception:  # noqa: BLE001 — any other import problem must not break th
 _KNOWN_CONTROL_PROPS = {"source-chapter", "applicability", "source-document"} | _custom_claimed
 _KNOWN_META_PROPS = {"country", "language", "source-document", "source-url"}
 
+# Keys each dedicated prop layout shows. A prop that carries more than its layout
+# shows is additionally listed in the generic table, so nothing is dropped.
+_PROP_LAYOUT_KEYS = {
+    "applicability": {"name", "value", "class", "remarks"},
+    "source-document": {"name", "value", "remarks"},
+}
+_PROP_DEFAULT_LAYOUT_KEYS = {"name", "value"}
+_GENERIC_PROP_KEYS = {"name", "value", "ns", "class", "remarks"}
+
+# Keys the renderer handles, per element kind. This table is the completeness
+# contract: `verify_roundtrip` reports every key that is not listed here, so an
+# element the renderer does not know is named instead of silently dropped.
+# Identifiers without content of their own (catalog uuid, part id) are listed
+# because they are deliberately not rendered.
+_HANDLED_KEYS = {
+    "catalog": {"uuid", "metadata", "params", "controls", "groups", "back-matter"},
+    "metadata": {"title", "version", "published", "last-modified", "oscal-version",
+                 "props", "links", "remarks"},
+    "group": {"id", "title", "props", "params", "parts", "links", "controls", "groups"},
+    "control": {"id", "title", "props", "params", "parts", "links", "controls"},
+    "part": {"id", "name", "title", "prose", "props", "parts", "links"},
+    "param": {"id", "label", "usage", "values", "select", "remarks"},
+    "select": {"how-many", "choice"},
+    "link": {"href", "rel", "text"},
+    "back-matter": {"resources"},
+    "resource": {"uuid", "title", "description", "props", "rlinks", "citation", "remarks"},
+    "rlink": {"href", "media-type"},
+    "citation": {"text"},
+}
+
+_APPLICABILITY_HEADER = "| Kontext | Verbindlichkeit | Bemerkung |"
+_ANCHOR_RE = re.compile(r"^<!-- o4r:(metadata|group|control|back-matter)(?: (.+))? -->$")
+
+
+def _anchor(kind: str, ident: str = "") -> str:
+    """Section marker (an HTML comment: invisible when rendered, dropped by pandoc).
+
+    `--verify` uses the markers to check each element inside its own section.
+    """
+    return f"<!-- o4r:{kind} {ident} -->" if ident else f"<!-- o4r:{kind} -->"
+
+
+def _heading(depth: int, text: str) -> str:
+    return f"{'#' * min(depth, 6)} {text}"
+
+
+def _cell(value) -> str:
+    """Escape a value for a Markdown table cell (reversed by `_parse_row`)."""
+    return str(value).replace("\\", "\\\\").replace("|", "\\|").replace("\n", "<br>")
+
+
+def _parse_row(line: str) -> list[str]:
+    """Split a Markdown table row into its unescaped cell values."""
+    cells, current, i = [], [], 0
+    inner = line.strip()[1:-1] if line.strip().startswith("|") and line.strip().endswith("|") else line
+    while i < len(inner):
+        ch = inner[i]
+        if ch == "\\" and i + 1 < len(inner) and inner[i + 1] in "\\|":
+            current.append(inner[i + 1])
+            i += 2
+            continue
+        if ch == "|":
+            cells.append("".join(current))
+            current = []
+        else:
+            current.append(ch)
+        i += 1
+    cells.append("".join(current))
+    return [c.strip().replace("<br>", "\n") for c in cells]
+
 
 def _meta_prop(props: list[dict], name: str) -> str | None:
     """Return the value of the first prop with the given name, or None."""
@@ -89,31 +166,138 @@ def _applicability_rows(props: list[dict]) -> list[tuple[str, str, str]]:
     for p in props:
         if p.get("name") == "applicability":
             rows.append((
-                p.get("class", ""),
-                p.get("value", ""),
-                p.get("remarks", ""),
+                str(p.get("class", "")),
+                str(p.get("value", "")),
+                str(p.get("remarks", "")),
             ))
     return rows
 
 
-def _render_extra_props(props: list[dict], known: set[str], heading: str, depth: int) -> list[str]:
-    """Render every prop whose name is NOT in `known` as a generic table.
+def _beyond_layout(prop: dict) -> bool:
+    """True if the prop carries keys its dedicated layout does not show."""
+    shown = _PROP_LAYOUT_KEYS.get(prop.get("name"), _PROP_DEFAULT_LAYOUT_KEYS)
+    return bool(set(prop) - shown)
+
+
+def _extra_props(props: list[dict], known: set[str], single: set[str] = frozenset()) -> list[dict]:
+    """The props that go into the generic table.
+
+    These are: every prop whose name has no dedicated layout; every prop that
+    carries more than its dedicated layout shows; and, for names in `single`
+    (layouts that show one value only), every occurrence after the first.
+    Props claimed by the custom renderer are that renderer's responsibility.
+    """
+    extra, seen = [], set()
+    for p in props:
+        name = p.get("name")
+        if name in _custom_claimed:
+            continue
+        repeated = name in single and name in seen
+        seen.add(name)
+        if name not in known or repeated or _beyond_layout(p):
+            extra.append(p)
+    return extra
+
+
+def _render_extra_props(props: list[dict], known: set[str], heading: str, depth: int,
+                        single: set[str] = frozenset()) -> list[str]:
+    """Render the generic property table (see `_extra_props`).
 
     Guarantees that custom/company props (often under their own `ns`) and
-    props introduced by newer schema versions remain visible. No allowlist
-    filtering beyond the structurally-rendered known props.
+    props introduced by newer schema versions remain visible.
     """
-    extra = [p for p in props if p.get("name") not in known]
+    extra = _extra_props(props, known, single)
     if not extra:
         return []
-    prefix = "#" * min(depth, 6)
-    lines = [f"{prefix} {heading}", "", "| Name | Wert | ns | class | Bemerkung |", "|------|------|----|-------|-----------|"]
+    lines = [_heading(depth, heading), "", "| Name | Wert | ns | class | Bemerkung |", "|------|------|----|-------|-----------|"]
     for p in extra:
         lines.append(
-            f"| {p.get('name','')} | {p.get('value','')} | {p.get('ns','')} "
-            f"| {p.get('class','')} | {p.get('remarks','')} |"
+            f"| {_cell(p.get('name',''))} | {_cell(p.get('value',''))} | {_cell(p.get('ns',''))} "
+            f"| {_cell(p.get('class',''))} | {_cell(p.get('remarks',''))} |"
         )
     lines.append("")
+    return lines
+
+
+def _render_links(links: list[dict]) -> list[str]:
+    """Render links as a list: text (or href), target, relation."""
+    if not links:
+        return []
+    lines = ["Verweise:", ""]
+    for link in links:
+        href = link.get("href", "")
+        item = f"- [{link.get('text') or href}]({href})"
+        if link.get("rel"):
+            item += f" (rel: `{link['rel']}`)"
+        lines.append(item)
+    lines.append("")
+    return lines
+
+
+def _render_params(params: list[dict]) -> list[str]:
+    """Render parameters as a list: id, label, usage, values, selection, remarks."""
+    if not params:
+        return []
+    lines = ["Parameter:", ""]
+    for param in params:
+        item = f"- `{param.get('id', '?')}`"
+        if param.get("label"):
+            item += f" – {param['label']}"
+        lines.append(item)
+        if param.get("usage"):
+            lines.append(f"  - Verwendung: {param['usage']}")
+        if param.get("values"):
+            lines.append(f"  - Werte: {', '.join(str(v) for v in param['values'])}")
+        select = param.get("select")
+        if select:
+            how_many = f" ({select['how-many']})" if select.get("how-many") else ""
+            lines.append(f"  - Auswahl{how_many}: {', '.join(str(c) for c in select.get('choice') or [])}")
+        if param.get("remarks"):
+            lines.append(f"  - Bemerkung: {param['remarks']}")
+    lines.append("")
+    return lines
+
+
+def _render_part_body(part: dict, depth: int) -> list[str]:
+    """Render what a part carries besides its heading: language, prose, props, links, sub-parts."""
+    lines = []
+    props = part.get("props") or []
+    language = _meta_prop(props, "language")
+    if language:
+        lines += [f"> Sprache: `{language}`", ""]
+    if part.get("prose"):
+        lines += [part["prose"], ""]
+    lines += _render_extra_props(props, {"language"}, "Weitere Eigenschaften", depth + 1, single={"language"})
+    lines += _render_links(part.get("links") or [])
+    for sub in part.get("parts") or []:
+        lines += _render_part(sub, depth + 1)
+    return lines
+
+
+def _render_part(part: dict, depth: int) -> list[str]:
+    """Render a part under its own sub-heading (title, or the part name)."""
+    title = part.get("title") or part.get("name") or "part"
+    return [_heading(depth, title), ""] + _render_part_body(part, depth)
+
+
+def _render_parts(parts: list[dict], depth: int) -> list[str]:
+    """Render the parts of a control or group.
+
+    Order: statements (prose directly under the heading, as in the source
+    document), then guidance, then every other part.
+    """
+    lines = []
+    for part in parts:
+        if part.get("name") == "statement":
+            if part.get("title"):
+                lines += [f"**{part['title']}**", ""]
+            lines += _render_part_body(part, depth)
+    for part in parts:
+        if part.get("name") == "guidance":
+            lines += _render_part(dict(part, title=part.get("title", "Guidance")), depth + 1)
+    for part in parts:
+        if part.get("name") not in ("statement", "guidance"):
+            lines += _render_part(part, depth + 1)
     return lines
 
 
@@ -127,7 +311,7 @@ def _render_metadata(meta: dict) -> list[str]:
     source_doc = _meta_prop(props, "source-document") or ""
     source_url = _meta_prop(props, "source-url") or ""
 
-    lines = [f"# {title}", ""]
+    lines = [_anchor("metadata"), f"# {title}", ""]
     info = []
     if version:
         info.append(f"Version {version}")
@@ -142,52 +326,48 @@ def _render_metadata(meta: dict) -> list[str]:
         if source_url:
             lines.append(f"> URL: {source_url}")
         lines.append("")
+    elif source_url:
+        lines += [f"> URL: {source_url}", ""]
+    technical = [
+        f"{label}: {meta[key]}"
+        for key, label in (("published", "Veröffentlicht"), ("last-modified", "Zuletzt geändert"),
+                           ("oscal-version", "OSCAL-Version"))
+        if meta.get(key) is not None
+    ]
+    if technical:
+        lines += [f"> {' | '.join(technical)}", ""]
+    if meta.get("remarks"):
+        lines += [meta["remarks"], ""]
+    lines += _render_links(meta.get("links") or [])
     # Any metadata prop not shown in the info line above, rendered generically.
-    lines += _render_extra_props(props, _KNOWN_META_PROPS, "Weitere Metadaten", 2)
+    lines += _render_extra_props(props, _KNOWN_META_PROPS, "Weitere Metadaten", 2, single=_KNOWN_META_PROPS)
     return lines
 
 
 def _render_control(ctrl: dict, depth: int, catalog_path: str) -> list[str]:
-    """Render one control as Markdown at the given heading depth."""
+    """Render one control, and its child controls, as Markdown at the given heading depth."""
     cid = ctrl.get("id", "?")
     title = ctrl.get("title", "")
     props = ctrl.get("props", [])
     parts = ctrl.get("parts", [])
     chapter = _meta_prop(props, "source-chapter") or cid
 
-    prefix = "#" * min(depth, 6)
-    lines = [f"{prefix} {chapter} – {title}", ""]
+    lines = [_anchor("control", cid), _heading(depth, f"{chapter} – {title}"), ""]
 
     # Source reference (so the owner can navigate back to the YAML)
     lines.append(f"> 📍 `{catalog_path}` · ID: `{cid}`")
     lines.append("")
 
-    # Statement (verbatim prose)
-    for part in parts:
-        if part.get("name") == "statement":
-            prose = part.get("prose", "")
-            if prose:
-                lines.append(prose)
-                lines.append("")
-
-    # Guidance parts
-    for part in parts:
-        if part.get("name") == "guidance":
-            gtitle = part.get("title", "Guidance")
-            prose = part.get("prose", "")
-            lines.append(f"{'#' * min(depth + 1, 6)} {gtitle}")
-            lines.append("")
-            if prose:
-                lines.append(prose)
-                lines.append("")
+    # Statement (verbatim prose), guidance, other parts
+    lines += _render_parts(parts, depth)
 
     # Applicability table
     app_rows = _applicability_rows(props)
     if app_rows:
-        lines.append("| Kontext | Verbindlichkeit | Bemerkung |")
+        lines.append(_APPLICABILITY_HEADER)
         lines.append("|---------|-----------------|-----------|")
         for cls, val, rem in app_rows:
-            lines.append(f"| {cls} | {val} | {rem} |")
+            lines.append(f"| {_cell(cls)} | {_cell(val)} | {_cell(rem)} |")
         lines.append("")
 
     # Source documents (additional references on controls)
@@ -201,12 +381,19 @@ def _render_control(ctrl: dict, depth: int, catalog_path: str) -> list[str]:
             lines.append(ref)
             lines.append("")
 
+    lines += _render_params(ctrl.get("params") or [])
+    lines += _render_links(ctrl.get("links") or [])
+
     # Company-specific rendering lives in tools/custom_renderer.py (edit there).
     lines += _custom_render(ctrl, depth)
 
     # Any remaining props (custom / company-specific, or introduced by a newer
     # schema version) rendered generically so nothing is silently dropped.
-    lines += _render_extra_props(props, _KNOWN_CONTROL_PROPS, "Weitere Eigenschaften", depth + 1)
+    lines += _render_extra_props(props, _KNOWN_CONTROL_PROPS, "Weitere Eigenschaften", depth + 1,
+                                 single={"source-chapter"})
+
+    for child in ctrl.get("controls") or []:
+        lines += _render_control(child, depth + 1, catalog_path)
 
     return lines
 
@@ -218,58 +405,247 @@ def _render_group(group: dict, depth: int, catalog_path: str) -> list[str]:
     # Derive chapter number from id (e.g. bs-ki-2 -> 2, bs-ki-3.1 -> 3.1)
     chapter = gid.rsplit("-", 1)[-1] if "-" in gid else gid
 
-    prefix = "#" * min(depth, 6)
-    lines = [f"{prefix} {chapter} – {title}", ""]
+    lines = [_anchor("group", gid), _heading(depth, f"{chapter} – {title}"), ""]
+    lines += _render_parts(group.get("parts") or [], depth)
+    lines += _render_params(group.get("params") or [])
+    lines += _render_links(group.get("links") or [])
+    lines += _render_extra_props(group.get("props") or [], set(), "Weitere Eigenschaften", depth + 1)
 
-    for ctrl in group.get("controls", []):
+    for ctrl in group.get("controls") or []:
         lines += _render_control(ctrl, depth + 1, catalog_path)
 
-    for sub in group.get("groups", []):
+    for sub in group.get("groups") or []:
         lines += _render_group(sub, depth + 1, catalog_path)
 
     return lines
 
 
+def _render_back_matter(back_matter: dict) -> list[str]:
+    """Render the back-matter resources (referenced documents)."""
+    resources = back_matter.get("resources") or []
+    if not resources:
+        return []
+    lines = [_anchor("back-matter"), "## Ressourcen", ""]
+    for res in resources:
+        lines += [_heading(3, res.get("title") or res.get("uuid", "?")), ""]
+        if res.get("uuid"):
+            lines += [f"> UUID: `{res['uuid']}`", ""]
+        if res.get("description"):
+            lines += [res["description"], ""]
+        if (res.get("citation") or {}).get("text"):
+            lines += [f"Zitation: {res['citation']['text']}", ""]
+        for rlink in res.get("rlinks") or []:
+            media = f" ({rlink['media-type']})" if rlink.get("media-type") else ""
+            lines.append(f"- Datei: `{rlink.get('href', '')}`{media}")
+        if res.get("rlinks"):
+            lines.append("")
+        if res.get("remarks"):
+            lines += [res["remarks"], ""]
+        lines += _render_extra_props(res.get("props") or [], set(), "Eigenschaften", 4)
+    return lines
+
+
 def generate_markdown(catalog: dict, catalog_path: str = "") -> str:
     """Translate an OSCAL catalog dict to structured Markdown."""
-    meta = catalog.get("metadata", {})
-    groups = catalog.get("groups", [])
-
-    lines = _render_metadata(meta)
-    for g in groups:
+    lines = _render_metadata(catalog.get("metadata", {}))
+    lines += _render_params(catalog.get("params") or [])
+    for g in catalog.get("groups") or []:
         lines += _render_group(g, 2, catalog_path)
+    for ctrl in catalog.get("controls") or []:
+        lines += _render_control(ctrl, 2, catalog_path)
+    lines += _render_back_matter(catalog.get("back-matter") or {})
 
     return "\n".join(lines)
 
 
-def verify_roundtrip(catalog: dict, markdown: str, catalog_path: str = "") -> list[dict]:
-    """Check that every prose value from the catalog appears verbatim in the MD.
+# --------------------------------------------------------------------------- #
+# Verification
+# --------------------------------------------------------------------------- #
 
-    Returns a list of mismatch records (empty = pass). Each record carries the
-    control id and part name so the author can navigate back to the exact spot
-    in the catalog and fix it.
+def _split_sections(markdown: str) -> tuple[dict[tuple[str, str], str], list[tuple[str, str]]]:
+    """Split the document at the section markers.
+
+    Returns ({(kind, id): section text}, [markers that occur more than once]).
+    A section runs from its marker to the next marker of any kind, so a control's
+    section contains its own content but not its child controls or successors.
     """
-    mismatches = []
+    sections: dict[tuple[str, str], list[str]] = {}
+    duplicates: list[tuple[str, str]] = []
+    current: list[str] | None = None
+    for line in markdown.split("\n"):
+        m = _ANCHOR_RE.match(line)
+        if m:
+            key = (m.group(1), m.group(2) or "")
+            if key in sections:
+                duplicates.append(key)
+            current = sections.setdefault(key, [])
+            continue
+        if current is not None:
+            current.append(line)
+    return {k: "\n".join(v) for k, v in sections.items()}, duplicates
 
-    def _walk_controls(obj: dict, path: str) -> None:
-        for ctrl in obj.get("controls", []):
-            cid = ctrl.get("id", "?")
-            for i, part in enumerate(ctrl.get("parts", [])):
-                prose = part.get("prose", "")
-                if prose and prose not in markdown:
-                    mismatches.append({
-                        "group_path": path,
-                        "control_id": cid,
-                        "part_name": part.get("name", f"#{i}"),
-                        "snippet": prose[:60].replace("\n", " "),
-                    })
-        for sub in obj.get("groups", []):
-            _walk_controls(sub, f"{path}/{sub.get('id', '?')}")
 
-    for g in catalog.get("groups", []):
-        _walk_controls(g, g.get("id", "?"))
+def _rendered_applicability(section: str) -> list[tuple[str, ...]]:
+    """Read the applicability table back from a control section."""
+    lines = section.split("\n")
+    if _APPLICABILITY_HEADER not in lines:
+        return []
+    rows = []
+    for line in lines[lines.index(_APPLICABILITY_HEADER) + 2:]:
+        if not line.startswith("|"):
+            break
+        rows.append(tuple(_parse_row(line)))
+    return rows
 
-    return mismatches
+
+def _all_parts(parts: list[dict]):
+    for part in parts or []:
+        yield part
+        yield from _all_parts(part.get("parts"))
+
+
+def verify_roundtrip(catalog: dict, markdown: str, catalog_path: str = "") -> list[dict]:
+    """Check the generated Markdown against the catalog. Empty list = pass.
+
+    Completeness: every key of every element is one the renderer handles
+    (`_HANDLED_KEYS`); anything else is reported by name instead of being
+    dropped silently.
+
+    Fidelity: the title, every prose value and (for controls) the applicability
+    table are found in the section of the element they belong to, not merely
+    somewhere in the document.
+
+    This checks the rendering against the catalog. It cannot check the catalog
+    against the owner's intent.
+
+    Each record carries `location` (path in the catalog), `problem`, and for
+    findings inside a control the `control_id` to navigate back.
+    """
+    findings: list[dict] = []
+    sections, duplicates = _split_sections(markdown)
+
+    def report(location: str, problem: str, control_id: str | None = None, snippet: str | None = None):
+        findings.append({"location": location, "problem": problem,
+                         "control_id": control_id, "snippet": snippet})
+
+    for kind, ident in duplicates:
+        report(f"{kind} `{ident}`", "rendered more than once (duplicate id); sections cannot be told apart",
+               ident if kind == "control" else None)
+
+    def check_keys(obj, kind: str, location: str, control_id: str | None = None):
+        if not isinstance(obj, dict):
+            return
+        for key in obj:
+            if key not in _HANDLED_KEYS[kind]:
+                report(location, f"`{key}` is not rendered", control_id)
+
+    def check_props(props, location: str, control_id: str | None = None):
+        for p in props or []:
+            if p.get("name") in _custom_claimed:
+                continue
+            for key in p:
+                if key not in _GENERIC_PROP_KEYS:
+                    report(f"{location}/prop `{p.get('name', '?')}`", f"`{key}` is not rendered", control_id)
+
+    def check_links(links, location: str, control_id: str | None = None):
+        for link in links or []:
+            check_keys(link, "link", f"{location}/link `{link.get('href', '?')}`", control_id)
+
+    def check_params(params, location: str, control_id: str | None = None):
+        for param in params or []:
+            ploc = f"{location}/param `{param.get('id', '?')}`"
+            check_keys(param, "param", ploc, control_id)
+            check_keys(param.get("select"), "select", f"{ploc}/select", control_id)
+
+    def check_text(text, section: str | None, location: str, what: str, control_id: str | None = None,
+                   needed: int = 1):
+        if not text:
+            return
+        if section is None or section.count(str(text)) < needed:
+            report(location, f"{what} not found verbatim in its own section", control_id,
+                   str(text)[:60].replace("\n", " "))
+
+    def check_parts(parts, section: str | None, location: str, control_id: str | None = None):
+        seen: dict[str, int] = {}
+        for part in _all_parts(parts):
+            ploc = f"{location}/part `{part.get('name', '?')}`"
+            check_keys(part, "part", ploc, control_id)
+            check_props(part.get("props"), ploc, control_id)
+            check_links(part.get("links"), ploc, control_id)
+            prose = part.get("prose")
+            if prose:
+                # identical prose in two parts must be rendered twice
+                seen[prose] = seen.get(prose, 0) + 1
+                check_text(prose, section, ploc, "prose", control_id, needed=seen[prose])
+            language = _meta_prop(part.get("props") or [], "language")
+            if language:
+                check_text(f"> Sprache: `{language}`", section, ploc, "language label", control_id)
+
+    def check_control(ctrl: dict, path: str):
+        cid = ctrl.get("id", "?")
+        location = f"{path}/{cid}"
+        section = sections.get(("control", cid))
+        if section is None:
+            report(location, "control is not rendered", cid)
+        check_keys(ctrl, "control", location, cid)
+        check_props(ctrl.get("props"), location, cid)
+        check_links(ctrl.get("links"), location, cid)
+        check_params(ctrl.get("params"), location, cid)
+        check_text(ctrl.get("title"), section, location, "title", cid)
+        check_parts(ctrl.get("parts"), section, location, cid)
+        expected = _applicability_rows(ctrl.get("props") or [])
+        if section is not None and _rendered_applicability(section) != expected:
+            report(location, "applicability table does not match the applicability props", cid)
+        for child in ctrl.get("controls") or []:
+            check_control(child, location)
+
+    def check_group(group: dict, path: str):
+        gid = group.get("id", "?")
+        location = f"{path}/{gid}" if path else gid
+        section = sections.get(("group", gid))
+        if section is None:
+            report(location, "group is not rendered")
+        check_keys(group, "group", location)
+        check_props(group.get("props"), location)
+        check_links(group.get("links"), location)
+        check_params(group.get("params"), location)
+        check_text(group.get("title"), section, location, "title")
+        check_parts(group.get("parts"), section, location)
+        for ctrl in group.get("controls") or []:
+            check_control(ctrl, location)
+        for sub in group.get("groups") or []:
+            check_group(sub, location)
+
+    check_keys(catalog, "catalog", "catalog")
+    check_params(catalog.get("params"), "catalog")
+
+    meta = catalog.get("metadata") or {}
+    meta_section = sections.get(("metadata", ""))
+    check_keys(meta, "metadata", "metadata")
+    check_props(meta.get("props"), "metadata")
+    check_links(meta.get("links"), "metadata")
+    for key in ("title", "remarks"):
+        check_text(meta.get(key), meta_section, "metadata", key)
+
+    for g in catalog.get("groups") or []:
+        check_group(g, "")
+    for ctrl in catalog.get("controls") or []:
+        check_control(ctrl, "catalog")
+
+    back_matter = catalog.get("back-matter") or {}
+    bm_section = sections.get(("back-matter", ""))
+    check_keys(back_matter, "back-matter", "back-matter")
+    for res in back_matter.get("resources") or []:
+        rloc = f"back-matter/resource `{res.get('uuid', '?')}`"
+        check_keys(res, "resource", rloc)
+        check_props(res.get("props"), rloc)
+        check_keys(res.get("citation"), "citation", f"{rloc}/citation")
+        for rlink in res.get("rlinks") or []:
+            check_keys(rlink, "rlink", f"{rloc}/rlink `{rlink.get('href', '?')}`")
+        for key in ("title", "description", "remarks"):
+            check_text(res.get(key), bm_section, rloc, key)
+
+    return findings
 
 
 def main(argv: list[str]) -> int:
@@ -277,9 +653,12 @@ def main(argv: list[str]) -> int:
         description="Back-generate a Markdown document from an OSCAL4Rail catalog (translation logic).",
     )
     ap.add_argument("file", help="OSCAL catalog (YAML or JSON)")
-    ap.add_argument("-o", "--output", help="output path (default: <file>.generated.md beside the input)")
+    ap.add_argument("-o", "--output",
+                    help="output path (default: _rendered/<name>.md in the directory of the input)")
     ap.add_argument("--stdout", action="store_true", help="write to stdout instead of a file")
-    ap.add_argument("--verify", action="store_true", help="check round-trip: every prose value appears verbatim in the output")
+    ap.add_argument("--verify", action="store_true",
+                    help="check the rendering: every element is rendered (or named), and each prose, "
+                         "title and applicability row appears in its own section")
     ap.add_argument("--quiet", action="store_true", help="suppress informational messages")
     args = ap.parse_args(argv)
 
@@ -295,10 +674,10 @@ def main(argv: list[str]) -> int:
         print(f"⚠️  {src}: file not found", file=sys.stderr)
         return 1
 
-    with open(src) as f:
+    with open(src, encoding="utf-8") as f:
         data = yaml.safe_load(f)
 
-    catalog = data.get("catalog")
+    catalog = data.get("catalog") if isinstance(data, dict) else None
     if not catalog:
         print(f"⚠️  {src}: no 'catalog' root element found", file=sys.stderr)
         return 1
@@ -310,22 +689,24 @@ def main(argv: list[str]) -> int:
     else:
         out = Path(args.output) if args.output else src.parent / "_rendered" / f"{src.stem}.md"
         out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(md)
+        out.write_text(md, encoding="utf-8")
         if not args.quiet:
             print(f"✅ {src} → {out}")
 
     if args.verify:
-        mismatches = verify_roundtrip(catalog, md, catalog_path=str(src))
-        if mismatches:
-            print(f"❌ Round-trip verification failed ({len(mismatches)} mismatch(es)):")
-            for m in mismatches:
-                print(f"  - control `{m['control_id']}` (part: {m['part_name']}) — prose not found verbatim")
-                print(f"    at: {m['group_path']}/{m['control_id']}")
-                print(f"    snippet: \"{m['snippet']}...\"")
-                print(f"    find it in the catalog: grep -n \"id: {m['control_id']}\" {src}")
+        findings = verify_roundtrip(catalog, md, catalog_path=str(src))
+        if findings:
+            print(f"❌ Round-trip verification failed ({len(findings)} finding(s)):")
+            for f in findings:
+                print(f"  - {f['location']}: {f['problem']}")
+                if f["snippet"]:
+                    print(f"    snippet: \"{f['snippet']}...\"")
+                if f["control_id"]:
+                    print(f"    find it in the catalog: grep -n \"id: {f['control_id']}\" {src}")
             return 1
         if not args.quiet:
-            print("✅ Round-trip: all prose values found verbatim in output")
+            print("✅ Round-trip: every element is rendered; prose, titles and applicability "
+                  "found in their own sections")
 
     return 0
 

@@ -60,9 +60,54 @@ For each control:
 - **Applicability table** showing obligation level per context
 - **Source document** references (when present)
 - **Additional properties** table for every other prop (see below)
+- **Other parts** (any part that is neither statement nor guidance) and
+  **nested parts**, each under its own sub-heading
+- **Language label** (`> Sprache: …`) before a part that carries a `language`
+  prop, so multilingual statements stay distinguishable
+- **Parameters** and **links** as lists
+- **Child controls**, as sub-sections of their parent control
 
-Catalog metadata (title, version, country, language, source URL) is rendered as
-a header block; any other metadata prop appears in a generic table too.
+Beyond controls:
+
+- Catalog metadata (title, version, country, language, source URL, publication
+  and modification date, OSCAL version, remarks, links) as a header block; any
+  other metadata prop appears in a generic table too.
+- Groups with their own parts, parameters, links and props; controls directly
+  under the catalog.
+- Back-matter resources (title, UUID, description, citation, file references,
+  props) in a closing "Ressourcen" section.
+
+A prop that carries more than its dedicated layout shows (for example a
+`language` prop with `remarks`, or a second `language` prop) is listed in the
+generic table as well, so its content is not lost.
+
+### Completeness: rendered or reported
+
+The renderer does not drop content silently. For every element kind it has a
+fixed list of the keys it renders. `--verify` walks the catalog and reports
+every key that is not on that list, by location and name:
+
+```
+❌ Round-trip verification failed (1 finding(s)):
+  - metadata: `roles` is not rendered
+```
+
+So a catalog that uses an OSCAL element the renderer does not know yet (for
+example `metadata.roles`, parameter `constraints`, a `class` on a control) does
+not produce an incomplete document with a green check. It fails, and names what
+is missing. Two identifiers are deliberately not rendered because they carry no
+content of their own: the catalog `uuid` and the `id` of a part.
+
+### Section markers
+
+Each metadata block, group, control and the back-matter starts with an HTML
+comment such as `<!-- o4r:control <regulation>-2.1 -->`. The markers are
+invisible in rendered Markdown and are dropped by pandoc. `--verify` uses them
+to check each element inside its own section: the title, every prose value and
+the applicability table of a control must be found in the section of that
+control, not merely somewhere in the document. Prose that ends up under the
+wrong control, or an applicability row that differs from the props, is a
+finding.
 
 ## Custom properties and company-specific renderers
 
@@ -234,14 +279,13 @@ Two mechanisms support this:
 
    The owner searches the YAML for `id: <regulation>-2.1` and lands on the exact control.
 
-2. **Navigation hints on verification failure.** When `--verify` finds a prose
-   mismatch, it reports the control ID, the part, a snippet, and a ready-to-run
-   search command:
+2. **Navigation hints on verification failure.** When `--verify` has a finding
+   inside a control, it reports the location in the catalog, the problem, a
+   snippet, and a ready-to-run search command:
 
    ```
-   ❌ Round-trip verification failed (1 mismatch(es)):
-     - control `<regulation>-2.1` (part: statement) — prose not found verbatim
-       at: <regulation>-2/<regulation>-2.1
+   ❌ Round-trip verification failed (1 finding(s)):
+     - <regulation>-2/<regulation>-2.1/part `statement`: prose not found verbatim in its own section
        snippet: "First characters of the affected prose..."
        find it in the catalog: grep -n "id: <regulation>-2.1" path/to/catalog.yaml
    ```
