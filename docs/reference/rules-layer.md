@@ -151,6 +151,49 @@ context('location') = 'fahrzeug-innen' and param('schwelle-fahrzeuge') <= 30
 A boolean AND-group of criteria (the common "all of the following apply" pattern) is a
 `rule-group` with `choice: all` whose members each carry their own `applies-when`.
 
+### 5.2 Grammar (EBNF)
+
+The subset as a grammar (ISO 14977 EBNF). An expression is inside Subset v1 exactly if
+it derives from `expression`. The validator checks this with
+`tools/metapath_subset.py`; it does not evaluate anything (evaluation is Layer 4, §6).
+
+```ebnf
+expression  = or-expr ;
+or-expr     = and-expr , { "or" , and-expr } ;
+and-expr    = term , { "and" , term } ;
+term        = "not" , "(" , or-expr , ")"
+            | "(" , or-expr , ")"
+            | comparison ;
+comparison  = operand , comp-op , operand
+            | operand , ( "=" | "!=" ) , value-list ;
+comp-op     = "=" | "!=" | "<" | "<=" | ">" | ">=" ;
+operand     = reference | literal ;
+reference   = ( "context" | "param" ) , "(" , string , ")" ;
+value-list  = "(" , literal , { "," , literal } , ")" ;
+literal     = number | string | boolean ;
+boolean     = "true" , "(" , ")" | "false" , "(" , ")" ;
+number      = [ "-" ] , digit , { digit } , [ "." , digit , { digit } ] ;
+string      = "'" , { character | "''" } , "'"
+            | '"' , { character | '""' } , '"' ;
+```
+
+Notes on the grammar:
+
+- **`and` binds tighter than `or`**; parentheses group. `not` is written as a function,
+  `not(...)`, as in Metapath.
+- **Every term is a comparison.** A bare `context('x')` or `param('x')` is not an
+  expression; compare it with a literal.
+- **Booleans** are written `true()` and `false()`, as in Metapath. A bare `true` would
+  be a path step, which the subset does not have.
+- **ISO dates** are written as quoted strings in ISO 8601 form (`'2026-01-01'`). The
+  grammar treats them as strings; that a value is compared as a date follows from the
+  declared parameter and is decided at evaluation.
+- **A quote inside a string** is written twice (`'it''s'`).
+- **Whitespace** (including line breaks) between tokens is not significant.
+- Everything else is outside the subset and rejected: path and axis navigation (`/`,
+  `//`, `..`, `axis::`), predicates, variables, attribute access, bare names, and every
+  function other than `context()`, `param()`, `not()`, `true()`, `false()`.
+
 ## 6. Layer boundary: L2 declares, L4 evaluates (ADR-018 §9)
 
 `enforcement` and `deviations` are **declared** in L2 (how a rule is meant to be
@@ -172,7 +215,13 @@ Run the rule-set through `oscal4rail validate`:
    - **version equality** with the bound catalog (ADR-014);
    - every `modality`/`status`/`enforcement` label is declared in `vocabularies`;
    - every `rule-group.member` resolves to a `rule-id`;
-   - every `applies-when.expression` parses under Subset v1.
+   - every `rule-id` is unique within the rule-set;
+   - every `applies-when.expression` parses under Subset v1 (§5.2);
+   - every `param('<id>')` an expression reads is declared in `rule-set.parameters`.
+
+   Not checked: whether a `context('<dimension>')` names an existing dimension. The
+   dimensions come from the catalog's applicability `class` path (§4), and the catalog
+   format does not yet declare their names in a machine-readable place.
 
 ## 8. Rule quality is measured, not asserted
 

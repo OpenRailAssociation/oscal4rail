@@ -36,6 +36,7 @@ from pathlib import Path
 import jsonschema
 from jsonschema import Draft7Validator
 
+import metapath_subset
 from o4r_common import NIST_DIR, REPO_ROOT, iter_controls, pinned_oscal_version
 from o4r_common import load_document as load_data
 
@@ -126,6 +127,30 @@ def ruleset_consistency(data: dict, rule_set_path: Path) -> list[str]:
     mod, st = set(voc.get("modality", {})), set(voc.get("status", {}))
     enf = set(voc.get("enforcement", {}))
     rule_ids = {r.get("rule-id") for r in rs.get("rules", []) or []}
+
+    # rule-id is the identity of a rule: unique within the rule-set
+    seen_rule_ids: set = set()
+    for r in rs.get("rules", []) or []:
+        rid = r.get("rule-id")
+        if rid in seen_rule_ids:
+            errs.append(f"rule {rid}: duplicate rule-id; rule-ids MUST be unique within a rule-set")
+        seen_rule_ids.add(rid)
+
+    # decision logic: every expression is inside Metapath Subset v1 (ADR-018 point 2),
+    # and every param() it reads is declared in rule-set.parameters
+    declared_params = {p.get("id") for p in rs.get("parameters", []) or [] if isinstance(p, dict)}
+    for r in rs.get("rules", []) or []:
+        applies_when = r.get("applies-when")
+        if not isinstance(applies_when, dict) or "expression" not in applies_when:
+            continue
+        rid = r.get("rule-id", "?")
+        lint = metapath_subset.lint(applies_when["expression"])
+        for message in lint.errors:
+            errs.append(f"rule {rid}: applies-when.expression is not valid Metapath Subset v1: {message}")
+        for name in dict.fromkeys(lint.param_refs):
+            if name not in declared_params:
+                errs.append(f"rule {rid}: applies-when.expression reads param('{name}'), "
+                            "which is not declared in rule-set.parameters")
 
     # vocab + group-member referential integrity (within the rule-set)
     for r in rs.get("rules", []) or []:
