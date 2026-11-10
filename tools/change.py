@@ -36,8 +36,9 @@ try:
 except ImportError:
     sys.exit("PyYAML required: pip install pyyaml")
 
+from o4r_common import load_document, pinned_oscal_version
+
 O4R_CHANGE_NS = "https://oscal4rail.openrail.org/ns/change"
-PINNED_OSCAL = "1.2.3"
 
 
 # --- loading: git ref or file ---------------------------------------------------------
@@ -52,7 +53,7 @@ def _load_source(spec: str, git_ref: str | None, git_path: str | None) -> dict:
         if raw.returncode != 0:
             sys.exit(f"git show {git_ref}:{git_path} failed: {raw.stderr.strip()}")
         return yaml.safe_load(raw.stdout)
-    return yaml.safe_load(Path(spec).read_text())
+    return load_document(Path(spec))
 
 
 # --- model access ---------------------------------------------------------------------
@@ -158,6 +159,10 @@ def classify(cid, old_ctrl, new_ctrl, old_rule, new_rule, mod_o, mod_n, st_o, st
 
 def build_mapping(old_cat, new_cat, old_rs, new_rs, src_label, tgt_label,
                   src_ver, tgt_ver):
+    # The report is produced under the pinned OSCAL version (manifest = SSOT, ADR-008).
+    oscal_version = pinned_oscal_version()
+    if oscal_version is None:
+        raise RuntimeError("cannot read the pinned OSCAL version from schemas/nist/manifest.json")
     old_ctrls, new_ctrls = _controls(old_cat), _controls(new_cat)
     old_rules, mod_o, st_o = _rules(old_rs)
     new_rules, mod_n, st_n = _rules(new_rs)
@@ -207,7 +212,7 @@ def build_mapping(old_cat, new_cat, old_rs, new_rs, src_label, tgt_label,
                 "title": f"Change report: {src_label} -> {tgt_label}",
                 "last-modified": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 "version": "1.0.0",
-                "oscal-version": PINNED_OSCAL,
+                "oscal-version": oscal_version,
             },
             "provenance": {
                 "method": "automation",
