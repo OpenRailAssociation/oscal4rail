@@ -92,6 +92,22 @@ machine-readable" must not replace fidelity to a single source of truth).
 This ADR fixes the *mechanism* (which serialization leads, which tool converts). It
 does not change any catalog content.
 
+**The framework stays a framework.** This canonical-serialization rule binds the
+*framework's own* artifacts and outputs only. How an implementing organization
+serializes *its* artifacts is left to that organization: JSON, XML and YAML are
+equally valid there (OSCAL's three interchangeable serializations). The framework
+neither requires nor privileges one for consumers; "YAML is canonical" is an internal
+convention for what OSCAL4Rail itself authors and ships, not a restriction on use.
+
+**Framework verification tools always work with YAML.** The framework's own tools
+(`tools/validate.py`, `tools/change.py`, `tools/generate_doc.py`) treat YAML as their
+canonical working and output serialization — generated machine-readable output is YAML
+(`*.validation.yaml`, change notifications), human-readable output is Markdown. A tool
+MAY *read* input in JSON/XML (consumer freedom, above), but its own working/output
+format is YAML. A third-party NIST reader that requires JSON internally (e.g.
+`compliance-trestle`) is an external tool, not a framework output; converting to JSON
+to feed it is that tool's implementation detail, not a framework serialization.
+
 ## Alternatives
 
 ### Alternative A: Maintain all three serializations word-for-word
