@@ -17,7 +17,7 @@ enforced: a mismatch is a report finding and does not fail the run.
 
 A full run report is written beside the validated file in both Markdown
 (human-readable) and JSON (machine-/agent-readable):
-  <file>.validation.md  and  <file>.validation.json
+  <file>.validation.md  and  <file>.validation.yaml
 
 Exit code: 0 if every file passes; non-zero if any NIST pass fails, or any
 O4R pass fails while --strict is set. Skips and oscal-version mismatches do
@@ -382,11 +382,15 @@ def render_markdown(report: dict) -> str:
 def write_reports(result: dict, strict: bool) -> tuple[Path, Path]:
     report = build_report(result, strict)
     src = Path(result["file"])
-    json_path = src.parent / f"{src.stem}.validation.json"
+    # Canonical serialization (ADR-012): the machine-readable report is YAML, the
+    # one leading format for OSCAL4Rail; Markdown is the human-readable rendering.
+    yaml_path = src.parent / f"{src.stem}.validation.yaml"
     md_path = src.parent / f"{src.stem}.validation.md"
-    json_path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n")
+    yaml_path.write_text(
+        yaml.safe_dump(report, sort_keys=False, allow_unicode=True, default_flow_style=False)
+    )
     md_path.write_text(render_markdown(report))
-    return md_path, json_path
+    return md_path, yaml_path
 
 
 # --------------------------------------------------------------------------- #

@@ -49,11 +49,11 @@ By default the validator writes a full run report beside the validated file, in
 two formats from one run:
 
 - `<name>.validation.md` — human-readable
-- `<name>.validation.json` — machine-/agent-readable
+- `<name>.validation.yaml` — machine-/agent-readable
 
 > These report files are generated, not versioned. The source of truth is the
 > catalog plus the validator. They are excluded via `.gitignore`
-> (`*.validation.md`, `*.validation.json`) and regenerated on demand and in CI.
+> (`*.validation.md`, `*.validation.yaml`) and regenerated on demand and in CI.
 
 ### Report structure (example)
 
@@ -82,22 +82,32 @@ Markdown (`bs-ki-de.validation.md`, shortened):
 - Note: oscal-version mismatch: artifact 1.1.3 != pinned 1.2.3 (reported, not enforced — ADR-013)
 ```
 
-JSON (`bs-ki-de.validation.json`, same run):
+YAML (`bs-ki-de.validation.yaml`, same run):
 
-```json
-{
-  "generated": "2026-10-20T13:08:25Z",
-  "validator": "tools/validate.py",
-  "mode": { "strict": true, "require_o4r": false },
-  "result": {
-    "file": "catalogs/bs-ki/de/bs-ki-de.yaml",
-    "model": "catalog",
-    "nist_pass": { "status": "pass", "schema": "oscal-catalog.json", "errors": [] },
-    "o4r_pass":  { "status": "pass", "schema": "oscal4rail-catalog-constraints.schema.json", "errors": [], "reason": null },
-    "oscal_version": { "artifact": "1.1.3", "pinned": "1.2.3", "match": false, "note": "..." },
-    "ok": true
-  }
-}
+```yaml
+generated: '2026-10-20T13:08:25Z'
+validator: tools/validate.py
+mode:
+  strict: true
+  require_o4r: false
+result:
+  file: catalogs/bs-ki/de/bs-ki-de.yaml
+  model: catalog
+  nist_pass:
+    status: pass
+    schema: oscal-catalog.json
+    errors: []
+  o4r_pass:
+    status: pass
+    schema: oscal4rail-catalog-constraints.schema.json
+    errors: []
+    reason: null
+  oscal_version:
+    artifact: '1.1.3'
+    pinned: '1.2.3'
+    match: false
+    note: '...'
+  ok: true
 ```
 
 ### Status values

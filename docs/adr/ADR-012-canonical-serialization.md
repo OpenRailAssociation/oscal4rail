@@ -1,8 +1,8 @@
 # ADR-012: Canonical Serialization — YAML Leading, JSON/XML Generated via OSCAL Tools
 
-**Status:** Accepted
+**Status:** Accepted (amended 2026-11-10: the canonical-format rule extended to tool-generated reports — see Decision point 5)
 
-**Date:** 2026-10-16
+**Date:** 2026-10-16 (amended 2026-11-10)
 
 **Deciders:** Jens Grote
 
@@ -75,6 +75,17 @@ machine-readable" must not replace fidelity to a single source of truth).
    `catalogs/<regulation>/<lang>/` — see `docs/reference/catalog-format.md` §4, §8.
    The `.en`/`.de` filename suffix convention applies **only to prose docs**
    (Markdown), not to OSCAL artifacts or schemas.
+5. **Tool-generated outputs follow the same canonical rule (amended 2026-11-10).**
+   Where a framework tool emits a machine-readable report or output (e.g. the
+   `tools/validate.py` validation report), the machine-readable serialization is
+   **YAML** — the one leading format — never a second machine format such as JSON.
+   A human-readable companion is **Markdown** (`<name>.validation.md`); the
+   machine-readable report is **YAML** (`<name>.validation.yaml`). This keeps the
+   intent "always one machine format" true for the framework's own outputs, not only
+   for instance artifacts, and avoids silently mixing JSON and YAML. Rationale:
+   consistency (one format to read and diff) and Goodhart protection — the framework
+   must practise the single-format rule it specifies. Schemas remain JSON Schema
+   (point 3): that is the standard's own format, not a serialization choice.
 
 ### Scope note (Framework ≠ Content, ADR-007)
 
