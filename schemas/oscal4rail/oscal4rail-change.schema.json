@@ -37,7 +37,7 @@
     "o4r-change-mapping": {
       "type": "object",
       "description": "A NIST mapping between two versions of the same rule catalog. source-resource = old state, target-resource = new state (ADR-014 version coupling). Each 'map' is one control-level change.",
-      "required": ["uuid", "source-resource", "target-resource", "maps"],
+      "required": ["uuid", "source-resource", "target-resource", "props", "maps"],
       "properties": {
         "source-resource": {
           "$ref": "#/$defs/versioned-resource",
