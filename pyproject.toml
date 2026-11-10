@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: 2026 DB Systel GmbH
+# SPDX-License-Identifier: Apache-2.0
+
+# The tools under tools/ are plain scripts, not an installable package. This file
+# declares what they need so a contributor can reproduce the environment:
+#
+#   python -m venv .venv && . .venv/bin/activate
+#   pip install -e ".[test]"
+#   pytest
+[project]
+name = "oscal4rail-tools"
+version = "0.3.0"
+description = "Reference tooling for the OSCAL4Rail framework (validator, change tool, document generator)"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+dependencies = [
+    "jsonschema==4.26.0",
+    "PyYAML==6.0.3",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest==9.2.0",
+]
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+# Nothing is packaged: the scripts are run from the checkout.
+[tool.setuptools]
+py-modules = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["tools"]
+addopts = "-ra"

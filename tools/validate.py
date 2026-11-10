@@ -29,18 +29,17 @@ from __future__ import annotations
 import argparse
 import datetime as _dt
 import json
+import re
 import sys
 from pathlib import Path
 
 import jsonschema
-import jsonschema._keywords
-import yaml
 from jsonschema import Draft7Validator
 
-REPO_ROOT = Path(__file__).parent.parent
-NIST_DIR = REPO_ROOT / "schemas" / "nist"
+from o4r_common import NIST_DIR, REPO_ROOT, iter_controls, pinned_oscal_version
+from o4r_common import load_document as load_data
+
 O4R_DIR = REPO_ROOT / "schemas" / "oscal4rail"
-MANIFEST = NIST_DIR / "manifest.json"
 
 # OSCAL root element -> NIST schema file
 NIST_SCHEMA_MAP = {
@@ -69,17 +68,11 @@ def _safe_pattern(validator, patrn, instance, schema):
     """Skip Unicode regex patterns (\\p{L}) not supported by Python re."""
     if r"\p{" in patrn:
         return
-    yield from jsonschema._keywords.pattern(validator, patrn, instance, schema)
+    if validator.is_type(instance, "string") and not re.search(patrn, instance):
+        yield jsonschema.ValidationError(f"{instance!r} does not match {patrn!r}")
 
 
 _Validator = jsonschema.validators.extend(Draft7Validator, {"pattern": _safe_pattern})
-
-
-def load_data(path: Path) -> dict:
-    with open(path) as f:
-        if path.suffix in (".yaml", ".yml"):
-            return yaml.safe_load(f)
-        return json.load(f)
 
 
 def detect_model(data: dict) -> str | None:
@@ -104,13 +97,6 @@ def separation_violation(data: dict) -> str | None:
     return None
 
 
-def pinned_oscal_version() -> str | None:
-    try:
-        return json.load(open(MANIFEST)).get("oscal_version")
-    except (OSError, ValueError):
-        return None
-
-
 def artifact_oscal_version(data: dict, model: str) -> str | None:
     root = data.get(model)
     if isinstance(root, dict):
@@ -127,23 +113,7 @@ def _load_catalog_controls(catalog_path: Path) -> tuple[set[str], str | None, st
     cat = data.get("catalog", {})
     version = (cat.get("metadata") or {}).get("version")
     cat_uuid = cat.get("uuid")
-    ids: set[str] = set()
-
-    def _walk(groups):
-        for g in groups or []:
-            for c in g.get("controls", []) or []:
-                _walk_control(c)
-            _walk(g.get("groups"))
-
-    def _walk_control(c):
-        if "id" in c:
-            ids.add(c["id"])
-        for sub in c.get("controls", []) or []:
-            _walk_control(sub)
-
-    _walk(cat.get("groups"))
-    for c in cat.get("controls", []) or []:
-        _walk_control(c)
+    ids = {c["id"] for c in iter_controls(data) if "id" in c}
     return ids, (str(version) if version is not None else None), (str(cat_uuid) if cat_uuid is not None else None)
 
 

@@ -85,6 +85,20 @@ uses **one canonical serialization and generates the others** — see
    - Source: document name, page number, chapter
 2. Or submit a PR directly with the fix
 
+## Working on the Tools
+
+The tools under `tools/` are plain Python scripts (Python 3.10 or newer). Their
+dependencies are declared in `pyproject.toml`:
+
+```bash
+python3 -m venv .venv && . .venv/bin/activate
+pip install -e ".[test]"
+pytest
+```
+
+A change to a tool comes with a test under `tests/`: one that fails without the
+change and passes with it.
+
 ## Commit Message Convention
 
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
