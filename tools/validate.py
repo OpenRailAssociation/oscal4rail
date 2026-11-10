@@ -223,6 +223,36 @@ def catalog_consistency(data: dict) -> list[str]:
     return errors
 
 
+# A well-formed ISO 639 language code: two letters (639-1) or three (639-2/-3).
+_ISO_639_SHAPE = re.compile(r"[a-z]{2,3}")
+
+
+def reference_language_violations(data: dict) -> list[str]:
+    """Value range of the optional `reference-language` metadata prop (ADR-017, points 3 and 4).
+
+    Each value is a well-formed ISO 639 code or the sentinel `all`; `all` is not
+    mixed with codes. The check is on the form of the code: whether a well-formed
+    code is assigned, and whether the regulation exists in that language, is the
+    owner's declaration and is not decided here.
+    """
+    catalog = data.get("catalog")
+    meta = catalog.get("metadata") if isinstance(catalog, dict) else None
+    props = meta.get("props") if isinstance(meta, dict) else None
+    values = [p.get("value") for p in props if isinstance(p, dict) and p.get("name") == "reference-language"] \
+        if isinstance(props, list) else []
+    errors = []
+    for value in values:
+        if value != "all" and not (isinstance(value, str) and _ISO_639_SHAPE.fullmatch(value)):
+            errors.append(
+                f"[catalog.metadata.props] reference-language '{value}' is neither a well-formed "
+                "ISO 639 code (two or three lowercase letters) nor 'all' (ADR-017)")
+    if "all" in values and len(values) > 1:
+        errors.append(
+            "[catalog.metadata.props] reference-language 'all' MUST NOT be combined with other "
+            f"reference-language values (found: {', '.join(repr(v) for v in values)}) (ADR-017)")
+    return errors
+
+
 def ruleset_consistency(data: dict, rule_set_path: Path) -> list[str]:
     """ADR-018 §10 cross-artifact contract, enforced as errors."""
     errs: list[str] = []
@@ -398,6 +428,7 @@ def validate_file(path: Path, strict: bool, foreign: bool = False) -> dict:
             # catalog: invariants JSON Schema cannot express (catalog-format.md §2)
             if subtype == "catalog":
                 o4r_errors = o4r_errors + catalog_consistency(data)
+                o4r_errors = o4r_errors + reference_language_violations(data)
             # rule-set: add the ADR-018 §10 cross-artifact consistency checks
             if model == "rule-set":
                 o4r_errors = o4r_errors + ruleset_consistency(data, path)
