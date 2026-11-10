@@ -36,7 +36,7 @@ try:
 except ImportError:
     sys.exit("PyYAML required: pip install pyyaml")
 
-from o4r_common import load_document, pinned_oscal_version
+from o4r_common import iter_controls, load_document, pinned_oscal_version
 
 O4R_CHANGE_NS = "https://oscal4rail.openrail.org/ns/change"
 
@@ -58,12 +58,23 @@ def _load_source(spec: str, git_ref: str | None, git_path: str | None) -> dict:
 
 # --- model access ---------------------------------------------------------------------
 
+class DuplicateControlId(ValueError):
+    """A catalog state declares the same control id more than once."""
+
+
 def _controls(catalog_doc: dict) -> dict[str, dict]:
-    cat = catalog_doc.get("catalog", {})
-    out = {}
-    for g in cat.get("groups", []):
-        for c in g.get("controls", []):
-            out[c["id"]] = c
+    """Index every control of the catalog by id, at any depth (shared traversal).
+
+    The index is keyed by the stable control id, not by position: a control that
+    moves to another group keeps its id and is therefore not an existence change.
+    A duplicate id makes the comparison ambiguous and is an error.
+    """
+    out: dict[str, dict] = {}
+    for c in iter_controls(catalog_doc):
+        cid = c["id"]
+        if cid in out:
+            raise DuplicateControlId(f"duplicate control id '{cid}'")
+        out[cid] = c
     return out
 
 
@@ -163,7 +174,14 @@ def build_mapping(old_cat, new_cat, old_rs, new_rs, src_label, tgt_label,
     oscal_version = pinned_oscal_version()
     if oscal_version is None:
         raise RuntimeError("cannot read the pinned OSCAL version from schemas/nist/manifest.json")
-    old_ctrls, new_ctrls = _controls(old_cat), _controls(new_cat)
+    try:
+        old_ctrls = _controls(old_cat)
+    except DuplicateControlId as exc:
+        raise DuplicateControlId(f"{exc} in the old catalog state ({src_label})") from None
+    try:
+        new_ctrls = _controls(new_cat)
+    except DuplicateControlId as exc:
+        raise DuplicateControlId(f"{exc} in the new catalog state ({tgt_label})") from None
     old_rules, mod_o, st_o = _rules(old_rs)
     new_rules, mod_n, st_n = _rules(new_rs)
     old_rules = old_rules or {}
@@ -316,10 +334,13 @@ def main() -> int:
     old_rs = _load_rules(args.rules_from)
     new_rs = _load_rules(args.rules_to)
 
-    mapping = build_mapping(
-        old_cat, new_cat, old_rs, new_rs, src_label, tgt_label,
-        _catalog_version(old_cat), _catalog_version(new_cat),
-    )
+    try:
+        mapping = build_mapping(
+            old_cat, new_cat, old_rs, new_rs, src_label, tgt_label,
+            _catalog_version(old_cat), _catalog_version(new_cat),
+        )
+    except DuplicateControlId as exc:
+        sys.exit(f"error: {exc}")
 
     if args.summary:
         print(_summary(mapping))
