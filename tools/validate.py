@@ -6,10 +6,16 @@
 Two-pass validation of an OSCAL4Rail artifact:
 
   Pass 1 (always)   NIST OSCAL base schema, selected by detected model.
-  Pass 2 (--strict) additive OSCAL4Rail constraints, auto-mapped by model
-                    (catalog -> catalog constraints, profile -> cascade
-                    constraints). Models without an O4R schema are SKIPPED
-                    and the skip is recorded in the report (no silent drift).
+  Pass 2 (--strict) additive OSCAL4Rail constraints, auto-mapped by artifact
+                    subtype (catalog -> catalog constraints, profile -> cascade
+                    constraints, rule-set -> rules, change report -> change
+                    constraints). A mapping-collection is a change report only
+                    if it carries the `o4r-artifact: change-report` marker;
+                    an ordinary control mapping has no O4R schema. Subtypes
+                    without an O4R schema are SKIPPED and the skip is recorded
+                    in the report (no silent drift). --foreign declares OSCAL
+                    that is not an OSCAL4Rail artifact (e.g. an upstream
+                    catalog): NIST pass only, O4R skip reported.
 
 Both passes evaluate patterns with Unicode property classes (the OSCAL token
 datatype: ids, prop names) and the formats uri, uri-reference, date-time, date
@@ -56,14 +62,20 @@ NIST_SCHEMA_MAP = {
     "mapping-collection": "oscal-mapping.json",
 }
 
-# OSCAL model -> additive OSCAL4Rail constraint schema (two-pass, ADR-013).
-# Models absent from this map have no O4R schema yet -> skip + report.
+# Artifact subtype -> additive OSCAL4Rail constraint schema (two-pass, ADR-013).
+# The subtype is the detected model, refined where one NIST model carries more
+# than one kind of OSCAL4Rail artifact (see `detect_subtype`). Subtypes absent
+# from this map have no O4R schema yet -> skip + report.
 O4R_SCHEMA_MAP = {
     "catalog": "oscal4rail-catalog-constraints.schema.json",
     "profile": "oscal4rail-profile-cascade-constraints.schema.json",
     "rule-set": "oscal4rail-rules.schema.json",
-    "mapping-collection": "oscal4rail-change.schema.json",
+    "change-report": "oscal4rail-change.schema.json",
 }
+
+# A NIST mapping-collection is an OSCAL4Rail change report (ADR-019) if one of its
+# mappings carries this marker prop; otherwise it is an ordinary control mapping.
+CHANGE_REPORT_MARKER = {"name": "o4r-artifact", "value": "change-report"}
 
 # OSCAL4Rail-native roots that have NO NIST base schema (NIST pass 1 is skipped
 # for them; they are validated by the O4R schema alone). ADR-014/ADR-018.
@@ -124,6 +136,25 @@ def detect_model(data: dict) -> str | None:
         if key in data:
             return key
     return None
+
+
+def detect_subtype(data: dict, model: str) -> str:
+    """Refine the model to the artifact subtype that selects the O4R constraints.
+
+    mapping-collection: `change-report` if any mapping carries the marker prop
+    (`o4r-artifact: change-report`), else `control-mapping`. Every other model is
+    its own subtype.
+    """
+    if model != "mapping-collection":
+        return model
+    root = data.get(model)
+    mappings = root.get("mappings") if isinstance(root, dict) else None
+    for mapping in mappings if isinstance(mappings, list) else []:
+        props = mapping.get("props") if isinstance(mapping, dict) else None
+        for prop in props if isinstance(props, list) else []:
+            if isinstance(prop, dict) and all(prop.get(k) == v for k, v in CHANGE_REPORT_MARKER.items()):
+                return "change-report"
+    return "control-mapping"
 
 
 def separation_violation(data: dict) -> str | None:
@@ -240,11 +271,18 @@ def _run_schema(schema_path: Path, data: dict) -> tuple[list[str], dict[str, int
     return out, skipped
 
 
-def validate_file(path: Path, strict: bool) -> dict:
-    """Validate one file, return a structured result (the report record)."""
+def validate_file(path: Path, strict: bool, foreign: bool = False) -> dict:
+    """Validate one file, return a structured result (the report record).
+
+    `foreign` declares the artifact as OSCAL that is not an OSCAL4Rail artifact
+    (e.g. an upstream catalog the cascade references). It is then validated
+    against the NIST schema only; the O4R pass is skipped and the skip reported.
+    It has no effect on OSCAL4Rail-native roots (rule-set).
+    """
     result: dict = {
         "file": str(path),
         "model": None,
+        "subtype": None,
         "nist_pass": {"status": "error", "schema": None, "errors": [], "skipped_constraints": {}},
         "o4r_pass": {"status": "skipped", "schema": None, "errors": [], "reason": None,
                      "skipped_constraints": {}},
@@ -263,6 +301,8 @@ def validate_file(path: Path, strict: bool) -> dict:
 
     model = detect_model(data)
     result["model"] = model
+    subtype = detect_subtype(data, model) if model is not None else None
+    result["subtype"] = subtype
 
     if model is None:
         result["nist_pass"]["status"] = "error"
@@ -305,12 +345,17 @@ def validate_file(path: Path, strict: bool) -> dict:
     if not strict:
         result["o4r_pass"]["status"] = "not-run"
         result["o4r_pass"]["reason"] = "O4R pass runs only with --strict"
-    elif model not in O4R_SCHEMA_MAP:
+    elif foreign and model not in O4R_NATIVE_ROOTS:
         result["o4r_pass"]["status"] = "skipped"
-        result["o4r_pass"]["reason"] = f"no O4R constraint schema for model '{model}'"
+        result["o4r_pass"]["reason"] = (
+            "declared as foreign (non-OSCAL4Rail) OSCAL with --foreign; "
+            "only the NIST base schema was applied")
+    elif subtype not in O4R_SCHEMA_MAP:
+        result["o4r_pass"]["status"] = "skipped"
+        result["o4r_pass"]["reason"] = f"no O4R constraint schema for subtype '{subtype}'"
     else:
-        o4r_schema = O4R_DIR / O4R_SCHEMA_MAP[model]
-        result["o4r_pass"]["schema"] = O4R_SCHEMA_MAP[model]
+        o4r_schema = O4R_DIR / O4R_SCHEMA_MAP[subtype]
+        result["o4r_pass"]["schema"] = O4R_SCHEMA_MAP[subtype]
         if not o4r_schema.exists():
             result["o4r_pass"]["status"] = "skipped"
             result["o4r_pass"]["reason"] = f"O4R schema file missing: {o4r_schema}"
@@ -343,11 +388,11 @@ def _now() -> str:
     return _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def build_report(result: dict, strict: bool) -> dict:
+def build_report(result: dict, strict: bool, foreign: bool = False) -> dict:
     return {
         "generated": _now(),
         "validator": "tools/validate.py",
-        "mode": {"strict": strict, "require_o4r": False},
+        "mode": {"strict": strict, "foreign": foreign, "require_o4r": False},
         "result": result,
     }
 
@@ -373,8 +418,10 @@ def render_markdown(report: dict) -> str:
         f"# Validation report — `{Path(r['file']).name}`",
         "",
         f"- **Generated:** {report['generated']}",
-        f"- **Mode:** strict={report['mode']['strict']} · require-o4r={report['mode']['require_o4r']} (deferred, #42)",
+        f"- **Mode:** strict={report['mode']['strict']} · foreign={report['mode'].get('foreign', False)} "
+        f"· require-o4r={report['mode']['require_o4r']} (deferred, #42)",
         f"- **Model:** `{r['model']}`",
+        f"- **Subtype:** `{r.get('subtype')}`",
         f"- **Overall:** {'✅ PASS' if r['ok'] else '❌ FAIL'}",
         "",
         "## NIST base schema (pass 1)",
@@ -412,8 +459,8 @@ def render_markdown(report: dict) -> str:
     return "\n".join(lines)
 
 
-def write_reports(result: dict, strict: bool) -> tuple[Path, Path]:
-    report = build_report(result, strict)
+def write_reports(result: dict, strict: bool, foreign: bool = False) -> tuple[Path, Path]:
+    report = build_report(result, strict, foreign)
     src = Path(result["file"])
     json_path = src.parent / f"{src.stem}.validation.json"
     md_path = src.parent / f"{src.stem}.validation.md"
@@ -451,6 +498,9 @@ def main(argv: list[str]) -> int:
         description="Consolidated OSCAL4Rail validator (two-pass; NIST + O4R constraints). See ADR-013.",
     )
     ap.add_argument("files", nargs="+", help="OSCAL artifact(s) (YAML or JSON)")
+    ap.add_argument("--foreign", action="store_true",
+                    help="the file(s) are OSCAL but not OSCAL4Rail artifacts (e.g. an upstream "
+                         "catalog): NIST pass only; the O4R pass is skipped and the skip reported")
     ap.add_argument("--strict", action="store_true",
                     help="also run the additive OSCAL4Rail constraint pass (auto-mapped by model)")
     ap.add_argument("--report", choices=["none", "file"], default="file",
@@ -465,9 +515,9 @@ def main(argv: list[str]) -> int:
             print(f"⚠️  {fp}: file not found", file=sys.stderr)
             all_ok = False
             continue
-        result = validate_file(path, strict=args.strict)
+        result = validate_file(path, strict=args.strict, foreign=args.foreign)
         if args.report == "file":
-            md, js = write_reports(result, strict=args.strict)
+            md, js = write_reports(result, strict=args.strict, foreign=args.foreign)
             if not args.quiet:
                 print(f"   report: {md}  |  {js}")
         _print_summary(result, args.quiet)

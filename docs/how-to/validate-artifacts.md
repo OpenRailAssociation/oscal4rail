@@ -12,12 +12,31 @@ It runs **two passes** (see [`schemas/README.md`](../../schemas/README.md)):
    OSCAL schema for the detected model (`schemas/nist/`, pinned via
    `manifest.json`, [ADR-008](../adr/ADR-008-reproducible-schema-acquisition.md)).
 2. **OSCAL4Rail constraints** (with `--strict`): the additive railway
-   conventions (`schemas/oscal4rail/`), **auto-mapped by model**:
-   `catalog` → catalog constraints, `profile` → cascade constraints.
+   conventions (`schemas/oscal4rail/`), **auto-mapped by artifact subtype**:
+   `catalog` → catalog constraints, `profile` → cascade constraints,
+   `rule-set` → rules constraints, change report → change constraints.
 
-Models without an O4R schema (e.g. `assessment-results`, `component-definition`,
-`mapping`) skip the second pass. The skip is recorded in the report. A skip does
-not fail the run.
+The subtype is the detected model, refined for `mapping-collection`, which
+carries two kinds of artifact:
+
+- a **change report** (ADR-019) is recognised by the mapping-level marker prop
+  `o4r-artifact: change-report` and checked against the change constraints;
+- any other mapping is an ordinary **control mapping** (e.g. company subset →
+  ISO 27001). It has no O4R constraint schema, so only the NIST pass applies.
+
+Subtypes without an O4R schema (e.g. `assessment-results`,
+`component-definition`, `control-mapping`) skip the second pass. The skip is
+recorded in the report. A skip does not fail the run.
+
+**Foreign OSCAL (`--foreign`).** The cascade references upstream catalogs that
+are valid OSCAL but not OSCAL4Rail artifacts (they do not follow the catalog
+conventions and are not meant to). Declare them with `--foreign`: the NIST pass
+runs, the O4R pass is skipped, and the report states that only the NIST base
+schema was applied.
+
+```bash
+python3 tools/validate.py --strict --foreign examples/upstream/bsi/_fetched/*-catalog.json
+```
 
 The validator also compares the artifact's `oscal-version` against the pinned
 tag. This is reported, not enforced (ADR-013). A mismatch is a report finding,
