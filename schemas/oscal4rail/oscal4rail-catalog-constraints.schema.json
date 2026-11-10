@@ -28,6 +28,11 @@
           "type": "array",
           "minItems": 1,
           "items": { "$ref": "#/$defs/group" }
+        },
+        "controls": {
+          "type": "array",
+          "description": "Controls directly under the catalog are controls: the same constraints apply.",
+          "items": { "$ref": "#/$defs/control" }
         }
       }
     }
@@ -90,8 +95,17 @@
       "required": ["name", "prose"],
       "properties": {
         "name": { "const": "statement" },
-        "prose": { "type": "string", "minLength": 1 }
+        "prose": { "type": "string", "minLength": 1, "pattern": "\\S" }
       }
+    },
+    "part": {
+      "type": "object",
+      "description": "Every part named 'statement' must carry non-empty prose (catalog-format.md section 3). 'contains' on the control only guarantees that one valid statement exists; this rule covers each further statement part, e.g. one per language.",
+      "if": {
+        "properties": { "name": { "const": "statement" } },
+        "required": ["name"]
+      },
+      "then": { "$ref": "#/$defs/statement-part" }
     },
     "group": {
       "type": "object",
@@ -115,12 +129,18 @@
         "id": { "$ref": "#/$defs/o4r-id" },
         "parts": {
           "type": "array",
-          "contains": { "$ref": "#/$defs/statement-part" }
+          "contains": { "$ref": "#/$defs/statement-part" },
+          "items": { "$ref": "#/$defs/part" }
         },
         "props": {
           "type": "array",
           "contains": { "$ref": "#/$defs/prop-source-chapter" },
           "items": { "$ref": "#/$defs/applicability-prop" }
+        },
+        "controls": {
+          "type": "array",
+          "description": "Child controls are controls: the same constraints apply at every depth.",
+          "items": { "$ref": "#/$defs/control" }
         }
       }
     }

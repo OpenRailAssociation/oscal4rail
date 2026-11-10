@@ -26,7 +26,7 @@ catalog:
         prose: Real-time passenger information must be displayed at stops.
       props:
       - name: source-chapter
-        value: '1'
+        value: '1.1'
       - name: applicability
         value: binding
         class: stop.rail
@@ -37,7 +37,7 @@ catalog:
         prose: Interior displays must show the next stop.
       props:
       - name: source-chapter
-        value: '1'
+        value: '1.2'
       - name: applicability
         value: binding
         class: vehicle-interior.rail
