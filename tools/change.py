@@ -119,7 +119,9 @@ def classify(cid, old_ctrl, new_ctrl, old_rule, new_rule, mod_o, mod_n, st_o, st
             if ln == "deprecated":
                 return "deprecated", "lifecycle", props
             if ln == "superseded":
-                sb = new_rule.get("superseded-by", "")
+                # `superseded-by` lives on the status binding, not on the rule
+                # (rules schema: $defs/status-binding; `rule` forbids extra keys).
+                sb = _axis(new_rule.get("status"), st_n).get("superseded-by", "")
                 if sb:
                     props.append({"name": "superseded-by", "value": sb})
                 return "superseded", "lifecycle", props
