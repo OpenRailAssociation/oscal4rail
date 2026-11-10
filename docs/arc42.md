@@ -183,7 +183,7 @@ Cross-border: A train operating DE↔CH↔AT must comply with all three national
 | Base standard | NIST OSCAL, pinned to one version via manifest (currently v1.2.3, all 3 layers) | Mature, public domain, existing tooling; no drift ([ADR-008](adr/ADR-008-reproducible-schema-acquisition.md)) |
 | Schema acquisition | Fetch official release assets + SHA256 verify (`tools/fetch_oscal_schemas.py`); `make schemas` as audit fallback | Minimal, portable, reproducible ([ADR-008](adr/ADR-008-reproducible-schema-acquisition.md)) |
 | Canonical serialization | YAML leading; JSON/XML generated via official OSCAL tools | SSOT, owner/diff readability ([ADR-012](adr/ADR-012-canonical-serialization.md)) |
-| Validation | One consolidated two-pass validator (`tools/validate.py`): NIST base + auto-mapped O4R constraints, report beside the file (MD+JSON) | Single CI pass/fail, coverage gaps observable ([ADR-013](adr/ADR-013-validator-consolidation.md)) |
+| Validation | One consolidated two-pass validator (`tools/validate.py`): NIST base + auto-mapped O4R constraints, report beside the file (MD+YAML) | Single CI pass/fail, coverage gaps observable ([ADR-013](adr/ADR-013-validator-consolidation.md)) |
 | Tooling foundation | compliance-trestle + oscal-deep-diff | Profile Resolution, Validation, Diff out-of-the-box ([ADR-007](adr/ADR-007-tooling-foundation.md)) |
 | Agent interface | compliance-trestle-mcp (MCP Server) | AI agents can invoke all OSCAL operations via standardized protocol |
 | Cascade model | OSCAL Profile chain (not custom schema) | Each cascade level = one Profile selecting from upstream Catalog |
@@ -268,7 +268,7 @@ Cross-border: A train operating DE↔CH↔AT must comply with all three national
 | `trestle-mcp` | MCP Server for AI agent integration | Python | 🔜 To evaluate |
 | `trestle-oscal4rail` | Railway-specific plugin (cascade, semantic diff, assessment) | Python | 🔜 To build |
 | `tools/fetch_oscal_schemas.py` | Fetch pinned NIST schemas as release assets + SHA256 verify ([ADR-008](adr/ADR-008-reproducible-schema-acquisition.md)) | Python | ✅ Exists |
-| `tools/validate.py` | Consolidated two-pass validator: NIST base + auto-mapped O4R constraints, report beside file (MD+JSON) ([ADR-013](adr/ADR-013-validator-consolidation.md)) | Python (`jsonschema`) | ✅ Exists |
+| `tools/validate.py` | Consolidated two-pass validator: NIST base + auto-mapped O4R constraints, report beside file (MD+YAML) ([ADR-013](adr/ADR-013-validator-consolidation.md)) | Python (`jsonschema`) | ✅ Exists |
 | `tools/generate_doc.py` | Round-trip generator: OSCAL YAML → human-readable document for owner verification | Python | ✅ Exists |
 | `parse_matrix` | Parse Excel Bewertungsmatrix → applicability per rule | openpyxl | ✅ Exists (extraction) |
 | `extract_pdf` | Extract verbatim text per chapter from regulation PDF | markitdown / pdfplumber | ✅ Exists (extraction) |

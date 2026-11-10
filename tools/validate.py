@@ -16,7 +16,7 @@ Additionally compares the artifact's `oscal-version` against the pinned tag
 enforced: a mismatch is a report finding and does not fail the run.
 
 A full run report is written beside the validated file in both Markdown
-(human-readable) and JSON (machine-/agent-readable):
+(human-readable) and YAML (machine-/agent-readable, ADR-012):
   <file>.validation.md  and  <file>.validation.yaml
 
 Exit code: 0 if every file passes; non-zero if any NIST pass fails, or any
@@ -421,7 +421,7 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--strict", action="store_true",
                     help="also run the additive OSCAL4Rail constraint pass (auto-mapped by model)")
     ap.add_argument("--report", choices=["none", "file"], default="file",
-                    help="write a per-file report (Markdown + JSON) beside the artifact (default: file)")
+                    help="write a per-file report (Markdown + YAML) beside the artifact (default: file)")
     ap.add_argument("--quiet", action="store_true", help="suppress per-file stdout summary")
     args = ap.parse_args(argv)
 

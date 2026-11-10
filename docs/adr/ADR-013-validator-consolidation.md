@@ -5,9 +5,9 @@ SPDX-License-Identifier: Apache-2.0
 
 # ADR-013: Consolidated Validator (Two-Pass, Auto-Mapped O4R Constraints, Report Beside the File)
 
-**Status:** Accepted
+**Status:** Accepted (amended 2026-11-10: the machine-readable report is YAML, not JSON — see Decision point 4)
 
-**Date:** 2026-10-20
+**Date:** 2026-10-20 (amended 2026-11-10)
 
 **Deciders:** Jens Grote
 
@@ -56,9 +56,12 @@ A single consolidated `tools/validate` with the following behaviour:
    `schemas/nist/manifest.json`: **reported, not enforced** in this version (see
    "Consciously deferred" below). A mismatch is a recorded report finding; it does **not**
    fail the run.
-4. **Report beside the validated file**, in **both** Markdown (human-readable) and JSON
+4. **Report beside the validated file**, in **both** Markdown (human-readable) and YAML
    (machine-/agent-readable), generated from one run: `<file>.validation.md` and
-   `<file>.validation.json` in the same directory as the validated artifact.
+   `<file>.validation.yaml` in the same directory as the validated artifact.
+   *(Amended 2026-11-10: originally JSON / `<file>.validation.json`; changed to YAML to
+   follow the canonical-serialization rule for tool-generated outputs,
+   [ADR-012](./ADR-012-canonical-serialization.md) Decision point 5.)*
 5. **Full run report** (NIST pass + O4R pass + skips + `oscal-version` check), not only the
    gaps — for traceability.
 6. **Non-zero exit on failure**, clear messages (CI-ready).
@@ -88,7 +91,7 @@ A single consolidated `tools/validate` with the following behaviour:
 ### Positive
 - One inspectable, dependency-lean validator (tech-stack principle: `jsonschema`, Draft-07).
 - Coverage gaps are **visible** (reported), not hidden, observability by design.
-- CI gets a single pass/fail plus a durable per-file report in two formats (one run → MD + JSON).
+- CI gets a single pass/fail plus a durable per-file report in two formats (one run → MD + YAML).
 
 ### Negative / Risks
 - Without `--require-o4r`, a project cannot yet *enforce* that every artifact is O4R-checked;
