@@ -1,0 +1,98 @@
+# SPDX-FileCopyrightText: 2026 DB Systel GmbH
+# SPDX-License-Identifier: Apache-2.0
+#
+# OSCAL4Rail Assessment Layer (L4) walking skeleton — assessment result side (issue #27).
+#
+# This is a valid NIST OSCAL assessment-results instance (model Released in OSCAL 1.x).
+# It PROFILES NIST — every field below is NIST-native; OSCAL4Rail add-ons ride on props under
+# ns=https://github.com/OpenRailAssociation/oscal4rail/ns (the NIST-sanctioned extension point).
+#
+# Design (docs/experiments/l4-assessment-exploration.md):
+#   - import-ap + reviewed-controls give native traceability back to the catalog ("what applies to me").
+#   - NIST finding.target.status.state is BINARY (satisfied|not-satisfied) — kept for tooling.
+#   - the normalized 4-level verdict rides on prop compliance-level (human + agent + automated readable).
+#   - assessor-type (human|agent|hybrid) is descriptive; the human sign-off is the GATE (MHC):
+#     even an agent/hybrid assessment counts as "met" only with the human attestation below.
+
+assessment-results:
+  uuid: f06aa99f-7931-4431-b4f2-35ea1494e568
+  metadata:
+    title: OSCAL4Rail assessment example — result for ex-1.1 (illustrative)
+    version: '1.0'
+    oscal-version: 1.2.3
+    last-modified: '2026-11-10T12:00:00Z'
+    roles:
+    - id: o4r-approver
+      title: OSCAL4Rail assessment approver (human sign-off, Meaningful Human Control)
+    parties:
+    - uuid: 9cfa997e-3eae-4dc5-8b1e-d49178e8a4a1
+      type: person
+      name: A. Approver (illustrative)
+    responsible-parties:
+    - role-id: o4r-approver
+      party-uuids:
+      - 9cfa997e-3eae-4dc5-8b1e-d49178e8a4a1
+    remarks: >-
+      Illustrative result instance for the L4 walking skeleton (issue #27). Framework uses
+      OSCAL 1.2.3 (ADR-008). No real system or regulation.
+  import-ap:
+    href: example-catalog.yaml
+    remarks: >-
+      Walking skeleton: the result imports the catalog directly for traceability. In a full
+      pipeline this points at an assessment-plan that in turn imports the catalog/profile.
+  results:
+  - uuid: 3b0ca48a-aa85-4d0b-9b1e-d49178e8a4a1
+    title: Assessment of ex-1.1 (transport encryption)
+    description: Illustrative assessment of control ex-1.1 against its assessment-criteria.
+    start: '2026-11-10T09:00:00Z'
+    props:
+    - name: compliance-level
+      ns: https://github.com/OpenRailAssociation/oscal4rail/ns
+      value: partially-satisfied
+      remarks: >-
+        Normalized OSCAL4Rail verdict against the catalog scale. Human-, agent- and
+        automation-readable. Maps to the binary NIST finding state below
+        (partially-satisfied -> not-satisfied) so NIST tooling stays correct.
+    - name: assessor-type
+      ns: https://github.com/OpenRailAssociation/oscal4rail/ns
+      value: hybrid
+      remarks: >-
+        Descriptive: evidence gathered by an automated check and an agent, verdict confirmed
+        by a human. Not the gate — the sign-off (attestations + responsible-party) is the gate.
+    reviewed-controls:
+      control-selections:
+      - include-controls:
+        - control-id: ex-1.1
+    observations:
+    - uuid: d0bc51c4-229b-400f-b80c-842bf7024c84
+      description: >-
+        Automated scan found one external endpoint still offering a deprecated protocol
+        version; all other endpoints negotiate TLS 1.2+.
+      methods:
+      - EXAMINE
+      collected: '2026-11-10T09:30:00Z'
+    findings:
+    - uuid: 5dc78cb9-b7b2-4fe5-9452-dfae1bd09d63
+      title: Deprecated protocol on one endpoint
+      description: >-
+        One endpoint permits a deprecated protocol version, so the control is not fully
+        satisfied. See the normalized compliance-level prop on the result for the 4-level verdict.
+      target:
+        type: statement-id
+        target-id: ex-1.1
+        status:
+          state: not-satisfied
+          reason: other
+          remarks: One endpoint still offers a deprecated protocol version.
+    attestations:
+    - responsible-parties:
+      - role-id: o4r-approver
+        party-uuids:
+        - 9cfa997e-3eae-4dc5-8b1e-d49178e8a4a1
+      parts:
+      - name: sign-off
+        ns: https://github.com/OpenRailAssociation/oscal4rail/ns
+        prose: >-
+          Reviewed and confirmed by the named human approver on 2026-11-10. This attestation
+          is the Meaningful Human Control gate: the assessment counts as evaluated only
+          because a human has signed off, regardless of assessor-type.

@@ -1,0 +1,63 @@
+# SPDX-FileCopyrightText: 2026 DB Systel GmbH
+# SPDX-License-Identifier: Apache-2.0
+#
+# OSCAL4Rail Assessment Layer (L4) walking skeleton — illustrative catalog side.
+#
+# Framework != Content (ADR-007): the control statement and assessment criteria below are
+# ILLUSTRATIVE placeholders, not any real regulation. They show the SHAPE of L4 criteria.
+#
+# L4 pattern (see docs/experiments/l4-assessment-exploration.md):
+#   - assessment criteria live on the control as part name=assessment-criteria (owner-owned, static)
+#   - the normalized compliance scale is carried as an OSCAL4Rail ns-prop (compliance-level),
+#     using the established extension point ns=https://github.com/OpenRailAssociation/oscal4rail/ns
+#   - an optional link rel=recommended-means points at an AMC (EASA AMC/AltMoC semantics)
+
+catalog:
+  uuid: eadbd5a7-8bcf-4a3f-94e8-223948d0450d
+  metadata:
+    title: OSCAL4Rail assessment example — illustrative catalog
+    version: '1.0'
+    oscal-version: 1.2.3
+    last-modified: '2026-11-10T12:00:00Z'
+    props:
+    - name: country
+      value: XX
+    - name: language
+      value: en
+    - name: source-document
+      value: illustrative — not a real regulation
+    remarks: >-
+      Illustrative, self-contained example catalog for the Assessment Layer (L4) walking
+      skeleton (issue #27). Framework uses OSCAL 1.2.3 (ADR-008). Text is illustrative,
+      not a real regulation.
+  groups:
+  - id: ex-1
+    title: Security (illustrative)
+    controls:
+    - id: ex-1.1
+      title: Transport encryption
+      parts:
+      - name: statement
+        prose: Data in transit must be encrypted with a current, non-deprecated protocol.
+      - name: assessment-criteria
+        prose: >-
+          Verify that all external connections negotiate TLS 1.2 or higher and that
+          deprecated protocol versions are disabled. Full satisfaction requires every
+          endpoint to comply; partial satisfaction is any remaining deprecated endpoint.
+      props:
+      - name: source-chapter
+        value: '1'
+      - name: compliance-level
+        ns: https://github.com/OpenRailAssociation/oscal4rail/ns
+        value: fully-satisfied
+        class: criteria
+        remarks: >-
+          Declares the normalized OSCAL4Rail compliance scale available for this control
+          (fully-satisfied | partially-satisfied | not-satisfied | not-applicable). The
+          assessment result instance reports the achieved level against this scale.
+      links:
+      - rel: recommended-means
+        href: '#amc-tls-baseline'
+        text: >-
+          AMC (EASA semantics): following this recommended means carries a presumption of
+          compliance; choosing an alternative (AltMoC) requires explicit demonstration.
