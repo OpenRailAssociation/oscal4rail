@@ -11,6 +11,12 @@ Two-pass validation of an OSCAL4Rail artifact:
                     constraints). Models without an O4R schema are SKIPPED
                     and the skip is recorded in the report (no silent drift).
 
+Both passes evaluate patterns with Unicode property classes (the OSCAL token
+datatype: ids, prop names) and the formats uri, uri-reference, date-time, date
+and email. This needs the declared dependencies (pyproject.toml). A constraint
+that cannot be evaluated because a module is missing is counted and shown in
+the summary and the report; it is never skipped silently.
+
 Additionally compares the artifact's `oscal-version` against the pinned tag
 (schemas/nist/manifest.json, ADR-008). Per ADR-013 this is REPORTED, not
 enforced: a mismatch is a report finding and does not fail the run.
@@ -64,15 +70,50 @@ O4R_SCHEMA_MAP = {
 O4R_NATIVE_ROOTS = {"rule-set"}
 
 
-def _safe_pattern(validator, patrn, instance, schema):
-    """Skip Unicode regex patterns (\\p{L}) not supported by Python re."""
-    if r"\p{" in patrn:
-        return
-    if validator.is_type(instance, "string") and not re.search(patrn, instance):
-        yield jsonschema.ValidationError(f"{instance!r} does not match {patrn!r}")
+# Patterns with Unicode property classes (\p{L}, \p{N}) are not supported by the
+# standard `re` module. In the pinned NIST schemas that is the OSCAL token
+# datatype, i.e. every id, prop name and token. They are evaluated with the
+# third-party `regex` module. If it is missing, the constraint cannot be checked:
+# it is counted and reported, never skipped silently (ADR-013).
+try:
+    import regex as _regex
+except ImportError:  # pragma: no cover - exercised via monkeypatch in the tests
+    _regex = None
 
 
-_Validator = jsonschema.validators.extend(Draft7Validator, {"pattern": _safe_pattern})
+def _make_validator(skipped: dict[str, int]):
+    """Build the validator class for one schema run.
+
+    `skipped` collects every constraint that could not be evaluated, keyed by a
+    readable reason, with the number of values it would have applied to.
+    """
+    def _skip(reason: str) -> None:
+        skipped[reason] = skipped.get(reason, 0) + 1
+
+    def _pattern(validator, patrn, instance, schema):
+        if not validator.is_type(instance, "string"):
+            return
+        if r"\p{" in patrn:
+            if _regex is None:
+                _skip("Unicode-class pattern not evaluated (Python module 'regex' is not installed)")
+                return
+            matched = _regex.search(patrn, instance)
+        else:
+            matched = re.search(patrn, instance)
+        if not matched:
+            yield jsonschema.ValidationError(f"{instance!r} does not match {patrn!r}")
+
+    def _format(validator, fmt, instance, schema):
+        checker = validator.format_checker
+        if fmt not in checker.checkers:
+            _skip(f"format '{fmt}' not checked (no checker installed)")
+            return
+        try:
+            checker.check(instance, fmt)
+        except jsonschema.exceptions.FormatError as exc:
+            yield jsonschema.ValidationError(exc.message, cause=exc.cause)
+
+    return jsonschema.validators.extend(Draft7Validator, {"pattern": _pattern, "format": _format})
 
 
 def detect_model(data: dict) -> str | None:
@@ -177,14 +218,26 @@ def ruleset_consistency(data: dict, rule_set_path: Path) -> list[str]:
     return errs
 
 
-def _run_schema(schema_path: Path, data: dict) -> list[str]:
-    schema = json.load(open(schema_path))
-    errors = sorted(_Validator(schema).iter_errors(data), key=lambda e: list(e.absolute_path))
+def _run_schema(schema_path: Path, data: dict) -> tuple[list[str], dict[str, int]]:
+    """Validate `data` against one schema.
+
+    Returns (error messages, constraints that could not be evaluated). The second
+    value maps a reason to the number of values the constraint applied to.
+    """
+    with open(schema_path, encoding="utf-8") as f:
+        schema = json.load(f)
+    skipped: dict[str, int] = {}
+    validator = _make_validator(skipped)(schema, format_checker=Draft7Validator.FORMAT_CHECKER)
+    errors = sorted(validator.iter_errors(data), key=lambda e: [str(p) for p in e.absolute_path])
     out = []
     for e in errors:
-        loc = ".".join(str(p) for p in e.absolute_path) or "(root)"
-        out.append(f"[{loc}] {e.message}")
-    return out
+        # An anyOf/oneOf failure only says "not valid under any of the given
+        # schemas" about a whole subtree. Report the most relevant underlying
+        # error instead, so the message names the offending value.
+        cause = jsonschema.exceptions.best_match([e]) if e.context else e
+        loc = ".".join(str(p) for p in cause.absolute_path) or "(root)"
+        out.append(f"[{loc}] {cause.message}")
+    return out, skipped
 
 
 def validate_file(path: Path, strict: bool) -> dict:
@@ -192,8 +245,9 @@ def validate_file(path: Path, strict: bool) -> dict:
     result: dict = {
         "file": str(path),
         "model": None,
-        "nist_pass": {"status": "error", "schema": None, "errors": []},
-        "o4r_pass": {"status": "skipped", "schema": None, "errors": [], "reason": None},
+        "nist_pass": {"status": "error", "schema": None, "errors": [], "skipped_constraints": {}},
+        "o4r_pass": {"status": "skipped", "schema": None, "errors": [], "reason": None,
+                     "skipped_constraints": {}},
         "oscal_version": {"artifact": None, "pinned": pinned_oscal_version(), "match": None, "note": None},
         "ok": False,
     }
@@ -227,7 +281,7 @@ def validate_file(path: Path, strict: bool) -> dict:
             result["nist_pass"]["status"] = "error"
             result["nist_pass"]["errors"] = [f"NIST schema not found: {nist_schema}"]
             return result
-        nist_errors = _run_schema(nist_schema, data)
+        nist_errors, result["nist_pass"]["skipped_constraints"] = _run_schema(nist_schema, data)
         result["nist_pass"]["status"] = "pass" if not nist_errors else "fail"
         result["nist_pass"]["errors"] = nist_errors
 
@@ -261,7 +315,7 @@ def validate_file(path: Path, strict: bool) -> dict:
             result["o4r_pass"]["status"] = "skipped"
             result["o4r_pass"]["reason"] = f"O4R schema file missing: {o4r_schema}"
         else:
-            o4r_errors = _run_schema(o4r_schema, data)
+            o4r_errors, result["o4r_pass"]["skipped_constraints"] = _run_schema(o4r_schema, data)
             # rule-set: add the ADR-018 §10 cross-artifact consistency checks
             if model == "rule-set":
                 o4r_errors = o4r_errors + ruleset_consistency(data, path)
@@ -308,6 +362,13 @@ def render_markdown(report: dict) -> str:
         return {"pass": "✅ pass", "fail": "❌ fail", "skipped": "⏭️ skipped",
                 "not-run": "— not run", "error": "⚠️ error"}.get(s, s)
 
+    def _skipped(pass_result: dict) -> list[str]:
+        skipped = pass_result.get("skipped_constraints") or {}
+        if not skipped:
+            return []
+        out = ["- Constraints NOT evaluated (a pass here does not cover them):"]
+        return out + [f"  - {reason}: {count} value(s)" for reason, count in sorted(skipped.items())]
+
     lines = [
         f"# Validation report — `{Path(r['file']).name}`",
         "",
@@ -323,6 +384,7 @@ def render_markdown(report: dict) -> str:
     if nist["errors"]:
         lines.append("- Errors:")
         lines += [f"  - `{e}`" for e in nist["errors"][:50]]
+    lines += _skipped(nist)
 
     lines += [
         "",
@@ -335,6 +397,7 @@ def render_markdown(report: dict) -> str:
     if o4r["errors"]:
         lines.append("- Errors:")
         lines += [f"  - `{e}`" for e in o4r["errors"][:50]]
+    lines += _skipped(o4r)
 
     lines += [
         "",
@@ -375,6 +438,10 @@ def _print_summary(result: dict, quiet: bool) -> None:
         extra.append("oscal-version mismatch (reported)")
     if o4r == "skipped":
         extra.append(f"O4R skipped: {result['o4r_pass']['reason']}")
+    not_evaluated = sum(
+        sum((result[p].get("skipped_constraints") or {}).values()) for p in ("nist_pass", "o4r_pass"))
+    if not_evaluated:
+        extra.append(f"{not_evaluated} constraint check(s) NOT evaluated (see report)")
     suffix = f"  [{'; '.join(extra)}]" if extra else ""
     print(f"{tag} {f}  (nist={nist}, o4r={o4r}){suffix}")
 
