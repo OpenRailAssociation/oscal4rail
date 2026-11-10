@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 DB Systel GmbH
+# SPDX-License-Identifier: Apache-2.0
 """Reference sketch: consume an OSCAL4Rail change report and route a reaction.
 
 NOT a product and NOT part of the framework. This is an illustrative sketch of how a
@@ -42,6 +44,12 @@ def _prop(props, name, default=None):
     return next((p["value"] for p in props or [] if p.get("name") == name), default)
 
 
+def _gap_ids(mapping: dict, summary: str) -> list[str]:
+    """Every control id listed in a NIST gap-summary, across all its entries."""
+    entries = mapping.get(summary, {}).get("unmapped-controls", [])
+    return [cid for entry in entries for cid in entry.get("with-ids", [])]
+
+
 def react(control_id: str, category: str, changed_field: str, props: list) -> bool:
     """Derive and PRINT a reaction. Returns True if this change should gate.
 
@@ -82,14 +90,13 @@ def main() -> int:
         tgt = mapping.get("target-resource", {}).get("href", "?")
         print(f"Change report: {src} -> {tgt}")
         # existence changes live in the NIST gap-summaries, not in maps
-        for c in mapping.get("source-gap-summary", {}).get("unmapped-controls", []):
-            total += 1
-            if react(c["with-ids"][0], "removed", "control-existence", None):
-                gating = True
-        for c in mapping.get("target-gap-summary", {}).get("unmapped-controls", []):
-            total += 1
-            if react(c["with-ids"][0], "added", "control-existence", None):
-                gating = True
+        # (one entry may list several ids in `with-ids`; each id is one change)
+        for summary, category in (("source-gap-summary", "removed"),
+                                  ("target-gap-summary", "added")):
+            for cid in _gap_ids(mapping, summary):
+                total += 1
+                if react(cid, category, "control-existence", None):
+                    gating = True
         # two-sided changes are maps
         for m in mapping.get("maps", []):
             total += 1
