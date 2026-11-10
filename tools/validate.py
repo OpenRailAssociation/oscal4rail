@@ -189,6 +189,40 @@ def _load_catalog_controls(catalog_path: Path) -> tuple[set[str], str | None, st
     return ids, (str(version) if version is not None else None), (str(cat_uuid) if cat_uuid is not None else None)
 
 
+def catalog_consistency(data: dict) -> list[str]:
+    """Catalog invariants that JSON Schema cannot express (catalog-format.md section 2).
+
+    - Control ids are unique across the whole catalog, at any depth. The id is
+      the stable identity every diff, rule and mapping refers to.
+    - The chapter encoded in a control id equals the `source-chapter` prop of the
+      same control: `<regulation>-<source-chapter>[-<context>]`. This is the
+      cross-check that ids were derived from chapters, not from pages or by hand.
+    """
+    errors: list[str] = []
+    seen: set[str] = set()
+    reported: set[str] = set()
+    for control in iter_controls(data):
+        cid = control.get("id")
+        if not isinstance(cid, str):
+            continue  # missing/invalid id is a schema error
+        if cid in seen and cid not in reported:
+            errors.append(f"[control {cid}] duplicate control id; ids MUST be unique within a catalog")
+            reported.add(cid)
+        seen.add(cid)
+        props = control.get("props")
+        for prop in props if isinstance(props, list) else []:
+            if not isinstance(prop, dict) or prop.get("name") != "source-chapter":
+                continue
+            chapter = str(prop.get("value", ""))
+            encoded = re.fullmatch(
+                rf"[a-z0-9]+(?:-[a-z0-9]+)*-{re.escape(chapter)}(?:-[a-z0-9-]+)?", cid)
+            if not chapter or not encoded:
+                errors.append(
+                    f"[control {cid}] id does not encode source-chapter '{chapter}'; expected "
+                    f"'<regulation>-{chapter}[-<context>]' (catalog-format.md section 2)")
+    return errors
+
+
 def ruleset_consistency(data: dict, rule_set_path: Path) -> list[str]:
     """ADR-018 §10 cross-artifact contract, enforced as errors."""
     errs: list[str] = []
@@ -361,6 +395,9 @@ def validate_file(path: Path, strict: bool, foreign: bool = False) -> dict:
             result["o4r_pass"]["reason"] = f"O4R schema file missing: {o4r_schema}"
         else:
             o4r_errors, result["o4r_pass"]["skipped_constraints"] = _run_schema(o4r_schema, data)
+            # catalog: invariants JSON Schema cannot express (catalog-format.md §2)
+            if subtype == "catalog":
+                o4r_errors = o4r_errors + catalog_consistency(data)
             # rule-set: add the ADR-018 §10 cross-artifact consistency checks
             if model == "rule-set":
                 o4r_errors = o4r_errors + ruleset_consistency(data, path)
