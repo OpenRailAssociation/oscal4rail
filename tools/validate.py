@@ -34,7 +34,7 @@ import sys
 from pathlib import Path
 
 import jsonschema
-import yaml  # noqa: F401 - kept so this module merges cleanly with the YAML report writer (#89)
+import yaml
 from jsonschema import Draft7Validator
 
 from o4r_common import NIST_DIR, REPO_ROOT, iter_controls, pinned_oscal_version
@@ -199,7 +199,15 @@ def validate_file(path: Path, strict: bool) -> dict:
         "ok": False,
     }
 
-    data = load_data(path)
+    try:
+        data = load_data(path)
+    except (OSError, ValueError, yaml.YAMLError) as exc:  # JSONDecodeError is a ValueError
+        result["nist_pass"]["errors"] = [f"cannot read document: {exc}"]
+        return result
+    if not isinstance(data, dict):
+        found = "empty document" if data is None else f"top-level {type(data).__name__}"
+        result["nist_pass"]["errors"] = [f"not an OSCAL document: expected a mapping at the top level, found {found}"]
+        return result
 
     # ADR-018 §10: a document must not mix a catalog/profile and a rule-set.
     sep = separation_violation(data)
@@ -372,6 +380,8 @@ def _print_summary(result: dict, quiet: bool) -> None:
     o4r = result["o4r_pass"]["status"]
     tag = "✅" if result["ok"] else "❌"
     extra = []
+    if nist == "error" and result["nist_pass"]["errors"]:
+        extra.append(result["nist_pass"]["errors"][0])
     if result["oscal_version"]["match"] is False:
         extra.append("oscal-version mismatch (reported)")
     if o4r == "skipped":

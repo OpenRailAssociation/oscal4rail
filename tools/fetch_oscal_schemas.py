@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 DB Systel GmbH
+# SPDX-License-Identifier: Apache-2.0
 """Fetch NIST OSCAL base schemas reproducibly from a pinned release.
 
 Implements OSCAL4Rail ADR-008: the NIST base schemas are never hand-copied.
