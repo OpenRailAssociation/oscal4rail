@@ -98,9 +98,23 @@ OSCAL4Rail uses the NIST status words on both layers wherever the meaning is the
    | `superseded` | `superseded` | identical |
    | `withdrawn` | `withdrawn` | identical |
 
-   `reserved`, `conditional` and `modified` are NIST values and therefore valid on a
-   control. OSCAL4Rail assigns them no meaning of its own. `modified` is not needed: what
-   changed between versions is the change report.
+   **An OSCAL4Rail catalog uses exactly these four control status values:**
+   `experimental`, `deprecated`, `superseded`, `withdrawn`. The validator rejects any
+   other value on a control of an OSCAL4Rail catalog. Each of the four has a defined
+   meaning in the change layer.
+
+   **The three remaining NIST values are not used**, each for its own reason:
+
+   | NIST value | NIST meaning | Why OSCAL4Rail does not use it |
+   |---|---|---|
+   | `reserved` | "a placeholder for a future control" | A placeholder has no requirement text. Every OSCAL4Rail control carries a verbatim statement (`catalog-format.md` §3). |
+   | `conditional` | "only applicable under certain conditions described in the remarks" | Conditions are stated machine-readably, through applicability (L1) and `applies-when` (L2). Conditions as free text in remarks would be a step back. |
+   | `modified` | "updated from a prior version, as described in the remarks" | That is what the change report states, per control and machine-readably ([ADR-019](./ADR-019-change-layer-vcs-native.md)). |
+
+   Leaving them out does not break compatibility. NIST prescribes none of the values, so a
+   catalog that uses a subset stays valid OSCAL. The restriction applies to OSCAL4Rail
+   catalogs only; a foreign upstream catalog may use any NIST value. If an owner later
+   needs one of the three, it can be added without breaking existing catalogs.
 
 3. **Control status and rule status are two separate lifecycles.** The control status
    says what happened to the catalog entry. The rule status (L2, ADR-018) says whether the
@@ -157,6 +171,8 @@ is the owner's declaration.
 - (+) NIST-native on L1, works without L2, ids stay resolvable.
 - (+) One vocabulary across the framework, defined by NIST.
 - (+) Keeps the layer boundary: validity stays in L2.
+- (+) A closed set of four values, each with a defined meaning; no value that is allowed
+  but means nothing.
 - (−) A breaking rename in the rules layer (`draft` → `experimental`).
 - (−) Publication needs a comparison with the previous version.
 
@@ -175,7 +191,8 @@ is the owner's declaration.
   changed to `experimental`.
 - **Catalogs grow** and keep retired controls. Readers and renderers must show the status
   so a retired control is not mistaken for a current one.
-- **Stricter than NIST** on the statement of a retired control.
+- **Stricter than NIST** in two places: a retired control keeps its statement, and only
+  four of the NIST status values are permitted.
 - **A new check with a new input:** "no id disappears" needs the previous published
   version. What counts as "published" (a Git tag, a ref) must be defined.
 - **Two lifecycles can disagree**, and the framework will deliberately not say so.
