@@ -11,6 +11,24 @@ SPDX-License-Identifier: Apache-2.0
 
 **Deciders:** Jens Grote
 
+> **Proposed amendment (2026-11-11, [ADR-022](./ADR-022-lifecycle-nist-status.md); takes
+> effect when ADR-022 is accepted).**
+> - **`removed` is no longer a change category** (D3, D7). A control is never deleted; it
+>   is retired with the NIST control prop `status`. A control id that is missing from the
+>   new state is an error at publication, not a change: the reference CLI stops and writes
+>   no report. The `source-gap-summary` is therefore not used.
+> - **Control status transitions are changes in their own right** and are detected without
+>   a rule-set, because the status is stated on the control (L1). Rule status transitions
+>   are detected as before, with a rule-set (L2). The `changed-field` prop names the layer
+>   that changed.
+> - **The lifecycle words are the NIST words:** the transition into force is from
+>   `experimental` (formerly `draft`).
+> - **No cross-layer check** is added. Whether a control status and a rule status fit
+>   together is content and stays outside the tools, as D8 already states.
+>
+> One-sided changes reduce to newly added controls. How a report stays a valid NIST mapping
+> when it contains only additions, or no change at all, is decided separately (#72).
+
 > **Relationship to prior ADRs.** [ADR-007](./ADR-007-tooling-foundation.md) named Change
 > Detection as "Layer 3: structured diff between Catalog versions" and listed
 > `oscal-deep-diff` (NIST, TypeScript) as a candidate backend. This ADR **refines** that:

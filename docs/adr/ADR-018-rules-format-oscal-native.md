@@ -6,6 +6,17 @@
 
 **Deciders:** Jens Grote
 
+> **Proposed amendment (2026-11-11, [ADR-022](./ADR-022-lifecycle-nist-status.md); takes
+> effect when ADR-022 is accepted).** The words of the fixed `lifecycle` axis of the rule
+> status (Decision point 8) are aligned with the NIST control status values: **`draft`
+> becomes `experimental`**; `deprecated`, `superseded` and `withdrawn` are already the NIST
+> words; `active` stays, because NIST has no word for it. The axis then reads
+> `experimental | active | deprecated | superseded | withdrawn`. Nothing else in this ADR
+> changes: the rule status stays an owner-declared label bound to that axis, validity is
+> stated in the rules layer, and the successor of a rule stays the field `superseded-by`.
+> The rule status is a lifecycle of its own, separate from the control status that ADR-022
+> introduces on the control layer; neither is derived from the other.
+
 > **Relationship to prior ADRs.** [ADR-016](./ADR-016-rules-format-decision-criteria.md)
 > (Accepted) fixed the evaluation grid, scored all nine candidate formats, and concluded
 > **build the own L2 format, do not adopt** an existing one. [ADR-014](./ADR-014-rules-layer-placement.md)
