@@ -21,6 +21,8 @@ catalog:
     version: '1.0'
     oscal-version: 1.2.3
     props:
+    - name: country
+      value: XX
     - name: language
       value: de
       remarks: Primary language of titles; per-language prose is tagged on each statement part.
