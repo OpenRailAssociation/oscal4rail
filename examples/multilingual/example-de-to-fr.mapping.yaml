@@ -27,7 +27,7 @@ mapping-collection:
   provenance:
     method: human
     matching-rationale: semantic
-    status: under-development
+    status: draft
     mapping-description: Equivalence of the same requirement across two language versions whose chapter numbering diverges.
   mappings:
   - uuid: 1a2b3c4d-0005-4000-8000-000000000005
