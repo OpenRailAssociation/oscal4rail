@@ -46,7 +46,7 @@ catalog:
           endpoint to comply; partial satisfaction is any remaining deprecated endpoint.
       props:
       - name: source-chapter
-        value: '1'
+        value: '1.1'
       - name: compliance-level
         ns: https://github.com/OpenRailAssociation/oscal4rail/ns
         value: fully-satisfied
