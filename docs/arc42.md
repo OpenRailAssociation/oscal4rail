@@ -556,6 +556,7 @@ are kept for readability; the authoritative text is the linked ADR file.
 | [ADR-017](adr/ADR-017-multilingual-reference-language.md) | Multilingual Model: same rule across languages, optional `reference-language` marker | Accepted | 2026-10-27 |
 | [ADR-018](adr/ADR-018-rules-format-oscal-native.md) | Rules-Layer Format — OSCAL-native via `parameter/constraint/test` + Control Mapping; fields convention, Metapath Subset v1, status lifecycle axis | Accepted | 2026-11-05 |
 | [ADR-019](adr/ADR-019-change-layer-vcs-native.md) | Change Impact Layer (L3) — VCS-native interpretation; the report is an OSCAL artifact (NIST Mapping Model) under the OSCAL4Rail schema; tools validate form not content | Accepted | 2026-11-05 |
+| [ADR-022](adr/ADR-022-lifecycle-nist-status.md) | Lifecycle: retire controls with the NIST `status` values, never delete them; control status and rule status are separate | Proposed | 2026-11-11 |
 
 > **Note.** The Rules-Layer (Layer 2) format decision is settled: [ADR-016](adr/ADR-016-rules-format-decision-criteria.md)
 > fixed the evaluation grid and concluded "build the own format, do not adopt";
