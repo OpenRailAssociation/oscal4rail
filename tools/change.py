@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 DB Systel GmbH
+# SPDX-License-Identifier: Apache-2.0
 """OSCAL4Rail Change Impact — reference CLI (MVP).
 
 Compares two states of the same rule catalog and emits an OSCAL `mapping-collection`
@@ -31,6 +33,8 @@ import uuid as _uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
+from o4r_common import AmbiguousScalarError, load_text
+
 try:
     import yaml
 except ImportError:
@@ -52,7 +56,7 @@ def _load_source(spec: str, git_ref: str | None, git_path: str | None) -> dict:
         )
         if raw.returncode != 0:
             sys.exit(f"git show {git_ref}:{git_path} failed: {raw.stderr.strip()}")
-        return yaml.safe_load(raw.stdout)
+        return load_text(raw.stdout, source=f"{git_ref}:{git_path}")
     return load_document(Path(spec))
 
 
@@ -296,6 +300,13 @@ def main() -> int:
     if not (git_mode or file_mode):
         ap.error("provide either '<base> <head> <catalog-path>' (Git) or '--from --to' (file)")
 
+    try:
+        return _run(args, git_mode)
+    except AmbiguousScalarError as exc:
+        sys.exit(f"error: {exc}")
+
+
+def _run(args, git_mode: bool) -> int:
     if git_mode:
         old_cat = _load_source(None, args.base, args.catalog_path)
         new_cat = _load_source(None, args.head, args.catalog_path)

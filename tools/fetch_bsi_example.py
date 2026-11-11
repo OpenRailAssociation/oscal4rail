@@ -1,6 +1,6 @@
+#!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 DB Systel GmbH
 # SPDX-License-Identifier: Apache-2.0
-#!/usr/bin/env python3
 """Fetch the BSI example upstream catalog reproducibly from a pinned commit.
 
 This is the example-side analogue of tools/fetch_oscal_schemas.py (ADR-008):
